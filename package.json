@@ -2,7 +2,17 @@
   "name": "innowacje2026",
   "version": "0.1.0",
   "private": true,
+  "proxy": "https://192.168.66.24",
   "dependencies": {
+    "@lsg/components": "./biblioteki/components-17.10.0.tgz",
+    "@lsg/icons": "./biblioteki/icons-0.5.0.tgz",
+    "@lsg/plugin": "./biblioteki/plugin-0.4.1.tgz",
+    "@lsg/polyfills": "./biblioteki/polyfills-1.1.0.tgz",
+    "@lsg/shared": "./biblioteki/shared-1.14.0.tgz",
+    "@lsg/ssr": "./biblioteki/ssr-0.0.3.tgz",
+    "@lsg/utils": "./biblioteki/utils-3.1.3.tgz",
+    "@lsg/webcomponents": "./biblioteki/webcomponents-7.0.1.tgz",
+    "@lsg/webcomponents-react": "./biblioteki/webcomponents-react-0.1.9.tgz",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -16,6 +26,10 @@
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
+  },
+  "overrides": {
+    "@lsg/icons": "./biblioteki/icons-0.5.0.tgz",
+    "@lsg/shared": "./biblioteki/shared-1.14.0.tgz"
   },
   "scripts": {
     "start": "react-scripts start",
