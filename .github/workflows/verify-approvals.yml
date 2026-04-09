@@ -1,0 +1,25 @@
+name: "Verify Code Review"
+
+# This workflow triggers on PR creation, new commits (synchronize), 
+# and every time a review is submitted.
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  check-approvals:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Required Approval
+        uses: peternied/required-approval@v1.3
+        with:
+          # Automatically provided by GitHub, no need to manually define this secret
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+          # List of GitHub usernames allowed to approve the PR (comma-separated, no spaces)
+          required-approvers-list: raj,po
+          
+          # Minimum number of approvals required from the list above to pass the check
+          min-required: 1
