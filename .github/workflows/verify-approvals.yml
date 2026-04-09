@@ -19,7 +19,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           
           # List of GitHub usernames allowed to approve the PR (comma-separated, no spaces)
-          required-approvers-list: raj,po
+          required-approvers-list: raajon,ppepito13
           
           # Minimum number of approvals required from the list above to pass the check
           min-required: 1
