@@ -1,20 +1,16 @@
-import React from 'react';
-import './App.css';
-import {
-    Spinner
-} from "@lsg/components";
-
+import { Spinner } from "@lsg/components";
+import Layout from "./components/Layout";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <Spinner />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-      </header>
-    </div>
+    <Layout>
+      <h1>Basic Layout</h1>
+
+      <Spinner />
+      <p>
+        Edit <code>src/App.tsx</code> and save to reload.
+      </p>
+    </Layout>
   );
 }
 
