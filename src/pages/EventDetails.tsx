@@ -1,0 +1,1 @@
+export default function EventDetails() { return <div>EventDetails Placeholder</div>; }

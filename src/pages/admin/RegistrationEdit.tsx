@@ -1,0 +1,1 @@
+export default function RegistrationEdit() { return <div>Admin RegistrationEdit Placeholder</div>; }

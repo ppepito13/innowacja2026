@@ -1,0 +1,1 @@
+export default function UserNew() { return <div>Admin UserNew Placeholder</div>; }
