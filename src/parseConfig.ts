@@ -4,6 +4,6 @@ Parse.initialize(
     process.env.REACT_APP_PARSE_APP_ID!,
     ''
 );
-Parse.serverURL = process.env.REACT_APP_PARSE_SERVER_URL!;
+Parse.serverURL = '/parse';
 
 export default Parse;
