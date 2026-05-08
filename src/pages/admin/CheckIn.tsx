@@ -1,0 +1,1 @@
+export default function CheckIn() { return <div>Admin CheckIn Placeholder</div>; }

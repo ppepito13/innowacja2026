@@ -1,0 +1,1 @@
+export default function Registrations() { return <div>Admin Registrations Placeholder</div>; }

@@ -1,0 +1,1 @@
+export default function Account() { return <div>Admin Account Placeholder</div>; }

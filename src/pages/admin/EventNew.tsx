@@ -1,0 +1,1 @@
+export default function EventNew() { return <div>Admin EventNew Placeholder</div>; }
