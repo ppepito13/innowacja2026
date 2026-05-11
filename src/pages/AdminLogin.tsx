@@ -1,0 +1,1 @@
+export default function AdminLogin() { return <div>AdminLogin Placeholder</div>; }
