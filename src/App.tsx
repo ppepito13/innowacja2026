@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { parseService, ParseObject } from './services/parseService';
 import Layout from './components/Layout';
 
 // Public pages
@@ -17,6 +19,12 @@ import Users from './pages/admin/Users';
 import UserNew from './pages/admin/UserNew';
 import UserEdit from './pages/admin/UserEdit';
 import Account from './pages/admin/Account';
+
+const Test = () => {
+  const [events, setEvents] = useState<ParseObject[]>([]);
+  useEffect(() => { parseService.getAll('TestEvent').then(setEvents); }, []);
+  return <pre>{JSON.stringify(events, null, 2)}</pre>;
+};
 
 function App() {
   return (
@@ -38,6 +46,7 @@ function App() {
           {/* Public Routes */}
           <Route exact path="/login" component={AdminLogin} />
           <Route exact path="/events/:slug" component={EventDetails} />
+          <Route exact path="/test" component={Test} />
           <Route exact path="/" component={Home} />
         </Switch>
       </Layout>
