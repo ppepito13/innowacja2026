@@ -1,6 +1,4 @@
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { parseService, ParseObject } from './services/parseService';
 import Layout from './components/Layout';
 
 // Public pages
@@ -20,11 +18,8 @@ import UserNew from './pages/admin/UserNew';
 import UserEdit from './pages/admin/UserEdit';
 import Account from './pages/admin/Account';
 
-const Test = () => {
-  const [events, setEvents] = useState<ParseObject[]>([]);
-  useEffect(() => { parseService.getAll('TestEvent').then(setEvents); }, []);
-  return <pre>{JSON.stringify(events, null, 2)}</pre>;
-};
+// Test page
+import Test from "./pages/Test";
 
 function App() {
   return (
