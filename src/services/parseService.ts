@@ -6,7 +6,6 @@ export interface ParseObject {
     objectId?: string;
     createdAt?: string;
     updatedAt?: string;
-    [key: string]: unknown;
 }
 
 export interface ParseResponse<T> {

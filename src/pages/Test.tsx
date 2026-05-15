@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { parseService, ParseObject } from '../services/parseService';
+import { parseService } from '../services/parseService';
+import { Event } from '../types/types';
 
 function Test() {
-    const [events, setEvents] = useState<ParseObject[]>([]);
+    const [events, setEvents] = useState<Event[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        parseService.getAll('TestEvent')
+        parseService.getAll<Event>('TestEvent')
             .then(setEvents)
             .catch(err => setError(err.message));
     }, []);
