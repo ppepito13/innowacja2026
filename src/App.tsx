@@ -18,6 +18,9 @@ import UserNew from './pages/admin/UserNew';
 import UserEdit from './pages/admin/UserEdit';
 import Account from './pages/admin/Account';
 
+// Test page
+import Test from "./pages/Test";
+
 function App() {
   return (
     <Router>
@@ -38,6 +41,7 @@ function App() {
           {/* Public Routes */}
           <Route exact path="/login" component={AdminLogin} />
           <Route exact path="/events/:slug" component={EventDetails} />
+          <Route exact path="/test" component={Test} />
           <Route exact path="/" component={Home} />
         </Switch>
       </Layout>
