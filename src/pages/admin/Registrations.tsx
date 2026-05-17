@@ -21,7 +21,7 @@ import Icon from '../../components/Icon';
 
 type RegistrationParams = { eventId: string };
 
-const RowsPerPage = 16;
+const RowsPerPage = 8;
 
 export default function Registrations() {
   const { eventId } = useParams<RegistrationParams>();
