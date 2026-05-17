@@ -30,9 +30,9 @@ export default function EventDetails() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Image Section */}
         <section className="mb-12 rounded-xl overflow-hidden h-64 md:h-96 relative bg-gray-800 shadow-2xl">
-          <img 
-            src={event.heroImageUrl} 
-            alt={event.title} 
+          <img
+            src={event.heroImageUrl}
+            alt={event.title}
             className="w-full h-full object-cover"
           />
         </section>
@@ -59,9 +59,9 @@ export default function EventDetails() {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-gray-800/40 rounded-2xl p-8 shadow-lg backdrop-blur-sm border border-gray-700/50">
-              <div 
+              <div
                 className="prose prose-invert max-w-none text-gray-300 leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: event.descriptionHtml }}
               />
@@ -70,8 +70,71 @@ export default function EventDetails() {
 
           {/* Right Column: Form */}
           <section>
-            <div className="bg-gray-800/50 rounded-xl p-8 min-h-[400px]">
-              Form Area Placeholder
+            <div className="bg-gray-800/80 rounded-2xl p-8 shadow-xl border border-gray-700/50 sticky top-8">
+              <h2 className="text-2xl font-bold mb-6 text-white">Register Now</h2>
+              <form className="flex flex-col gap-5">
+                <div>
+                  <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
+                  <input
+                    type="text"
+                    id="fullName"
+                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+                    placeholder="John Doe"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    id="email"
+                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+                    placeholder="john@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="dropdown" className="block text-sm font-medium text-gray-300 mb-1">Dropdown</label>
+                  <div className="relative">
+                    <select
+                      id="dropdown"
+                      defaultValue=""
+                      className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors appearance-none"
+                    >
+                      <option value="" disabled hidden>Select option</option>
+
+                      <option value="option1">Option 1</option>
+                      <option value="option2">Option 2</option>
+                      <option value="option3">Option 3</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 mt-2">
+                  <div className="flex items-center h-5">
+                    <input
+                      id="consent"
+                      type="checkbox"
+                      className="w-4 h-4 rounded bg-gray-900 border-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
+                    />
+                  </div>
+                  <label htmlFor="consent" className="text-sm text-gray-400 leading-tight cursor-pointer">
+                    I consent to the processing of my personal data for the purpose of event registration and communication.
+                  </label>
+                </div>
+
+                <button
+                  type="button"
+                  className="w-full mt-4 py-3 px-4 rounded-lg text-white font-bold text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg bg-indigo-500 hover:bg-indigo-600"
+                >
+                  Submit Registration
+                </button>
+              </form>
             </div>
           </section>
         </div>
