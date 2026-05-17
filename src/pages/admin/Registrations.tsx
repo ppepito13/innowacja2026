@@ -1,20 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useHistory } from 'react-router';
 import {
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  Eye,
-  MoreHorizontal,
-  Pencil,
-  X,
-  XCircle,
-  Clock,
-} from 'lucide-react';
+  LuCircleCheck,
+  LuChevronLeft,
+  LuChevronRight,
+  LuDownload,
+  LuEye,
+  LuEllipsis,
+  LuPencil,
+  LuX,
+  LuCircleX,
+  LuClock,
+} from 'react-icons/lu';
 import { Button, InputDatepicker, InputTextfieldStateful } from '@lsg/components';
 import { parseService, createPointer } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
+
+import Icon from '../../components/Icon';
 
 type Params = { eventId: string };
 
@@ -32,9 +34,9 @@ const formatColumnName = (columnName: string) =>
 const renderRegistrationStatus = (status: Registration['status']) => {
   switch (status) {
     case 'approved':
-      return <CheckCircle2 size={14} />;
+      return <Icon icon={LuCircleCheck} size={14} />;
     case 'pending':
-      return <Clock size={14} />;
+      return <Icon icon={LuClock} size={14} />;
     default:
       return null;
   }
@@ -208,7 +210,7 @@ export default function Registrations() {
 
           <Button onClick={() => exportRegistrations()} disabled={registrations.length === 0}>
             <span className="flex flex-row items-center gap-2 text-lg">
-              <Download size={16} />
+              <Icon icon={LuDownload} />
               <span>Export</span>
             </span>
           </Button>
@@ -301,7 +303,7 @@ export default function Registrations() {
                           className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
                           onClick={() => setSelectedRegistration(registration)}
                         >
-                          <Eye size={14} />
+                          <Icon icon={LuEye} size={14} />
                         </button>
 
                         <button
@@ -312,7 +314,7 @@ export default function Registrations() {
                             )
                           }
                         >
-                          <Pencil size={14} />
+                          <Icon icon={LuPencil} size={14} />
                         </button>
 
                         <button
@@ -327,7 +329,7 @@ export default function Registrations() {
                           }
                           disabled={registration.status === 'approved'}
                         >
-                          <MoreHorizontal size={14} />
+                          <Icon icon={LuEllipsis} size={14} />
                         </button>
                       </div>
 
@@ -337,7 +339,7 @@ export default function Registrations() {
                             className="flex w-full items-center gap-2 px-3 py-2 text-xs border border-b-0 rounded-t-xl bg-white hover:bg-background"
                             onClick={() => updateStatus(registration.objectId, 'approved')}
                           >
-                            <CheckCircle2 size={14} />
+                            <Icon icon={LuCircleCheck} size={14} />
                             <span>Approve Registration</span>
                           </button>
 
@@ -345,7 +347,7 @@ export default function Registrations() {
                             className="flex w-full items-center gap-2 px-3 py-2 text-xs border rounded-b-xl bg-white hover:bg-background"
                             onClick={() => updateStatus(registration.objectId, 'pending')}
                           >
-                            <XCircle size={14} />
+                            <Icon icon={LuCircleX} size={14} />
                             <span>Reject Registration</span>
                           </button>
                         </div>
@@ -369,14 +371,14 @@ export default function Registrations() {
               className="rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
               onClick={() => setPage((page) => Math.max(1, page - 1))}
             >
-              <ChevronLeft size={14} />
+              <Icon icon={LuChevronLeft} size={14} />
             </button>
 
             <button
               className="rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
               onClick={() => setPage((page) => Math.min(totalPages, page + 1))}
             >
-              <ChevronRight size={14} />
+              <Icon icon={LuChevronRight} size={14} />
             </button>
           </div>
         </div>
@@ -398,7 +400,7 @@ export default function Registrations() {
                   className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white hover:bg-background"
                   onClick={() => setSelectedRegistration(null)}
                 >
-                  <X size={14} />
+                  <Icon icon={LuX} size={14} />
                 </button>
               </div>
 

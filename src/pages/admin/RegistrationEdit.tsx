@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, useHistory } from 'react-router';
-import { Save, ArrowLeft } from 'lucide-react';
+import { LuSave, LuArrowLeft } from 'react-icons/lu';
 import { Button, InputTextfieldStateful } from '@lsg/components';
 import { parseService } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
+
+import Icon from '../../components/Icon';
 
 type Params = {
   eventId: string;
@@ -76,7 +78,7 @@ export default function RegistrationEdit() {
           className="w-9 h-9 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
           onClick={() => history.goBack()}
         >
-          <ArrowLeft size={16} />
+          <Icon icon={LuArrowLeft} />
         </button>
       </div>
 
@@ -103,7 +105,7 @@ export default function RegistrationEdit() {
 
         <Button className="scale-75" onClick={saveRegistration} disabled={saving}>
           <span className="flex flex-row items-center gap-2">
-            <Save size={16} />
+            <Icon icon={LuSave} />
             <span>{saving ? 'Saving...' : 'Save'}</span>
           </span>
         </Button>
