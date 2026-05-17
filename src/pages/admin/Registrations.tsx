@@ -184,7 +184,7 @@ export default function Registrations() {
 
   return (
     <>
-      <div className="flex flex-col bg-white px-8 py-4 rounded-2xl">
+      <div className="flex flex-col bg-white px-8 py-4 rounded-2xl sm:min-w-[1024px]">
         {/* HEADER */}
         <div className="flex flex-row items-center justify-between">
           <div className="flex flex-col">
