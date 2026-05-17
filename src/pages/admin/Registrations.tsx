@@ -15,35 +15,16 @@ import {
 import { Button, InputDatepicker, InputTextfieldStateful } from '@lsg/components';
 import { parseService, createPointer } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
+import { formatDate, formatColumnName, formatBoolean } from '../../utils/formatters';
 
 import Icon from '../../components/Icon';
 
-type Params = { eventId: string };
+type RegistrationParams = { eventId: string };
 
-const formatDate = (date: string) =>
-  new Intl.DateTimeFormat('pl-PL', { dateStyle: 'short', timeStyle: 'short' }).format(
-    new Date(date),
-  );
-
-const formatColumnName = (columnName: string) =>
-  columnName
-    .replace(/([A-Z])/g, ' $1')
-    .trim()
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-
-const renderRegistrationStatus = (status: Registration['status']) => {
-  switch (status) {
-    case 'approved':
-      return <Icon icon={LuCircleCheck} size={14} />;
-    case 'pending':
-      return <Icon icon={LuClock} size={14} />;
-    default:
-      return null;
-  }
-};
+const RowsPerPage = 16;
 
 export default function Registrations() {
-  const { eventId } = useParams<Params>();
+  const { eventId } = useParams<RegistrationParams>();
   const history = useHistory();
 
   const [event, setEvent] = useState<Event | null>(null);
@@ -57,8 +38,6 @@ export default function Registrations() {
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
   const [openedActionId, setOpenedActionId] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
-
-  const rowsPerPage = 16;
 
   useEffect(() => {
     setLoading(true);
@@ -128,13 +107,24 @@ export default function Registrations() {
     });
   }, [registrations, search, dateFrom, dateTo]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / RowsPerPage));
 
   const paginated = useMemo(() => {
-    const firstRegistration = (page - 1) * rowsPerPage;
+    const firstRegistration = (page - 1) * RowsPerPage;
 
-    return filtered.slice(firstRegistration, firstRegistration + rowsPerPage);
+    return filtered.slice(firstRegistration, firstRegistration + RowsPerPage);
   }, [filtered, page]);
+
+  const renderStatus = (status: Registration['status']) => {
+    switch (status) {
+      case 'approved':
+        return <Icon icon={LuCircleCheck} size={14} />;
+      case 'pending':
+        return <Icon icon={LuClock} size={14} />;
+      default:
+        return null;
+    }
+  };
 
   const updateStatus = async (registrationId: string, status: Registration['status']) => {
     try {
@@ -281,19 +271,8 @@ export default function Registrations() {
                     {columns.map((column) => (
                       <td key={column} className="px-4 py-2 text-xs sm:text-sm text-center">
                         {column === 'status'
-                          ? renderRegistrationStatus(registration.status)
-                          : (() => {
-                              const value = getCellValue(registration, column);
-
-                              switch (value) {
-                                case 'true':
-                                  return 'Yes';
-                                case 'false':
-                                  return 'No';
-                                default:
-                                  return value;
-                              }
-                            })()}
+                          ? renderStatus(registration.status)
+                          : formatBoolean(getCellValue(registration, column))}
                       </td>
                     ))}
 
@@ -413,7 +392,7 @@ export default function Registrations() {
                 {Object.entries(selectedRegistration.formData ?? {}).map(([key, value]) => (
                   <div key={key} className="flex gap-2 items-center">
                     <span className="font-semibold">{formatColumnName(key)}:</span>
-                    {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}
+                    {formatBoolean(String(value))}
                   </div>
                 ))}
               </div>

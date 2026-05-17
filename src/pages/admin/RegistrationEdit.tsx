@@ -4,22 +4,17 @@ import { LuSave, LuArrowLeft } from 'react-icons/lu';
 import { Button, InputTextfieldStateful } from '@lsg/components';
 import { parseService } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
+import { formatColumnName } from '../../utils/formatters';
 
 import Icon from '../../components/Icon';
 
-type Params = {
+type RegistrationEditParams = {
   eventId: string;
   registrationId: string;
 };
 
-const formatColumnName = (columnName: string) =>
-  columnName
-    .replace(/([A-Z])/g, ' $1')
-    .trim()
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-
 export default function RegistrationEdit() {
-  const { eventId, registrationId } = useParams<Params>();
+  const { eventId, registrationId } = useParams<RegistrationEditParams>();
   const history = useHistory();
 
   const [event, setEvent] = useState<Event | null>(null);
