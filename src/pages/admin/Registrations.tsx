@@ -58,16 +58,10 @@ export default function Registrations() {
   }, [eventId]);
 
   const columns = useMemo(() => {
-    const formDataKeys = new Set<string>();
+    const formConfigKeys = Object.keys(event?.formConfig ?? {});
 
-    registrations.forEach((registration) => {
-      Object.keys(registration.formData ?? {}).forEach((key) => {
-        formDataKeys.add(key);
-      });
-    });
-
-    return ['createdAt', ...Array.from(formDataKeys), 'status'];
-  }, [registrations]);
+    return ['createdAt', ...formConfigKeys, 'status'];
+  }, [event]);
 
   const getCellValue = (registration: Registration, column: string): string => {
     if (column === 'createdAt') {

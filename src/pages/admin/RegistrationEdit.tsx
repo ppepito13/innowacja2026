@@ -79,12 +79,12 @@ export default function RegistrationEdit() {
 
       {/* FORM */}
       <div className="flex flex-col mt-4">
-        {Object.entries(formData).map(([key, value]) => (
+        {Object.keys(event?.formConfig ?? {}).map((key) => (
           <InputTextfieldStateful
             key={key}
             label={formatColumnName(key)}
             placeholder={formatColumnName(key)}
-            defaultValue={String(value ?? '')}
+            defaultValue={String(formData[key] ?? '')}
             onChange={(value) =>
               setFormData((previousData) => ({ ...previousData, [key]: String(value) }))
             }
