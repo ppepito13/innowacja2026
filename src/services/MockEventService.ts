@@ -15,7 +15,7 @@ export const getMockEvent = (): Event => {
         <li>test 3</li>
       </ul>
     `,
-    brandingHexColor: '#6366f1',
+    brandingHexColor: '#ffcc00',
     heroImageUrl: 'https://images.unsplash.com/photo-1682316953238-f1520b80618f?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   };
 };
