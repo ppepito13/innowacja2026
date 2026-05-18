@@ -5,6 +5,7 @@ import { Button, InputTextfieldStateful } from '@lsg/components';
 import { parseService } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
 import { formatColumnName } from '../../utils/formatters';
+import { useTranslation } from 'react-i18next';
 
 import Icon from '../../components/Icon';
 
@@ -14,6 +15,8 @@ type RegistrationEditParams = {
 };
 
 export default function RegistrationEdit() {
+  const { t } = useTranslation();
+
   const { eventId, registrationId } = useParams<RegistrationEditParams>();
   const history = useHistory();
 
@@ -51,11 +54,15 @@ export default function RegistrationEdit() {
   };
 
   if (loading) {
-    return <p className="p-8 text-primary/60">Loading data...</p>;
+    return <p className="p-8 text-primary/60">{t('registrationEdit.loading')}...</p>;
   }
 
   if (error) {
-    return <p className="p-8 text-red-600">Error: {error}</p>;
+    return (
+      <p className="p-8 text-red-600">
+        {t('registrationEdit.error')}: {error}
+      </p>
+    );
   }
 
   return (
@@ -63,7 +70,7 @@ export default function RegistrationEdit() {
       {/* HEADER */}
       <div className="flex flex-row items-center justify-between">
         <div className="flex flex-col">
-          <h1 className="text-3xl mb-0">Edit Registration</h1>
+          <h1 className="text-3xl mb-0">{t('registrationEdit.title')}</h1>
           <p className="text-lg mt-0 text-primary/75">
             {event?.title ?? eventId} #{registrationId}
           </p>
@@ -95,13 +102,17 @@ export default function RegistrationEdit() {
       {/* ACTIONS */}
       <div className="flex items-center justify-end mt-4 pb-4">
         <Button look="secondary" className="scale-75" onClick={() => history.goBack()}>
-          Cancel
+          {t('registrationEdit.cancel')}
         </Button>
 
         <Button className="scale-75" onClick={saveRegistration} disabled={saving}>
           <span className="flex flex-row items-center gap-2">
             <Icon icon={LuSave} />
-            <span>{saving ? 'Saving...' : 'Save'}</span>
+            <span>
+              {saving
+                ? `${t('registrationEdit.save.pending')}...`
+                : t('registrationEdit.save.idle')}
+            </span>
           </span>
         </Button>
       </div>

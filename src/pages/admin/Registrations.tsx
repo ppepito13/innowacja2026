@@ -16,6 +16,7 @@ import { Button, InputDatepicker, InputTextfieldStateful, ComplexTable } from '@
 import { parseService, createPointer } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
 import { formatDate, formatColumnName, formatBoolean } from '../../utils/formatters';
+import { useTranslation } from 'react-i18next';
 
 import Icon from '../../components/Icon';
 
@@ -24,6 +25,8 @@ type RegistrationParams = { eventId: string };
 const RowsPerPage = 8;
 
 export default function Registrations() {
+  const { t } = useTranslation();
+
   const { eventId } = useParams<RegistrationParams>();
   const history = useHistory();
 
@@ -175,11 +178,15 @@ export default function Registrations() {
   };
 
   if (loading) {
-    return <p className="p-8 text-primary/60">Loading data...</p>;
+    return <p className="p-8 text-primary/60">{t('registrations.loading')}...</p>;
   }
 
   if (error) {
-    return <p className="p-8 text-red-600">Error: {error}</p>;
+    return (
+      <p className="p-8 text-red-600">
+        {t('registrations.error')}: {error}
+      </p>
+    );
   }
 
   return (
@@ -188,14 +195,16 @@ export default function Registrations() {
         {/* HEADER */}
         <div className="flex flex-row items-center justify-between">
           <div className="flex flex-col">
-            <h1 className="text-3xl mb-0">Registrations - {event?.title ?? eventId}</h1>
-            <p className="text-lg mt-0 text-primary/75">View and manage event registrations.</p>
+            <h1 className="text-3xl mb-0">
+              {t('registrations.title', { title: event?.title ?? eventId })}
+            </h1>
+            <p className="text-lg mt-0 text-primary/75">{t('registrations.description')}</p>
           </div>
 
           <Button onClick={() => exportRegistrations()} disabled={registrations.length === 0}>
             <span className="flex flex-row items-center gap-2 text-lg">
               <Icon icon={LuDownload} />
-              <span>Export</span>
+              <span>{t('registrations.export')}</span>
             </span>
           </Button>
         </div>
@@ -204,8 +213,8 @@ export default function Registrations() {
         <div className="flex flex-row gap-4 mt-4">
           <InputTextfieldStateful
             className="flex-1"
-            label="Search"
-            placeholder="Search..."
+            label={t('registrations.filters.search')}
+            placeholder={`${t('registrations.filters.search')}...`}
             defaultValue={search}
             onChange={(value) => {
               setSearch(String(value));
@@ -214,7 +223,7 @@ export default function Registrations() {
           />
 
           <InputDatepicker
-            label="From"
+            label={t('registrations.filters.from')}
             value={dateFrom ?? ''}
             onChange={(value) => {
               setDateFrom(value ? new Date(value as any) : null);
@@ -223,7 +232,7 @@ export default function Registrations() {
           />
 
           <InputDatepicker
-            label="To"
+            label={t('registrations.filters.to')}
             value={dateTo ?? ''}
             onChange={(value) => {
               setDateTo(value ? new Date(value as any) : null);
@@ -235,7 +244,7 @@ export default function Registrations() {
         {/* TABLE */}
         {paginated.length === 0 ? (
           <div className="w-full rounded-xl border mt-4 py-10 text-center text-sm text-primary/50">
-            No registrations found
+            {t('registrations.noRegistrations')}
           </div>
         ) : (
           <ComplexTable
@@ -254,7 +263,7 @@ export default function Registrations() {
               })),
               {
                 name: 'actions',
-                title: 'Actions',
+                title: t('registrations.actions'),
                 formatter: (value: string) => {
                   const { objectId, status } = JSON.parse(value);
 
@@ -301,14 +310,14 @@ export default function Registrations() {
                             onClick={() => updateStatus(objectId, 'approved')}
                           >
                             <Icon icon={LuCircleCheck} size={14} />
-                            <span>Approve Registration</span>
+                            <span>{t('registrations.approve')}</span>
                           </button>
                           <button
                             className="flex w-full items-center gap-2 px-3 py-2 text-xs border rounded-b-xl bg-white hover:bg-background"
                             onClick={() => updateStatus(objectId, 'pending')}
                           >
                             <Icon icon={LuCircleX} size={14} />
-                            <span>Reject Registration</span>
+                            <span>{t('registrations.reject')}</span>
                           </button>
                         </div>
                       )}
@@ -332,7 +341,8 @@ export default function Registrations() {
         {/* PAGINATION */}
         <div className="mt-4 flex justify-between">
           <span className="text-xs text-primary/60 sm:text-sm">
-            Page {page} of {totalPages}
+            {t('registrations.pagination.current')} {page} {t('registrations.pagination.total')}{' '}
+            {totalPages}
           </span>
 
           <div className="flex gap-2">
@@ -365,7 +375,7 @@ export default function Registrations() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Registration details</h2>
+                <h2 className="text-xl font-semibold">{t('registrations.details.title')}</h2>
 
                 <button
                   className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white hover:bg-background"
@@ -376,9 +386,12 @@ export default function Registrations() {
               </div>
 
               <div className="space-y-3 text-sm">
-                <span className="font-semibold">Status:</span> {selectedRegistration.status}
+                <span className="font-semibold">Status:</span>{' '}
+                {selectedRegistration.status === 'approved'
+                  ? t('registrations.details.status.approved')
+                  : t('registrations.details.status.pending')}
                 <div className="flex gap-2 items-center">
-                  <span className="font-semibold">Date:</span>
+                  <span className="font-semibold">{t('registrations.details.date')}:</span>
                   {formatDate(selectedRegistration.createdAt)}
                 </div>
                 {Object.entries(selectedRegistration.formData ?? {}).map(([key, value]) => (

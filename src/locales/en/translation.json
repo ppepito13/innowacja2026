@@ -1,0 +1,40 @@
+{
+  "registrations": {
+    "title": "Registrations - {{title}}",
+    "description": "View and manage event registrations",
+    "export": "Export",
+    "filters": {
+      "search": "Search",
+      "from": "From",
+      "to": "To"
+    },
+    "noRegistrations": "No registrations found",
+    "approve": "Approve registration",
+    "reject": "Reject registration",
+    "details": {
+      "title": "Registration details",
+      "status": {
+        "approved": "Approved",
+        "pending": "Pending"
+      },
+      "date": "Date"
+    },
+    "actions": "Actions",
+    "pagination": {
+      "current": "Page",
+      "total": "of"
+    },
+    "loading": "Loading data",
+    "error": "Error"
+  },
+  "registrationEdit": {
+    "title": "Edit Registration",
+    "cancel": "Cancel",
+    "save": {
+      "idle": "Save",
+      "pending": "Saving"
+    },
+    "loading": "Loading data",
+    "error": "Error"
+  }
+}

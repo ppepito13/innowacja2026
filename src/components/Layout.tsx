@@ -1,12 +1,26 @@
-import React from "react";
+import React from 'react';
 
-import { Link } from "@lsg/components";
+import { Link } from '@lsg/components';
+import { useTranslation } from 'react-i18next';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
+const LANGUAGES = [
+  {
+    code: 'en',
+    label: 'English',
+  },
+  {
+    code: 'pl',
+    label: 'Polski',
+  },
+];
+
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const { i18n } = useTranslation();
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="flex items-center justify-between bg-primary text-secondary px-8 py-4">
@@ -18,12 +32,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </nav>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center p-8">
-        {children}
-      </main>
+      <main className="flex-1 flex flex-col items-center justify-center p-8">{children}</main>
 
-      <footer className="bg-primary text-secondary text-center px-8 py-4">
+      <footer className="flex flex-col items-center bg-primary text-secondary text-center px-8 py-4">
         <p>Projekt Innowacja 2026</p>
+
+        <div className="flex flex-row gap-4">
+          {LANGUAGES.map(({ code, label }) => (
+            <Link
+              key={code}
+              onClick={() => i18n.changeLanguage(code)}
+              className={i18n.language === code ? 'opacity-100' : 'opacity-50'}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
       </footer>
     </div>
   );

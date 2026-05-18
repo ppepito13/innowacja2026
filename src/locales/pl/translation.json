@@ -1,0 +1,40 @@
+{
+  "registrations": {
+    "title": "Rejestracje - {{title}}",
+    "description": "Sprawdź i zarządzaj rejestracjami wydarzenia",
+    "export": "Wyeksportuj",
+    "filters": {
+      "search": "Szukaj",
+      "from": "Od",
+      "to": "Do"
+    },
+    "noRegistrations": "Nie znaleziono rejestracji",
+    "approve": "Zatwierdź rejestrację",
+    "reject": "Odrzuć rejestrację",
+    "details": {
+      "title": "Szczegóły rejestracji",
+      "status": {
+        "approved": "Zatwierdzona",
+        "pending": "Oczekująca"
+      },
+      "date": "Data"
+    },
+    "actions": "Czynności",
+    "pagination": {
+      "current": "Strona",
+      "total": "z"
+    },
+    "loading": "Ładowanie danych",
+    "error": "Błąd"
+  },
+  "registrationEdit": {
+    "title": "Zmień Rejestrację",
+    "cancel": "Anuluj",
+    "save": {
+      "idle": "Zapisz",
+      "pending": "Zapisywanie"
+    },
+    "loading": "Ładowanie danych",
+    "error": "Błąd"
+  }
+}
