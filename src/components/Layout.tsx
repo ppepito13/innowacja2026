@@ -19,7 +19,7 @@ const LANGUAGES = [
 ];
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -35,7 +35,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <main className="flex-1 flex flex-col items-center justify-center p-8">{children}</main>
 
       <footer className="flex flex-col items-center bg-primary text-secondary text-center px-8 py-4">
-        <p>Projekt Innowacja 2026</p>
+        <p>{t('layout.projectName')} 2026</p>
 
         <div className="flex flex-row gap-4">
           {LANGUAGES.map(({ code, label }) => (

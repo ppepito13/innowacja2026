@@ -1,4 +1,13 @@
 {
+  "common": {
+    "boolean": {
+      "true": "Tak",
+      "false": "Nie"
+    }
+  },
+  "layout": {
+    "projectName": "Projekt Innowacja"
+  },
   "registrations": {
     "title": "Rejestracje - {{title}}",
     "description": "Sprawdź i zarządzaj rejestracjami wydarzenia",
