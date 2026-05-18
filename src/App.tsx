@@ -19,7 +19,7 @@ import UserEdit from './pages/admin/UserEdit';
 import Account from './pages/admin/Account';
 
 // Test page
-import Test from "./pages/Test";
+import Test from './pages/Test';
 
 function App() {
   return (
@@ -30,8 +30,12 @@ function App() {
           <Route exact path="/admin" component={Dashboard} />
           <Route exact path="/admin/events/new" component={EventNew} />
           <Route exact path="/admin/events/:id/edit" component={EventEdit} />
-          <Route exact path="/admin/registrations" component={Registrations} />
-          <Route exact path="/admin/registrations/:eventId/:registrationId/edit" component={RegistrationEdit} />
+          <Route exact path="/admin/registrations/:eventId" component={Registrations} />
+          <Route
+            exact
+            path="/admin/registrations/:eventId/:registrationId/edit"
+            component={RegistrationEdit}
+          />
           <Route exact path="/admin/check-in" component={CheckIn} />
           <Route exact path="/admin/users" component={Users} />
           <Route exact path="/admin/users/new" component={UserNew} />
