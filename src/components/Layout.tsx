@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Link } from '@lsg/components';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../auth/AuthProvider';
 
 interface LayoutProps {
   children: React.ReactNode;

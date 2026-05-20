@@ -1,5 +1,5 @@
 import { Redirect, Route, RouteProps } from 'react-router';
-import { useAuth } from './AuthContext';
+import { useAuth } from './AuthProvider';
 import { User } from '../types/types';
 
 type Role = User['role'];

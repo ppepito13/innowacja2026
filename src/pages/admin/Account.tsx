@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useHistory } from 'react-router';
 import { LuLogOut } from 'react-icons/lu';
 import { Button } from '@lsg/components';
-import { useAuth } from '../../auth/AuthContext';
+import { useAuth } from '../../auth/AuthProvider';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 
