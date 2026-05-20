@@ -36,6 +36,80 @@
     "loading": "Ładowanie danych",
     "error": "Błąd"
   },
+  "eventNew": {
+    "title": "Nowe wydarzenie",
+    "subtitle": "Wypełnij szczegóły, aby utworzyć nowe wydarzenie",
+    "cancel": "Anuluj",
+    "create": {
+      "idle": "Utwórz wydarzenie",
+      "pending": "Tworzenie"
+    },
+    "sections": {
+      "colors": "System kolorów",
+      "heroImage": "Zdjęcie główne"
+    },
+    "fields": {
+      "title": "Nazwa wydarzenia",
+      "description": "Opis",
+      "descriptionPlaceholder": "Opisz swoje wydarzenie...",
+      "dateType": "Typ daty",
+      "dateTypeSingle": "Wydarzenie jednodniowe",
+      "dateTypeMulti": "Wydarzenie wielodniowe",
+      "startDate": "Data początkowa",
+      "endDate": "Data końcowa",
+      "eventFormat": "Format wydarzenia",
+      "formatVirtual": "Wirtualne",
+      "formatOnSite": "Stacjonarne",
+      "locationVirtual": "Link do spotkania",
+      "locationVirtualPlaceholder": "https://meet.example.com/...",
+      "locationOnSite": "Adres",
+      "locationOnSitePlaceholder": "Ulica i numer Kod pocztowy, Miasto",
+      "primaryColor": "Kolor główny",
+      "accentColor": "Kolor akcentu",
+      "heroImageUrl": "URL zdjęcia",
+      "heroImagePreview": "Podgląd zdjęcia głównego",
+      "upload": "Wgraj",
+      "uploading": "Wgrywanie..."
+    }
+  },
+  "eventEdit": {
+    "title": "Edytuj wydarzenie",
+    "subtitle": "Zaktualizuj szczegóły \"{{title}}\"",
+    "cancel": "Anuluj",
+    "save": {
+      "idle": "Zapisz",
+      "pending": "Zapisywanie"
+    },
+    "loading": "Ładowanie danych",
+    "error": "Błąd",
+    "sections": {
+      "colors": "System kolorów",
+      "heroImage": "Zdjęcie główne"
+    },
+    "fields": {
+      "title": "Nazwa wydarzenia",
+      "description": "Opis",
+      "descriptionPlaceholder": "Opisz swoje wydarzenie...",
+      "dateType": "Typ daty",
+      "dateTypeSingle": "Wydarzenie jednodniowe",
+      "dateTypeMulti": "Wydarzenie wielodniowe",
+      "startDate": "Data początkowa",
+      "endDate": "Data końcowa",
+      "eventFormat": "Format wydarzenia",
+      "formatVirtual": "Wirtualne",
+      "formatOnSite": "Stacjonarne",
+      "locationVirtual": "Link do spotkania",
+      "locationVirtualPlaceholder": "https://meet.example.com/...",
+      "locationOnSite": "Adres",
+      "locationOnSitePlaceholder": "Ulica i numer Kod pocztowy, Miasto",
+      "primaryColor": "Kolor główny",
+      "accentColor": "Kolor akcentu",
+      "heroImageUrl": "URL zdjęcia",
+      "heroImagePreview": "Podgląd zdjęcia głównego",
+      "upload": "Wgraj",
+      "uploading": "Wgrywanie..."
+    }
+  },
   "registrationEdit": {
     "title": "Zmień Rejestrację",
     "cancel": "Anuluj",
