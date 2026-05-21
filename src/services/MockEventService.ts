@@ -1,7 +1,14 @@
-import { Event } from '../types/Event';
+import { Event } from '../types/types';
 
 export const getMockEvent = (): Event => {
   return {
+    objectId: 'mock-id-123',
+    description: 'Mock backend description',
+    startDate: new Date(),
+    isActive: true,
+    formConfig: {},
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     id: 'innowacja2026',
     title: 'Innowacja 2026',
     date: '16-17 maj 2026',

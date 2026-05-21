@@ -7,6 +7,14 @@ export interface Event {
     formConfig: Record<string, unknown>; // JSON/Object
     createdAt: string;
     updatedAt: string;
+
+    // Frontend (Mock) fields
+    id?: string;
+    date?: string;
+    location?: string;
+    descriptionHtml?: string;
+    brandingHexColor?: string;
+    heroImageUrl?: string;
 }
 
 export interface Registration {

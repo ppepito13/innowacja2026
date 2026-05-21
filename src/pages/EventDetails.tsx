@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Event } from '../types/Event';
+import { useTranslation } from 'react-i18next';
+import { Event } from '../types/types';
 import { getMockEvent } from '../services/MockEventService';
+import { ReactComponent as CalendarIcon } from '../assets/calendar-icon.svg';
+import { ReactComponent as LocationIcon } from '../assets/location-icon.svg';
+import { ReactComponent as ChevronDownIcon } from '../assets/chevron-down-icon.svg';
 
 export default function EventDetails() {
   const { eventId } = useParams<{ eventId: string }>();
   const [event, setEvent] = useState<Event | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     // In a real app we would fetch by eventId, for now we just use the mock
@@ -14,7 +19,7 @@ export default function EventDetails() {
   }, [eventId]);
 
   if (!event) {
-    return <div className="min-h-screen bg-[#111111] text-white flex items-center justify-center">Loading...</div>;
+    return <div className="min-h-screen bg-[#111111] text-white flex items-center justify-center">{t('eventDetails.loading')}</div>;
   }
 
   return (
@@ -48,36 +53,31 @@ export default function EventDetails() {
 
               <div className="flex flex-wrap gap-6 text-sm text-gray-400 mb-8 pb-6 border-b border-gray-700/50">
                 <div className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                  <CalendarIcon className="h-4 w-4" />
                   <span>{event.date}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+                  <LocationIcon className="h-4 w-4" />
                   <span>{event.location}</span>
                 </div>
               </div>
 
               <div
                 className="prose prose-invert max-w-none text-gray-300 leading-relaxed text-sm md:text-base"
-                dangerouslySetInnerHTML={{ __html: event.descriptionHtml }}
+                dangerouslySetInnerHTML={{ __html: event.descriptionHtml || '' }}
               />
             </div>
           </section>
 
           {/* Right Column: Form */}
           <section className="w-full lg:w-[40%] bg-[#162436] rounded-xl shadow-2xl p-8 sticky top-8">
-            <h2 className="text-xl font-bold mb-1 text-white">Register Now</h2>
-            <p className="text-sm text-gray-400 mb-8">Fill out the form below to secure your spot.</p>
+            <h2 className="text-xl font-bold mb-1 text-white">{t('eventDetails.registerNow')}</h2>
+            <p className="text-sm text-gray-400 mb-8">{t('eventDetails.fillForm')}</p>
 
             <form className="flex flex-col gap-6">
               <div>
                 <label htmlFor="fullName" className="block text-xs font-bold text-white mb-2">
-                  Full Name <span className="text-red-500">*</span>
+                  {t('eventDetails.fullName')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -89,7 +89,7 @@ export default function EventDetails() {
 
               <div>
                 <label htmlFor="email" className="block text-xs font-bold text-white mb-2">
-                  Email Address <span className="text-red-500">*</span>
+                  {t('eventDetails.email')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -101,7 +101,7 @@ export default function EventDetails() {
 
               <div>
                 <label htmlFor="dropdown" className="block text-xs font-bold text-white mb-2">
-                  Dropdown
+                  {t('eventDetails.dropdown')}
                 </label>
                 <div className="relative w-full box-border">
                   <select
@@ -109,15 +109,13 @@ export default function EventDetails() {
                     defaultValue=""
                     className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors appearance-none"
                   >
-                    <option value="" disabled hidden>Select option</option>
-                    <option value="option1">Option 1</option>
-                    <option value="option2">Option 2</option>
-                    <option value="option3">Option 3</option>
+                    <option value="" disabled hidden>{t('eventDetails.selectOption')}</option>
+                    <option value="option1">{t('eventDetails.option1')}</option>
+                    <option value="option2">{t('eventDetails.option2')}</option>
+                    <option value="option3">{t('eventDetails.option3')}</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                    </svg>
+                    <ChevronDownIcon className="fill-current h-4 w-4" />
                   </div>
                 </div>
               </div>
@@ -134,23 +132,23 @@ export default function EventDetails() {
                   </div>
                   <div>
                     <label htmlFor="consent" className="text-sm font-medium text-white cursor-pointer block mb-1">
-                      Data Processing Consent <span className="text-red-500">*</span>
+                      {t('eventDetails.dataConsent')} <span className="text-red-500">*</span>
                     </label>
                     <p className="text-xs text-gray-300">
-                      Read more in <a href="#" className="underline text-gray-200 hover:text-white">terms and conditions</a>.
+                      {t('eventDetails.readMoreIn')} <a href="#terms" className="underline text-gray-200 hover:text-white">{t('eventDetails.termsAndConditions')}</a>.
                     </p>
                   </div>
                 </div>
               </div>
 
-              <p className="text-[11px] text-gray-400 -mt-2">* Required field.</p>
+              <p className="text-[11px] text-gray-400 -mt-2">* {t('eventDetails.requiredField')}</p>
 
               <button
                 type="button"
                 className="w-full mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
                 style={{ backgroundColor: event.brandingHexColor }}
               >
-                Register
+                {t('eventDetails.register')}
               </button>
             </form>
           </section>
