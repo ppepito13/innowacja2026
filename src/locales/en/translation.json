@@ -6,7 +6,28 @@
     }
   },
   "layout": {
-    "projectName": "Innovation Project"
+    "projectName": "Innovation Project",
+    "account": "Account"
+  },
+  "login": {
+    "title": "Login",
+    "description": "Login to access protected routes",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Login",
+    "pending": "Logging in",
+    "error": "Invalid credentials. Please try again."
+  },
+  "account": {
+    "title": "Account",
+    "description": "View your account details",
+    "username": "Username",
+    "email": "Email",
+    "role": "Role",
+    "logout": {
+      "idle": "Logout",
+      "pending": "Logging out"
+    }
   },
   "registrations": {
     "title": "Registrations - {{title}}",

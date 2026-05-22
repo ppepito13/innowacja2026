@@ -6,7 +6,28 @@
     }
   },
   "layout": {
-    "projectName": "Projekt Innowacja"
+    "projectName": "Projekt Innowacja",
+    "account": "Konto"
+  },
+  "login": {
+    "title": "Logowanie",
+    "description": "Zaloguj się, aby uzyskać dostęp",
+    "email": "Email",
+    "password": "Hasło",
+    "submit": "Zaloguj się",
+    "pending": "Logowanie",
+    "error": "Nieprawidłowe dane. Proszę spróbować ponownie."
+  },
+  "account": {
+    "title": "Konto",
+    "description": "Sprawdź dane swojego konta",
+    "username": "Nazwa użytkownika",
+    "email": "Email",
+    "role": "Rola",
+    "logout": {
+      "idle": "Wyloguj się",
+      "pending": "Wylogowywanie"
+    }
   },
   "registrations": {
     "title": "Rejestracje - {{title}}",

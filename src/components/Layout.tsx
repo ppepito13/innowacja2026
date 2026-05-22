@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Link } from '@lsg/components';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../auth/AuthProvider';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,15 +21,17 @@ const LANGUAGES = [
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { i18n, t } = useTranslation();
+  const { user } = useAuth();
 
   return (
     <div className="flex flex-col min-h-screen">
       <header className="flex items-center justify-between bg-primary text-secondary px-8 py-4">
-        <Link href="/">LOGO</Link>
+        <Link href="/">Commerzbank Events</Link>
 
         <nav className="flex items-center gap-4">
           <Link href="/">Home</Link>
-          <Link href="/">Home</Link>
+
+          {user && <Link href="/admin/account">{t('layout.account')}</Link>}
         </nav>
       </header>
 
