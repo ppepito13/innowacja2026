@@ -1,4 +1,8 @@
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+
+import { AuthProvider } from './auth/AuthProvider';
+import ProtectedRoute from './auth/ProtectedRoute';
+
 import Layout from './components/Layout';
 
 // Public pages
@@ -23,40 +27,68 @@ import Test from './pages/Test';
 
 function App() {
   return (
-    <Router>
-      <Switch>
-        {/* Public Fullscreen Routes */}
-        <Route exact path="/events/:slug" component={EventDetails} />
+<AuthProvider>
+      <Router>
+        <Switch>
+          {/* Public Fullscreen Routes */}
+          <Route exact path="/events/:slug" component={EventDetails} />
 
-        {/* Routes with Layout */}
-        <Route>
-          <Layout>
-            <Switch>
-              {/* Admin Routes */}
-              <Route exact path="/admin" component={Dashboard} />
-              <Route exact path="/admin/events/new" component={EventNew} />
-              <Route exact path="/admin/events/:id/edit" component={EventEdit} />
-              <Route exact path="/admin/registrations/:eventId" component={Registrations} />
-              <Route
-                exact
-                path="/admin/registrations/:eventId/:registrationId/edit"
-                component={RegistrationEdit}
-              />
-              <Route exact path="/admin/check-in" component={CheckIn} />
-              <Route exact path="/admin/users" component={Users} />
-              <Route exact path="/admin/users/new" component={UserNew} />
-              <Route exact path="/admin/users/:id/edit" component={UserEdit} />
-              <Route exact path="/admin/account" component={Account} />
+          {/* Routes with Layout */}
+          <Route>
+            <Layout>
+              <Switch>
+                {/* Admin Routes */}
+                <ProtectedRoute exact path="/admin" component={Dashboard} requiredRole="Admin" />
+                <ProtectedRoute
+                  exact
+                  path="/admin/events/new"
+                  component={EventNew}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/events/:id/edit"
+                  component={EventEdit}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/registrations/:eventId"
+                  component={Registrations}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/registrations/:eventId/:registrationId/edit"
+                  component={RegistrationEdit}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute exact path="/admin/check-in" component={CheckIn} requiredRole="Admin" />
+                <ProtectedRoute exact path="/admin/users" component={Users} requiredRole="Admin" />
+                <ProtectedRoute
+                  exact
+                  path="/admin/users/new"
+                  component={UserNew}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/users/:id/edit"
+                  component={UserEdit}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute exact path="/admin/account" component={Account} requiredRole="Admin" />
 
-              {/* Other Public Routes */}
-              <Route exact path="/login" component={AdminLogin} />
-              <Route exact path="/test" component={Test} />
-              <Route exact path="/" component={Home} />
-            </Switch>
-          </Layout>
-        </Route>
-      </Switch>
-    </Router>
+                {/* Other Public Routes */}
+                <Route exact path="/login" component={AdminLogin} />
+                <Route exact path="/test" component={Test} />
+                <Route exact path="/" component={Home} />
+              </Switch>
+            </Layout>
+          </Route>
+        </Switch>
+      </Router>
+    </AuthProvider>
   );
 }
 

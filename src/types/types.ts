@@ -18,20 +18,21 @@ export interface Event {
 }
 
 export interface Registration {
-    objectId: string;
-    event: Event; // Pointer
-    formData: Record<string, unknown>; // JSON/Object
-    status: 'pending' | 'approved'; // String: pending/approved
-    checkInTime: Date | null; // Date/Nullable
-    createdAt: string;
-    updatedAt: string;
+  objectId: string;
+  event: Event; // Pointer
+  formData: Record<string, unknown>; // JSON/Object
+  status: 'pending' | 'approved'; // String: pending/approved
+  checkInTime: Date | null; // Date/Nullable
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface User {
-    objectId: string;
-    username: string;
-    email: string;
-    role: 'Admin' | 'Organizer'; // String: Admin/Organizer
-    createdAt: string;
-    updatedAt: string;
+  objectId: string;
+  username: string;
+  email: string;
+  emailVerified: boolean;
+  role: 'Admin' | 'Organizer'; // String: Admin/Organizer
+  createdAt: string;
+  updatedAt: string;
 }
