@@ -66,5 +66,22 @@
     },
     "loading": "Ładowanie danych",
     "error": "Błąd"
+  },
+  "eventDetails": {
+    "loading": "Ładowanie...",
+    "registerNow": "Zarejestruj się teraz",
+    "fillForm": "Wypełnij poniższy formularz, aby zarezerwować miejsce.",
+    "fullName": "Imię i nazwisko",
+    "email": "Adres e-mail",
+    "dropdown": "Lista rozwijana",
+    "selectOption": "Wybierz opcję",
+    "option1": "Opcja 1",
+    "option2": "Opcja 2",
+    "option3": "Opcja 3",
+    "dataConsent": "Zgoda na przetwarzanie danych",
+    "readMoreIn": "Dowiedz się więcej w",
+    "termsAndConditions": "regulaminie",
+    "requiredField": "Pole wymagane.",
+    "register": "Zarejestruj"
   }
 }

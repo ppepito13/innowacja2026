@@ -1,12 +1,20 @@
 export interface Event {
-  objectId: string;
-  title: string;
-  description: string; // HTML/String
-  startDate: Date;
-  isActive: boolean;
-  formConfig: Record<string, unknown>; // JSON/Object
-  createdAt: string;
-  updatedAt: string;
+    objectId: string;
+    title: string;
+    description: string; // HTML/String
+    startDate: Date;
+    isActive: boolean;
+    formConfig: Record<string, unknown>; // JSON/Object
+    createdAt: string;
+    updatedAt: string;
+
+    // Frontend (Mock) fields
+    id?: string;
+    date?: string;
+    location?: string;
+    descriptionHtml?: string;
+    brandingHexColor?: string;
+    heroImageUrl?: string;
 }
 
 export interface Registration {

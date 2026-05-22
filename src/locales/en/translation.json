@@ -66,5 +66,22 @@
     },
     "loading": "Loading data",
     "error": "Error"
+  },
+  "eventDetails": {
+    "loading": "Loading...",
+    "registerNow": "Register Now",
+    "fillForm": "Fill out the form below to secure your spot.",
+    "fullName": "Full Name",
+    "email": "Email Address",
+    "dropdown": "Dropdown",
+    "selectOption": "Select option",
+    "option1": "Option 1",
+    "option2": "Option 2",
+    "option3": "Option 3",
+    "dataConsent": "Data Processing Consent",
+    "readMoreIn": "Read more in",
+    "termsAndConditions": "terms and conditions",
+    "requiredField": "Required field.",
+    "register": "Register"
   }
 }

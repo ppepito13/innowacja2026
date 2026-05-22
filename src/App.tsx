@@ -27,59 +27,66 @@ import Test from './pages/Test';
 
 function App() {
   return (
-    <AuthProvider>
+<AuthProvider>
       <Router>
-        <Layout>
-          <Switch>
-            {/* Admin Routes */}
-            <ProtectedRoute exact path="/admin" component={Dashboard} requiredRole="Admin" />
-            <ProtectedRoute
-              exact
-              path="/admin/events/new"
-              component={EventNew}
-              requiredRole="Admin"
-            />
-            <ProtectedRoute
-              exact
-              path="/admin/events/:id/edit"
-              component={EventEdit}
-              requiredRole="Admin"
-            />
-            <ProtectedRoute
-              exact
-              path="/admin/registrations/:eventId"
-              component={Registrations}
-              requiredRole="Admin"
-            />
-            <ProtectedRoute
-              exact
-              path="/admin/registrations/:eventId/:registrationId/edit"
-              component={RegistrationEdit}
-              requiredRole="Admin"
-            />
-            <ProtectedRoute exact path="/admin/check-in" component={CheckIn} requiredRole="Admin" />
-            <ProtectedRoute exact path="/admin/users" component={Users} requiredRole="Admin" />
-            <ProtectedRoute
-              exact
-              path="/admin/users/new"
-              component={UserNew}
-              requiredRole="Admin"
-            />
-            <ProtectedRoute
-              exact
-              path="/admin/users/:id/edit"
-              component={UserEdit}
-              requiredRole="Admin"
-            />
-            <ProtectedRoute exact path="/admin/account" component={Account} requiredRole="Admin" />
+        <Switch>
+          {/* Public Fullscreen Routes */}
+          <Route exact path="/events/:slug" component={EventDetails} />
 
-            {/* Public Routes */}
-            <Route exact path="/login" component={AdminLogin} />
-            <Route exact path="/events/:slug" component={EventDetails} />
-            <Route exact path="/test" component={Test} />
-            <Route exact path="/" component={Home} />
-          </Switch>
-        </Layout>
+          {/* Routes with Layout */}
+          <Route>
+            <Layout>
+              <Switch>
+                {/* Admin Routes */}
+                <ProtectedRoute exact path="/admin" component={Dashboard} requiredRole="Admin" />
+                <ProtectedRoute
+                  exact
+                  path="/admin/events/new"
+                  component={EventNew}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/events/:id/edit"
+                  component={EventEdit}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/registrations/:eventId"
+                  component={Registrations}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/registrations/:eventId/:registrationId/edit"
+                  component={RegistrationEdit}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute exact path="/admin/check-in" component={CheckIn} requiredRole="Admin" />
+                <ProtectedRoute exact path="/admin/users" component={Users} requiredRole="Admin" />
+                <ProtectedRoute
+                  exact
+                  path="/admin/users/new"
+                  component={UserNew}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/users/:id/edit"
+                  component={UserEdit}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute exact path="/admin/account" component={Account} requiredRole="Admin" />
+
+                {/* Other Public Routes */}
+                <Route exact path="/login" component={AdminLogin} />
+                <Route exact path="/test" component={Test} />
+                <Route exact path="/" component={Home} />
+              </Switch>
+            </Layout>
+          </Route>
+        </Switch>
       </Router>
     </AuthProvider>
   );
