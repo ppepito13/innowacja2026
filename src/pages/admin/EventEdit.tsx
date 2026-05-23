@@ -14,8 +14,8 @@ type EventEditParams = { id: string };
 
 const EVENT_CLASS = 'TestEvent';
 
-function parseParseDate(value: any): Date | null {
-    if (!value) return null;
+function parseParseDate(value: any): Date | undefined {
+    if (!value) return undefined;
     if (value.iso) return new Date(value.iso);
     return new Date(value);
 }
@@ -25,47 +25,50 @@ export default function EventEdit() {
     const { id } = useParams<EventEditParams>();
     const history = useHistory();
 
+    const [event, setEvent] = useState<Partial<Event>>({});
     const [loaded, setLoaded] = useState(false);
-    const [eventTitle, setEventTitle] = useState('');
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [dateType, setDateType] = useState<'single' | 'multi'>('single');
-    const [startDate, setStartDate] = useState<Date | null>(null);
-    const [endDate, setEndDate] = useState<Date | null>(null);
-    const [eventFormat, setEventFormat] = useState<'virtual' | 'on-site'>('on-site');
-    const [location, setLocation] = useState('');
-    const [primaryColor, setPrimaryColor] = useState('#002e3c');
-    const [accentColor, setAccentColor] = useState('#ffd700');
-    const [heroImageUrl, setHeroImageUrl] = useState('');
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const handleFieldChange = <K extends keyof Event>(field: K, value: Event[K] | undefined) => {
+        setEvent((prev) => ({ ...prev, [field]: value }));
+    };
+
     useEffect(() => {
         parseService
             .getById<Event>(EVENT_CLASS, id)
-            .then((event) => {
-                const e = event as any;
-                setEventTitle(e.title ?? '');
-                setTitle(e.title ?? '');
-                setDescription(e.description ?? '');
-                setDateType(e.dateType ?? (e.endDate ? 'multi' : 'single'));
-                setStartDate(parseParseDate(e.startDate));
-                setEndDate(parseParseDate(e.endDate));
-                setEventFormat(e.eventFormat ?? 'on-site');
-                setLocation(e.location ?? '');
-                setPrimaryColor(e.primaryColor ?? '#002e3c');
-                setAccentColor(e.accentColor ?? '#ffd700');
-                setHeroImageUrl(e.heroImageUrl ?? '');
+            .then((rawEvent) => {
+                const e = rawEvent as any;
+                setEvent({
+                    ...rawEvent,
+                    dateType: e.dateType ?? 'single',
+                    eventFormat: e.eventFormat ?? 'on-site',
+                    location: e.location ?? '',
+                    primaryColor: e.primaryColor ?? '#002e3c',
+                    accentColor: e.accentColor ?? '#ffd700',
+                    heroImageUrl: e.heroImageUrl ?? '',
+                    startDate: parseParseDate(e.startDate),
+                    endDate: parseParseDate(e.endDate),
+                });
                 setLoaded(true);
             })
             .catch((e: any) => setError(e.message));
     }, [id]);
 
     const handleDateTypeChange = (value: 'single' | 'multi') => {
-        setDateType(value);
-        if (value === 'single') setEndDate(null);
+        setEvent((prev) => ({
+            ...prev,
+            dateType: value,
+            ...(value === 'single' && { endDate: undefined }),
+        }));
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) handleFileUpload(file);
+        e.target.value = '';
     };
 
     const handleFileUpload = async (file: File) => {
@@ -76,7 +79,7 @@ export default function EventEdit() {
                 file,
                 { headers: { 'Content-Type': file.type } },
             );
-            setHeroImageUrl(data.url);
+            handleFieldChange('heroImageUrl', data.url);
         } catch (e: any) {
             setError(e.message);
         } finally {
@@ -89,17 +92,17 @@ export default function EventEdit() {
         setError(null);
 
         const payload: Record<string, unknown> = {
-            title,
-            description,
-            dateType,
-            eventFormat,
-            location,
-            primaryColor,
-            accentColor,
-            heroImageUrl,
-            ...(startDate && { startDate: { __type: 'Date', iso: startDate.toISOString() } }),
-            ...(dateType === 'multi' && endDate
-                ? { endDate: { __type: 'Date', iso: endDate.toISOString() } }
+            title: event.title,
+            description: event.description,
+            dateType: event.dateType,
+            eventFormat: event.eventFormat,
+            location: event.location,
+            primaryColor: event.primaryColor,
+            accentColor: event.accentColor,
+            heroImageUrl: event.heroImageUrl,
+            ...(event.startDate && { startDate: { __type: 'Date', iso: event.startDate.toISOString() } }),
+            ...(event.dateType === 'multi' && event.endDate
+                ? { endDate: { __type: 'Date', iso: event.endDate.toISOString() } }
                 : { endDate: { __op: 'Delete' } }),
         };
 
@@ -129,7 +132,7 @@ export default function EventEdit() {
                 <div className="flex flex-col">
                     <h1 className="text-3xl mb-0">{t('eventEdit.title')}</h1>
                     <p className="text-lg mt-0 text-primary/75">
-                        {t('eventEdit.subtitle', { title: eventTitle })}
+                        {t('eventEdit.subtitle', { title: event.title ?? id })}
                     </p>
                 </div>
                 <button
@@ -149,23 +152,23 @@ export default function EventEdit() {
                 <InputTextfieldStateful
                     label={t('eventEdit.fields.title')}
                     placeholder={t('eventEdit.fields.title')}
-                    defaultValue={title}
-                    onChange={(v) => setTitle(String(v))}
+                    defaultValue={event.title ?? ''}
+                    onChange={(v) => handleFieldChange('title', String(v))}
                 />
 
                 {/* Description */}
                 <InputTextfieldStateful
                     label={t('eventEdit.fields.description')}
                     placeholder={t('eventEdit.fields.descriptionPlaceholder')}
-                    defaultValue={description}
+                    defaultValue={event.description ?? ''}
                     textArea={true}
-                    onChange={(v) => setDescription(String(v))}
+                    onChange={(v) => handleFieldChange('description', String(v))}
                 />
 
                 {/* Date Type */}
                 <RadioGroup
                     label={t('eventEdit.fields.dateType')}
-                    value={dateType}
+                    value={event.dateType ?? 'single'}
                     onChange={handleDateTypeChange}
                     options={[
                         { value: 'single', label: t('eventEdit.fields.dateTypeSingle') },
@@ -178,16 +181,16 @@ export default function EventEdit() {
                     <div className="flex-1">
                         <InputDatepicker
                             label={t('eventEdit.fields.startDate')}
-                            value={startDate ?? ''}
-                            onChange={(v) => setStartDate(v ? new Date(v as any) : null)}
+                            value={event.startDate ?? ''}
+                            onChange={(v) => handleFieldChange('startDate', v ? new Date(v as any) : undefined)}
                         />
                     </div>
-                    {dateType === 'multi' && (
+                    {event.dateType === 'multi' && (
                         <div className="flex-1">
                             <InputDatepicker
                                 label={t('eventEdit.fields.endDate')}
-                                value={endDate ?? ''}
-                                onChange={(v) => setEndDate(v ? new Date(v as any) : null)}
+                                value={event.endDate ?? ''}
+                                onChange={(v) => handleFieldChange('endDate', v ? new Date(v as any) : undefined)}
                             />
                         </div>
                     )}
@@ -196,8 +199,8 @@ export default function EventEdit() {
                 {/* Event Format */}
                 <RadioGroup
                     label={t('eventEdit.fields.eventFormat')}
-                    value={eventFormat}
-                    onChange={setEventFormat}
+                    value={event.eventFormat ?? 'on-site'}
+                    onChange={(v) => handleFieldChange('eventFormat', v)}
                     options={[
                         { value: 'virtual', label: t('eventEdit.fields.formatVirtual') },
                         { value: 'on-site', label: t('eventEdit.fields.formatOnSite') },
@@ -207,17 +210,17 @@ export default function EventEdit() {
                 {/* Location — label and placeholder adapt to event format */}
                 <InputTextfieldStateful
                     label={
-                        eventFormat === 'virtual'
+                        event.eventFormat === 'virtual'
                             ? t('eventEdit.fields.locationVirtual')
                             : t('eventEdit.fields.locationOnSite')
                     }
                     placeholder={
-                        eventFormat === 'virtual'
+                        event.eventFormat === 'virtual'
                             ? t('eventEdit.fields.locationVirtualPlaceholder')
                             : t('eventEdit.fields.locationOnSitePlaceholder')
                     }
-                    defaultValue={location}
-                    onChange={(v) => setLocation(String(v))}
+                    defaultValue={event.location ?? ''}
+                    onChange={(v) => handleFieldChange('location', String(v))}
                 />
 
                 {/* Colors */}
@@ -227,20 +230,20 @@ export default function EventEdit() {
                 <div className="flex gap-4">
                     <ColorField
                         label={t('eventEdit.fields.primaryColor')}
-                        value={primaryColor}
-                        onChange={setPrimaryColor}
+                        value={event.primaryColor ?? '#002e3c'}
+                        onChange={(v) => handleFieldChange('primaryColor', v)}
                     />
                     <ColorField
                         label={t('eventEdit.fields.accentColor')}
-                        value={accentColor}
-                        onChange={setAccentColor}
+                        value={event.accentColor ?? '#ffd700'}
+                        onChange={(v) => handleFieldChange('accentColor', v)}
                     />
                 </div>
 
                 {/* Color Preview */}
                 <div className="h-8 rounded-lg border border-primary/10 flex overflow-hidden mt-1">
-                    <div className="flex-1" style={{ backgroundColor: primaryColor }} />
-                    <div className="flex-1" style={{ backgroundColor: accentColor }} />
+                    <div className="flex-1" style={{ backgroundColor: event.primaryColor ?? '#002e3c' }} />
+                    <div className="flex-1" style={{ backgroundColor: event.accentColor ?? '#ffd700' }} />
                 </div>
 
                 {/* Hero Image */}
@@ -254,8 +257,8 @@ export default function EventEdit() {
                     <div className="flex gap-2">
                         <input
                             type="text"
-                            value={heroImageUrl}
-                            onChange={(e) => setHeroImageUrl(e.target.value)}
+                            value={event.heroImageUrl ?? ''}
+                            onChange={(e) => handleFieldChange('heroImageUrl', e.target.value)}
                             placeholder="https://..."
                             className="flex-1 border border-primary/20 rounded-lg px-3 py-2 text-sm text-primary focus:outline-none focus:border-primary/60"
                         />
@@ -273,18 +276,14 @@ export default function EventEdit() {
                             type="file"
                             accept="image/*"
                             className="hidden"
-                            onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) handleFileUpload(file);
-                                e.target.value = '';
-                            }}
+                            onChange={handleFileChange}
                         />
                     </div>
                 </div>
 
-                {heroImageUrl && (
+                {event.heroImageUrl && (
                     <img
-                        src={heroImageUrl}
+                        src={event.heroImageUrl}
                         alt={t('eventEdit.fields.heroImagePreview')}
                         className="mt-1 h-36 w-full object-cover rounded-lg border border-primary/10"
                         onError={(e) => {

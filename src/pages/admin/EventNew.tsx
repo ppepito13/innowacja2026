@@ -36,6 +36,12 @@ export default function EventNew() {
         if (value === 'single') setEndDate(null);
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) handleFileUpload(file);
+        e.target.value = '';
+    };
+
     const handleFileUpload = async (file: File) => {
         setUploading(true);
         try {
@@ -68,7 +74,9 @@ export default function EventNew() {
             isActive: false,
             formConfig: {},
             ...(startDate && { startDate: { __type: 'Date', iso: startDate.toISOString() } }),
-            ...(dateType === 'multi' && endDate && { endDate: { __type: 'Date', iso: endDate.toISOString() } }),
+            ...(dateType === 'multi' && endDate
+                ? { endDate: { __type: 'Date', iso: endDate.toISOString() } }
+                : {}),
         };
 
         parseService
@@ -227,11 +235,7 @@ export default function EventNew() {
                             type="file"
                             accept="image/*"
                             className="hidden"
-                            onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) handleFileUpload(file);
-                                e.target.value = '';
-                            }}
+                            onChange={handleFileChange}
                         />
                     </div>
                 </div>
