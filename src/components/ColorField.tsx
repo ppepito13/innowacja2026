@@ -1,3 +1,5 @@
+import React from 'react';
+
 interface ColorFieldProps {
     label: string;
     value: string;
@@ -6,6 +8,13 @@ interface ColorFieldProps {
 
 export default function ColorField({ label, value, onChange }: ColorFieldProps) {
     const safeHex = /^#[0-9a-fA-F]{6}$/.test(value) ? value : '#000000';
+
+    const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value;
+        if (/^#[0-9a-fA-F]{0,6}$/.test(raw)) {
+            onChange(raw);
+        }
+    };
 
     return (
         <div className="flex flex-col gap-1 flex-1">
@@ -21,11 +30,7 @@ export default function ColorField({ label, value, onChange }: ColorFieldProps) 
                     type="text"
                     value={value}
                     maxLength={7}
-                    onChange={(e) => {
-                        let val = e.target.value;
-                        if (!val.startsWith('#')) val = '#' + val.replace('#', '');
-                        if (/^#[0-9a-fA-F]{0,6}$/.test(val)) onChange(val);
-                    }}
+                    onChange={handleTextChange}
                     className="flex-1 border border-primary/20 rounded-lg px-3 py-2 text-sm font-mono text-primary focus:outline-none focus:border-primary/60"
                     placeholder="#000000"
                 />
