@@ -1,0 +1,2 @@
+export const DEFAULT_PRIMARY_COLOR = '#002e3c';
+export const DEFAULT_ACCENT_COLOR = '#ffd700';

@@ -9,6 +9,7 @@ import Icon from '../../components/Icon';
 import ColorField from '../../components/ColorField';
 import RadioGroup from '../../components/RadioGroup';
 import parseClient from '../../services/parseClient';
+import { DEFAULT_PRIMARY_COLOR, DEFAULT_ACCENT_COLOR } from '../../constants/eventDefaults';
 
 type EventEditParams = { id: string };
 
@@ -242,8 +243,8 @@ export default function EventEdit() {
 
                 {/* Color Preview */}
                 <div className="h-8 rounded-lg border border-primary/10 flex overflow-hidden mt-1">
-                    <div className="flex-1" style={{ backgroundColor: event.primaryColor ?? '#002e3c' }} />
-                    <div className="flex-1" style={{ backgroundColor: event.accentColor ?? '#ffd700' }} />
+                    <div className="flex-1" style={{ backgroundColor: event.primaryColor ?? DEFAULT_PRIMARY_COLOR }} />
+                    <div className="flex-1" style={{ backgroundColor: event.accentColor ?? DEFAULT_ACCENT_COLOR }} />
                 </div>
 
                 {/* Hero Image */}
