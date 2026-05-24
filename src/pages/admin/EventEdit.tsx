@@ -9,11 +9,9 @@ import Icon from '../../components/Icon';
 import ColorField from '../../components/ColorField';
 import RadioGroup from '../../components/RadioGroup';
 import parseClient from '../../services/parseClient';
-import { DEFAULT_PRIMARY_COLOR, DEFAULT_ACCENT_COLOR } from '../../constants/eventDefaults';
+import { EVENT_CLASS, DEFAULT_PRIMARY_COLOR, DEFAULT_ACCENT_COLOR } from '../../constants/eventDefaults';
 
 type EventEditParams = { id: string };
-
-const EVENT_CLASS = 'TestEvent';
 
 function parseParseDate(value: any): Date | undefined {
     if (!value) return undefined;

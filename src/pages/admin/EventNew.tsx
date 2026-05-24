@@ -9,8 +9,7 @@ import Icon from '../../components/Icon';
 import ColorField from '../../components/ColorField';
 import RadioGroup from '../../components/RadioGroup';
 import parseClient from '../../services/parseClient';
-
-const EVENT_CLASS = 'TestEvent';
+import { EVENT_CLASS } from '../../constants/eventDefaults';
 
 export default function EventNew() {
     const { t } = useTranslation();
