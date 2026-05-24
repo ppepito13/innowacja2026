@@ -48,7 +48,13 @@ export default function Account() {
 
       {/* ACTIONS */}
       <div className="flex items-center justify-end mt-4 pb-4">
-        <Button look="secondary" className="scale-75" onClick={handleLogout} disabled={loggingOut}>
+        <Button
+          look="secondary"
+          className="scale-75"
+          onClick={handleLogout}
+          disabled={loggingOut}
+          data-testid="logout-button"
+        >
           <span className="flex flex-row items-center gap-2">
             <Icon icon={LuLogOut} />
             <span>
