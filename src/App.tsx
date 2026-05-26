@@ -24,6 +24,7 @@ import Account from './pages/admin/Account';
 
 // Test page
 import Test from './pages/Test';
+import FormConfigBuilder from "./pages/FormConfigBuilder";
 
 function App() {
   return (
@@ -82,6 +83,7 @@ function App() {
                 {/* Other Public Routes */}
                 <Route exact path="/login" component={AdminLogin} />
                 <Route exact path="/test" component={Test} />
+                <Route exact path="/formconfigbuilder" component={FormConfigBuilder} />
                 <Route exact path="/" component={Home} />
               </Switch>
             </Layout>
