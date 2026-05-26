@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { LuUserPlus, LuPencil, LuTrash2 } from 'react-icons/lu';
-import { parseService } from '../../services/parseService';
 import { User } from '../../types/types';
 import Icon from '../../components/Icon';
+import parseClient from '../../services/parseClient';
 
 export default function Users() {
   const history = useHistory();
@@ -14,17 +14,21 @@ export default function Users() {
   const [roleFilter, setRoleFilter] = useState<'All' | 'Admin' | 'Organizer'>('All');
 
   useEffect(() => {
-    parseService.getAll<User>('_User')
-      .then(setUsers)
+    parseClient.get('/users', {
+      headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY }
+    })
+      .then(res => setUsers(res.data.results))
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
   const handleDelete = (objectId: string) => {
     if (!window.confirm('Na pewno usunąć użytkownika?')) return;
-    parseService.remove('_User', objectId)
+    parseClient.delete(`/users/${objectId}`, {
+      headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY }
+    })
       .then(() => setUsers(prev => prev.filter(u => u.objectId !== objectId)))
-      .catch(err => setError(err.message));
+      .catch(err => setError(err.response?.data?.error || err.message));
   };
 
   const filtered = users.filter(u => {

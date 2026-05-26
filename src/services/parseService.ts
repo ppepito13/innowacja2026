@@ -1,5 +1,5 @@
 import parseClient from './parseClient';
-
+import bcrypt from 'bcryptjs';
 // Typy
 
 export interface ParseObject {
@@ -84,8 +84,9 @@ export const parseService = {
 
 export const authService = {
   async login(email: string, password: string) {
+    const passwordHash = bcrypt.hashSync(password, process.env.REACT_APP_BCRYPT_SALT);
     const { data } = await parseClient.get('/login', {
-      params: { username: email, password: password } // bez bcrypt, username zamiast email
+      params: { username: email, password: passwordHash }
     });
     localStorage.setItem('parseSessionToken', data.sessionToken);
     return data;
