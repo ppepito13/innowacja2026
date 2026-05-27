@@ -34,6 +34,7 @@ export interface User {
   emailVerified: boolean;
   role: 'Admin' | 'Organizer'; // String: Admin/Organizer
   lastLoginAt?: string;
+  fullName?: string;
   createdAt: string;
   updatedAt: string;
 }

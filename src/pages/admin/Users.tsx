@@ -142,7 +142,7 @@ export default function Users() {
           {sorted.map(user => (
             <tr key={user.objectId} className="border-b border-primary/5 transition-colors">
               <td className="py-3">
-                <p className="font-medium text-primary">{user.username}</p>
+                <p className="font-medium text-primary">{user.fullName || user.username}</p>
                 <p className="text-primary/50 text-xs">{user.email}</p>
               </td>
               <td className="py-3">
