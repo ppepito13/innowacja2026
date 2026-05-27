@@ -229,12 +229,12 @@ export default function EventEdit() {
                 <div className="flex gap-4">
                     <ColorField
                         label={t('eventEdit.fields.primaryColor')}
-                        value={event.primaryColor ?? '#002e3c'}
+                        value={event.primaryColor ?? DEFAULT_PRIMARY_COLOR}
                         onChange={(v) => handleFieldChange('primaryColor', v)}
                     />
                     <ColorField
                         label={t('eventEdit.fields.accentColor')}
-                        value={event.accentColor ?? '#ffd700'}
+                        value={event.accentColor ?? DEFAULT_ACCENT_COLOR}
                         onChange={(v) => handleFieldChange('accentColor', v)}
                     />
                 </div>
