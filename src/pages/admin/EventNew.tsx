@@ -79,10 +79,10 @@ export default function EventNew() {
             primaryColor: event.primaryColor,
             accentColor: event.accentColor,
             heroImageUrl: event.heroImageUrl,
-            ...(event.startDate && { startDate: event.startDate.toISOString() }),
+            ...(event.startDate && { startDate: { __type: 'Date', iso: event.startDate.toISOString() } }),
             ...(event.dateType === 'multi' && event.endDate
-                ? { endDate: event.endDate.toISOString() }
-                : {}),
+                ? { endDate: { __type: 'Date', iso: event.endDate.toISOString() } }
+                : { endDate: { __op: 'Delete' } }),
         };
 
         parseService
