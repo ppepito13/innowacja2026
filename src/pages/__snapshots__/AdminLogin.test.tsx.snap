@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AdminLogin Renders properly 1`] = `
+<DocumentFragment>
+  <div
+    class="flex flex-col bg-white px-8 py-4 rounded-2xl w-[512px]"
+  >
+    <div
+      class="flex flex-col mb-4"
+    >
+      <h1
+        class="text-3xl mb-0"
+      >
+        login.title
+      </h1>
+      <p
+        class="text-lg mt-0 text-primary/75"
+      >
+        login.description
+      </p>
+    </div>
+    <div
+      class="flex flex-col"
+    >
+      <input
+        aria-label="login.email"
+        type="text"
+      />
+      <input
+        aria-label="login.password"
+        type="password"
+      />
+    </div>
+    <div
+      class="flex items-center justify-end mt-4 pb-4"
+    >
+      <button
+        class="scale-75"
+      >
+        <span
+          class="flex flex-row items-center gap-2"
+        >
+          <span
+            data-testid="icon"
+          />
+          <span>
+            login.submit
+          </span>
+        </span>
+      </button>
+    </div>
+  </div>
+</DocumentFragment>
+`;
