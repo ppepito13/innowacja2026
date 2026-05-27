@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { LuUserPlus, LuArrowLeft } from 'react-icons/lu';
 import { InputTextfieldStateful } from '@lsg/components';
+import { useTranslation } from 'react-i18next';
 import bcrypt from 'bcryptjs';
 import parseClient from '../../services/parseClient';
 import Icon from '../../components/Icon';
 
 export default function UserNew() {
+  const { t } = useTranslation();
   const history = useHistory();
 
   const [fullName, setFullName] = useState('');
@@ -17,7 +19,7 @@ export default function UserNew() {
 
   const handleSubmit = () => {
     if (!fullName || !email) {
-      setError('Full name and email are required.');
+      setError(t('users.new.fullName') + ' and ' + t('users.new.email') + ' are required.');
       return;
     }
 
@@ -41,16 +43,14 @@ export default function UserNew() {
   return (
     <div className="flex flex-col bg-white px-8 py-4 rounded-2xl w-[512px]">
 
-      {/* HEADER */}
       <div className="flex flex-col mb-4">
-        <h1 className="text-3xl mb-0">Add New User</h1>
-        <p className="text-lg mt-0 text-primary/75">Enter the details to create a new account.</p>
+        <h1 className="text-3xl mb-0">{t('users.new.title')}</h1>
+        <p className="text-lg mt-0 text-primary/75">{t('users.new.description')}</p>
       </div>
 
-      {/* FORM */}
       <div className="flex flex-col gap-2">
         <InputTextfieldStateful
-          label="Full Name *"
+          label={t('users.new.fullName') + ' *'}
           placeholder="John Doe"
           defaultValue={fullName}
           onChange={(value) => setFullName(String(value))}
@@ -58,43 +58,41 @@ export default function UserNew() {
 
         <div>
           <InputTextfieldStateful
-            label="Email Address *"
+            label={t('users.new.email') + ' *'}
             placeholder="john.doe@example.com"
             defaultValue={email}
             onChange={(value) => setEmail(String(value))}
           />
-          <p className="text-xs text-primary/50 mt-1">This will be the user's login.</p>
+          <p className="text-xs text-primary/50 mt-1">{t('users.new.emailHint')}</p>
         </div>
 
         <div>
           <InputTextfieldStateful
-            label="Password"
+            label={t('users.new.password')}
             placeholder="password"
             type="password"
             defaultValue={password}
             onChange={(value) => setPassword(String(value))}
           />
-          <p className="text-xs text-primary/50 mt-1">Default password is "password". User can change it after first login.</p>
+          <p className="text-xs text-primary/50 mt-1">{t('users.new.passwordHint')}</p>
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-primary">Role *</label>
-          <p className="text-sm text-primary px-3 py-2 border border-primary/20 rounded-lg bg-primary/5">Organizer</p>
-          <p className="text-xs text-primary/50">Access only to assigned events.</p>
+          <label className="text-sm font-medium text-primary">{t('users.new.role')}</label>
+          <p className="text-sm text-primary px-3 py-2 border border-primary/20 rounded-lg bg-primary/5">{t('users.roles.Organizer')}</p>
+          <p className="text-xs text-primary/50">{t('users.new.roleHint')}</p>
         </div>
       </div>
 
-      {/* ERROR */}
       {error && <p className="text-error text-sm mt-2">{error}</p>}
 
-      {/* ACTIONS */}
       <div className="flex items-center justify-between mt-4 pb-4">
         <button
           onClick={() => history.push('/admin/users')}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-primary/60 hover:text-primary transition-colors cursor-pointer outline-none border-none bg-transparent"
         >
           <Icon icon={LuArrowLeft} />
-          <span>Cancel</span>
+          <span>{t('users.new.cancel')}</span>
         </button>
 
         <button
@@ -103,7 +101,7 @@ export default function UserNew() {
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-primary bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none disabled:opacity-50"
         >
           <Icon icon={LuUserPlus} />
-          <span>{loading ? 'Creating...' : 'Add User'}</span>
+          <span>{loading ? `${t('users.new.pending')}...` : t('users.new.submit')}</span>
         </button>
       </div>
 

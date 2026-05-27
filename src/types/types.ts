@@ -33,6 +33,7 @@ export interface User {
   email: string;
   emailVerified: boolean;
   role: 'Admin' | 'Organizer'; // String: Admin/Organizer
+  lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;
 }

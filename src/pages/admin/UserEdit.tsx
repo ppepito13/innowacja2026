@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { LuSave, LuArrowLeft } from 'react-icons/lu';
 import { InputTextfieldStateful } from '@lsg/components';
+import { useTranslation } from 'react-i18next';
 import bcrypt from 'bcryptjs';
 import parseClient from '../../services/parseClient';
 import Icon from '../../components/Icon';
@@ -9,6 +10,7 @@ import Icon from '../../components/Icon';
 interface Params { id: string; }
 
 export default function UserEdit() {
+  const { t } = useTranslation();
   const { id } = useParams<Params>();
   const history = useHistory();
 
@@ -53,16 +55,14 @@ export default function UserEdit() {
   return (
     <div className="flex flex-col bg-white px-8 py-4 rounded-2xl w-[512px]">
 
-      {/* HEADER */}
       <div className="flex flex-col mb-4">
-        <h1 className="text-3xl mb-0">Edit User</h1>
-        <p className="text-lg mt-0 text-primary/75">Modify user details for "{fullName || email}".</p>
+        <h1 className="text-3xl mb-0">{t('users.edit.title')}</h1>
+        <p className="text-lg mt-0 text-primary/75">{t('users.edit.description', { name: fullName || email })}</p>
       </div>
 
-      {/* FORM */}
       <div className="flex flex-col gap-2">
         <InputTextfieldStateful
-          label="Full Name *"
+          label={t('users.edit.fullName') + ' *'}
           placeholder="John Doe"
           defaultValue={fullName}
           onChange={(value) => setFullName(String(value))}
@@ -70,35 +70,34 @@ export default function UserEdit() {
 
         <div>
           <InputTextfieldStateful
-            label="Email Address *"
+            label={t('users.edit.email') + ' *'}
             placeholder="john.doe@example.com"
             defaultValue={email}
             onChange={(value) => setEmail(String(value))}
           />
-          <p className="text-xs text-primary/50 mt-1">This will be the user's login.</p>
+          <p className="text-xs text-primary/50 mt-1">{t('users.edit.emailHint')}</p>
         </div>
 
         <div>
           <InputTextfieldStateful
-            label="New Password"
-            placeholder="Leave empty to keep current"
+            label={t('users.edit.newPassword')}
+            placeholder={t('users.edit.passwordHint')}
             type="password"
             defaultValue={newPassword}
             onChange={(value) => setNewPassword(String(value))}
           />
-          <p className="text-xs text-primary/50 mt-1">Leave empty to keep current password.</p>
+          <p className="text-xs text-primary/50 mt-1">{t('users.edit.passwordHint')}</p>
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-primary">Role *</label>
-          <p className="text-sm text-primary px-3 py-2 border border-primary/20 rounded-lg bg-primary/5">Organizer</p>
+          <label className="text-sm font-medium text-primary">{t('users.edit.role')}</label>
+          <p className="text-sm text-primary px-3 py-2 border border-primary/20 rounded-lg bg-primary/5">{t('users.roles.Organizer')}</p>
         </div>
 
-        {/* isLocked */}
         <div className="flex items-center justify-between px-3 py-3 border border-primary/20 rounded-lg mt-1">
           <div>
-            <p className="text-sm font-medium text-primary">Lock account</p>
-            <p className="text-xs text-primary/50">User will not be able to log in.</p>
+            <p className="text-sm font-medium text-primary">{t('users.edit.lockAccount')}</p>
+            <p className="text-xs text-primary/50">{t('users.edit.lockAccountHint')}</p>
           </div>
           <button
             onClick={() => setIsLocked(!isLocked)}
@@ -109,17 +108,15 @@ export default function UserEdit() {
         </div>
       </div>
 
-      {/* ERROR */}
       {error && <p className="text-error text-sm mt-2">{error}</p>}
 
-      {/* ACTIONS */}
       <div className="flex items-center justify-between mt-4 pb-4">
         <button
           onClick={() => history.push('/admin/users')}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-primary/60 hover:text-primary transition-colors cursor-pointer outline-none border-none bg-transparent"
         >
           <Icon icon={LuArrowLeft} />
-          <span>Cancel</span>
+          <span>{t('users.edit.cancel')}</span>
         </button>
 
         <button
@@ -128,7 +125,7 @@ export default function UserEdit() {
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-primary bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none disabled:opacity-50"
         >
           <Icon icon={LuSave} />
-          <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+          <span>{saving ? `${t('users.edit.pending')}...` : t('users.edit.submit')}</span>
         </button>
       </div>
 

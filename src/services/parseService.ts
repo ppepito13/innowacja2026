@@ -89,6 +89,14 @@ export const authService = {
       params: { username: email, password: passwordHash }
     });
     localStorage.setItem('parseSessionToken', data.sessionToken);
+
+    // zapisz datę ostatniego logowania
+    await parseClient.put(`/users/${data.objectId}`, {
+      lastLoginAt: new Date().toISOString()
+    }, {
+      headers: { 'X-Parse-Session-Token': data.sessionToken }
+    });
+
     return data;
   },
 

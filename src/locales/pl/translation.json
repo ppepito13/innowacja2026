@@ -83,5 +83,56 @@
     "termsAndConditions": "regulaminie",
     "requiredField": "Pole wymagane.",
     "register": "Zarejestruj"
+  },
+  "users": {
+    "title": "Użytkownicy",
+    "description": "Zarządzaj użytkownikami i ich uprawnieniami.",
+    "addUser": "Dodaj użytkownika",
+    "allUsers": "Wszyscy użytkownicy",
+    "allUsersDescription": "Przeglądaj, edytuj i usuwaj użytkowników systemu.",
+    "search": "Szukaj użytkowników...",
+    "allRoles": "Wszystkie role",
+    "found": "Znaleziono {{count}} użytkowników",
+    "columns": {
+      "user": "Użytkownik",
+      "role": "Rola",
+      "lastLogin": "Ostatnie logowanie",
+      "actions": "Akcje"
+    },
+    "roles": {
+      "Admin": "Administrator",
+      "Organizer": "Organizator"
+    },
+    "noUsers": "Nie znaleziono użytkowników.",
+    "deleteConfirm": "Na pewno usunąć użytkownika?",
+    "new": {
+      "title": "Dodaj nowego użytkownika",
+      "description": "Wprowadź dane, aby utworzyć nowe konto.",
+      "fullName": "Imię i nazwisko",
+      "email": "Adres e-mail",
+      "emailHint": "To będzie login użytkownika.",
+      "password": "Hasło",
+      "passwordHint": "Domyślne hasło to \"password\". Użytkownik może je zmienić po pierwszym logowaniu.",
+      "role": "Rola",
+      "roleHint": "Dostęp tylko do przypisanych wydarzeń.",
+      "cancel": "Anuluj",
+      "submit": "Dodaj użytkownika",
+      "pending": "Tworzenie"
+    },
+    "edit": {
+      "title": "Edytuj użytkownika",
+      "description": "Zmień dane użytkownika \"{{name}}\".",
+      "fullName": "Imię i nazwisko",
+      "email": "Adres e-mail",
+      "emailHint": "To będzie login użytkownika.",
+      "newPassword": "Nowe hasło",
+      "passwordHint": "Zostaw puste, aby zachować obecne hasło.",
+      "role": "Rola",
+      "lockAccount": "Zablokuj konto",
+      "lockAccountHint": "Użytkownik nie będzie mógł się zalogować.",
+      "cancel": "Anuluj",
+      "submit": "Zapisz zmiany",
+      "pending": "Zapisywanie"
+    }
   }
 }
