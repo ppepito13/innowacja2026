@@ -142,7 +142,6 @@
     "error": "Error"
   },
   "eventDetails": {
-    "loading": "Loading...",
     "registerNow": "Register Now",
     "fillForm": "Fill out the form below to secure your spot.",
     "fullName": "Full Name",
@@ -156,7 +155,13 @@
     "readMoreIn": "Read more in",
     "termsAndConditions": "terms and conditions",
     "requiredField": "Required field.",
-    "register": "Register"
+    "register": "Register",
+    "validation": {
+      "required": "This field is required",
+      "email": "Invalid email address",
+      "phone": "Invalid phone number",
+      "number": "Must be a number"
+    }
   },
   "users": {
     "title": "Users",

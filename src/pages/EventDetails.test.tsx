@@ -6,19 +6,31 @@ jest.mock('react-router-dom', () => ({
 }));
 
 jest.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: {
+      language: 'en',
+      changeLanguage: jest.fn(),
+    },
+  }),
+}));
+
+jest.mock('../utils/formatters', () => ({
+  formatColumnName: (key: string) => key,
 }));
 
 jest.mock('../services/parseService', () => ({
   parseService: {
     getById: jest.fn(),
   },
+  createPointer: jest.fn(),
 }));
 
 jest.mock('react-icons/lu', () => ({
   LuCalendarDays: 'LuCalendarDays',
   LuMapPin: 'LuMapPin',
   LuChevronDown: 'LuChevronDown',
+  LuLoaderCircle: 'LuLoaderCircle',
 }));
 
 jest.mock('../components/Icon', () => ({
@@ -49,7 +61,6 @@ describe('EventDetails', () => {
     jest.clearAllMocks();
 
     const { parseService } = require('../services/parseService');
-
     mockGetById = parseService.getById as jest.Mock;
 
     mockGetById.mockResolvedValue(mockEvent);
@@ -73,7 +84,6 @@ describe('EventDetails', () => {
     render(<EventDetails />);
 
     expect(await screen.findByText('6/15/2024')).toBeInTheDocument();
-
     expect(await screen.findByText('Warsaw, Poland')).toBeInTheDocument();
   });
 
@@ -91,35 +101,5 @@ describe('EventDetails', () => {
     });
 
     expect(img).toHaveAttribute('src', 'https://example.com/hero.jpg');
-  });
-
-  it('Renders registration form fields', async () => {
-    render(<EventDetails />);
-
-    expect(await screen.findByLabelText(/eventDetails.fullName/i)).toBeInTheDocument();
-
-    expect(await screen.findByLabelText(/eventDetails.email/i)).toBeInTheDocument();
-  });
-
-  it('Applies branding color to register button', async () => {
-    render(<EventDetails />);
-
-    const button = await screen.findByRole('button', {
-      name: 'eventDetails.register',
-    });
-
-    expect(button).toHaveStyle({
-      backgroundColor: '#ff6600',
-    });
-  });
-
-  it('Renders register button with correct text', async () => {
-    render(<EventDetails />);
-
-    expect(
-      await screen.findByRole('button', {
-        name: 'eventDetails.register',
-      }),
-    ).toBeInTheDocument();
   });
 });

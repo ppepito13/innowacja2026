@@ -142,7 +142,6 @@
     "error": "Błąd"
   },
   "eventDetails": {
-    "loading": "Ładowanie...",
     "registerNow": "Zarejestruj się teraz",
     "fillForm": "Wypełnij poniższy formularz, aby zarezerwować miejsce.",
     "fullName": "Imię i nazwisko",
@@ -156,7 +155,13 @@
     "readMoreIn": "Dowiedz się więcej w",
     "termsAndConditions": "regulaminie",
     "requiredField": "Pole wymagane.",
-    "register": "Zarejestruj"
+    "register": "Zarejestruj",
+    "validation": {
+      "required": "To pole jest wymagane",
+      "email": "Nieprawidłowy adres e-mail",
+      "phone": "Nieprawidłowy numer telefonu",
+      "number": "Musi być liczbą"
+    }
   },
   "users": {
     "title": "Użytkownicy",

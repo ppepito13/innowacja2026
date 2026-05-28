@@ -2,33 +2,112 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Event } from '../types/types';
-import { parseService } from '../services/parseService';
-import { LuCalendarDays, LuMapPin, LuChevronDown } from 'react-icons/lu';
+import { formatColumnName } from '../utils/formatters';
+import { parseService, createPointer } from '../services/parseService';
+import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle } from 'react-icons/lu';
 import Icon from '../components/Icon';
+
+const LANGUAGES = [
+  { code: 'en', label: 'EN' },
+  { code: 'pl', label: 'PL' },
+];
 
 export default function EventDetails() {
   const { eventId } = useParams<{ eventId: string }>();
   const [event, setEvent] = useState<Event | null>(null);
-  const { t } = useTranslation();
+  const [consent, setConsent] = useState(false);
+  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     if (!eventId) return;
     parseService.getById<Event>('TestEvent', eventId).then(setEvent);
   }, [eventId]);
 
+  const validateField = (value: string, field: any) => {
+    const required = field.required === true;
+
+    if (required && !value) {
+      return t('eventDetails.validation.required');
+    }
+
+    if (!value) return '';
+
+    if (field.type === 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+      if (!emailRegex.test(value)) return t('eventDetails.validation.email');
+    }
+
+    if (field.type === 'phone') {
+      if (!/^[0-9+\-() ]+$/.test(value)) return t('eventDetails.validation.phone');
+    }
+
+    return '';
+  };
+
+  const isFormValid =
+    Object.entries(event?.formConfig ?? {}).every(([key, config]) => {
+      const value = formData[key] ?? '';
+      const field = config as any;
+      return !validateField(value, field);
+    }) && consent;
+
+  const handleSubmit = async () => {
+    if (!event || loading) return;
+
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+
+    try {
+      await parseService.create('Registration', {
+        event: createPointer('TestEvent', event.objectId),
+        formData,
+        status: 'pending',
+      });
+
+      setFormData({});
+      setConsent(false);
+      setFormErrors({});
+      setSuccess(true);
+    } catch (e: any) {
+      setError(e.message || 'Error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!event) {
     return (
       <div className="min-h-screen bg-[#111111] text-white flex items-center justify-center">
-        {t('eventDetails.loading')}
+        <Icon icon={LuLoaderCircle} size={32} className="animate-spin" />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-[#0b1521] text-white font-sans relative pb-16">
-      <header className="bg-[#1f2937] p-4 flex items-center shadow-md relative z-20">
-        <div className="max-w-7xl mx-auto w-full flex items-center gap-3">
-          <div className="text-xl font-bold text-white">Logo</div>
+      <header className="bg-[#1f2937] p-4 flex items-center justify-between shadow-md relative z-20">
+        <div className="text-xl font-bold text-white">Commerzbank Events</div>
+
+        <div className="flex gap-2 text-sm">
+          {LANGUAGES.map(({ code, label }) => (
+            <span
+              key={code}
+              onClick={() => i18n.changeLanguage(code)}
+              className={`px-3 py-1 rounded cursor-pointer transition ${
+                i18n.language === code
+                  ? 'bg-[#2f4661] text-white'
+                  : 'bg-[#24364b] text-gray-300 hover:bg-[#2f4661]'
+              }`}
+            >
+              {label}
+            </span>
+          ))}
         </div>
       </header>
 
@@ -49,7 +128,14 @@ export default function EventDetails() {
                 <div className="flex items-center gap-2">
                   <Icon icon={LuCalendarDays} size={16} />
                   <span>{event.startDate.date?.toString()}</span>
+                  {event.endDate && (
+                    <>
+                      <span>&ndash;</span>
+                      <span>{event.startDate.date?.toString()}</span>
+                    </>
+                  )}
                 </div>
+
                 {event.location && (
                   <div className="flex items-center gap-2">
                     <Icon icon={LuMapPin} size={16} />
@@ -70,52 +156,123 @@ export default function EventDetails() {
             <p className="text-sm text-gray-400 mb-8">{t('eventDetails.fillForm')}</p>
 
             <form className="flex flex-col gap-6">
-              <div>
-                <label htmlFor="fullName" className="block text-xs font-bold text-white mb-2">
-                  {t('eventDetails.fullName')} <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="fullName"
-                  className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
-                  placeholder="John Doe"
-                />
-              </div>
+              {Object.entries(event.formConfig ?? {}).map(([key, config]) => {
+                const field = config as any;
+                const isRequired = field.required === true;
+                const value = formData[key] || '';
 
-              <div>
-                <label htmlFor="email" className="block text-xs font-bold text-white mb-2">
-                  {t('eventDetails.email')} <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
-                  placeholder="john.doe@example.com"
-                />
-              </div>
+                return (
+                  <div key={key}>
+                    <label htmlFor={key} className="block text-xs font-bold text-white mb-2">
+                      {formatColumnName(key)}{' '}
+                      {isRequired && <span className="text-red-500">*</span>}
+                    </label>
 
-              <div>
-                <label htmlFor="dropdown" className="block text-xs font-bold text-white mb-2">
-                  {t('eventDetails.dropdown')}
-                </label>
-                <div className="relative w-full box-border">
-                  <select
-                    id="dropdown"
-                    defaultValue=""
-                    className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors appearance-none"
-                  >
-                    <option value="" disabled hidden>
-                      {t('eventDetails.selectOption')}
-                    </option>
-                    <option value="option1">{t('eventDetails.option1')}</option>
-                    <option value="option2">{t('eventDetails.option2')}</option>
-                    <option value="option3">{t('eventDetails.option3')}</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                    <Icon icon={LuChevronDown} size={16} />
+                    {field.type === 'string' && (
+                      <input
+                        id={key}
+                        type="text"
+                        value={value}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setFormData((prev) => ({ ...prev, [key]: val }));
+                          setFormErrors((prev) => ({
+                            ...prev,
+                            [key]: validateField(val, field),
+                          }));
+                        }}
+                        className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
+                      />
+                    )}
+
+                    {field.type === 'email' && (
+                      <input
+                        id={key}
+                        type="email"
+                        value={value}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setFormData((prev) => ({ ...prev, [key]: val }));
+                          setFormErrors((prev) => ({
+                            ...prev,
+                            [key]: validateField(val, field),
+                          }));
+                        }}
+                        className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
+                      />
+                    )}
+
+                    {field.type === 'phone' && (
+                      <input
+                        id={key}
+                        type="tel"
+                        value={value}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setFormData((prev) => ({ ...prev, [key]: val }));
+                          setFormErrors((prev) => ({
+                            ...prev,
+                            [key]: validateField(val, field),
+                          }));
+                        }}
+                        className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
+                      />
+                    )}
+
+                    {field.type === 'number' && (
+                      <input
+                        id={key}
+                        type="number"
+                        value={value}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setFormData((prev) => ({ ...prev, [key]: val }));
+                          setFormErrors((prev) => ({
+                            ...prev,
+                            [key]: validateField(val, field),
+                          }));
+                        }}
+                        className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
+                      />
+                    )}
+
+                    {field.type === 'select' && (
+                      <div className="relative w-full box-border">
+                        <select
+                          id={key}
+                          value={value}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setFormData((prev) => ({ ...prev, [key]: val }));
+                            setFormErrors((prev) => ({
+                              ...prev,
+                              [key]: validateField(val, field),
+                            }));
+                          }}
+                          className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors appearance-none"
+                        >
+                          <option value="" disabled hidden>
+                            {t('eventDetails.selectOption')}
+                          </option>
+                          {field.values?.map((value: string) => (
+                            <option key={value} value={value}>
+                              {value}
+                            </option>
+                          ))}
+                        </select>
+
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                          <Icon icon={LuChevronDown} size={16} />
+                        </div>
+                      </div>
+                    )}
+
+                    {formErrors[key] && (
+                      <p className="text-xs text-yellow-400 mt-1">{formErrors[key]}</p>
+                    )}
                   </div>
-                </div>
-              </div>
+                );
+              })}
 
               <div className="bg-[#1e2e40] border border-gray-600/50 rounded-md p-4 mt-2">
                 <div className="flex items-start gap-3">
@@ -123,6 +280,8 @@ export default function EventDetails() {
                     <input
                       id="consent"
                       type="checkbox"
+                      checked={consent}
+                      onChange={(e) => setConsent(e.target.checked)}
                       className="w-4 h-4 rounded-full border border-gray-500 bg-[#162436] focus:ring-0 cursor-pointer appearance-none checked:bg-current"
                       style={{ color: event.primaryColor, borderColor: event.accentColor }}
                     />
@@ -151,9 +310,14 @@ export default function EventDetails() {
                 type="button"
                 className="w-full mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
                 style={{ backgroundColor: event.accentColor }}
+                onClick={handleSubmit}
+                disabled={loading || !isFormValid}
               >
                 {t('eventDetails.register')}
               </button>
+
+              {success && <p className="text-green-400 text-sm">{t('eventDetails.success')}</p>}
+              {error && <p className="text-red-400 text-sm">{error}</p>}
             </form>
           </section>
         </div>
