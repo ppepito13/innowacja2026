@@ -35,6 +35,7 @@ export interface User {
   role: 'Admin' | 'Organizer'; // String: Admin/Organizer
   lastLoginAt?: string;
   fullName?: string;
+  isLocked?: boolean;
   createdAt: string;
   updatedAt: string;
 }

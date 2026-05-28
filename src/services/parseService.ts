@@ -88,7 +88,7 @@ export const authService = {
     const { data } = await parseClient.get('/login', {
       params: { username: email, password: passwordHash }
     });
-    localStorage.setItem('parseSessionToken', data.sessionToken);
+    localStorage.setItem('sessionToken', data.sessionToken);
 
     // zapisz datę ostatniego logowania
     await parseClient.put(`/users/${data.objectId}`, {
@@ -102,11 +102,11 @@ export const authService = {
 
   async logout(): Promise<void> {
     await parseClient.post('/logout');
-    localStorage.removeItem('parseSessionToken');
+    localStorage.removeItem('sessionToken');
   },
 
   async getCurrentUser(): Promise<ParseObject | null> {
-    const token = localStorage.getItem('parseSessionToken');
+    const token = localStorage.getItem('sessionToken');
     if (!token) return null;
     const { data } = await parseClient.get('/users/me');
     return data;

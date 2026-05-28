@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import bcrypt from 'bcryptjs';
 import parseClient from '../../services/parseClient';
 import Icon from '../../components/Icon';
+import { User } from '../../types/types';
 
 interface Params { id: string; }
 
@@ -14,23 +15,25 @@ export default function UserEdit() {
   const { id } = useParams<Params>();
   const history = useHistory();
 
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
+  const [user, setUser] = useState<User>({
+    objectId: '', username: '', email: '', emailVerified: false,
+    role: 'Organizer', fullName: '', isLocked: false,
+    createdAt: '', updatedAt: '',
+  });
   const [newPassword, setNewPassword] = useState('');
-  const [isLocked, setIsLocked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleChange = <K extends keyof User>(field: K, value: User[K]) => {
+    setUser(prev => ({ ...prev, [field]: value }));
+  };
+
   useEffect(() => {
-    parseClient.get(`/users/${id}`, {
+    parseClient.get<User>(`/users/${id}`, {
       headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY }
     })
-      .then(res => {
-        setFullName(res.data.fullName || '');
-        setEmail(res.data.email || '');
-        setIsLocked(res.data.isLocked || false);
-      })
+      .then(res => setUser(res.data))
       .catch(err => setError(err.response?.data?.error || err.message))
       .finally(() => setLoading(false));
   }, [id]);
@@ -39,7 +42,11 @@ export default function UserEdit() {
     setSaving(true);
     setError(null);
 
-    const payload: Record<string, unknown> = { fullName, email, isLocked };
+    const payload: Record<string, unknown> = {
+      fullName: user.fullName,
+      email: user.email,
+      isLocked: user.isLocked,
+    };
     if (newPassword) payload.password = bcrypt.hashSync(newPassword, process.env.REACT_APP_BCRYPT_SALT);
 
     parseClient.put(`/users/${id}`, payload, {
@@ -57,23 +64,23 @@ export default function UserEdit() {
 
       <div className="flex flex-col mb-4">
         <h1 className="text-3xl mb-0">{t('users.edit.title')}</h1>
-        <p className="text-lg mt-0 text-primary/75">{t('users.edit.description', { name: fullName || email })}</p>
+        <p className="text-lg mt-0 text-primary/75">{t('users.edit.description', { name: user.fullName || user.email })}</p>
       </div>
 
       <div className="flex flex-col gap-2">
         <InputTextfieldStateful
           label={t('users.edit.fullName') + ' *'}
           placeholder="John Doe"
-          defaultValue={fullName}
-          onChange={(value) => setFullName(String(value))}
+          defaultValue={user.fullName ?? ''}
+          onChange={(value) => handleChange('fullName', String(value))}
         />
 
         <div>
           <InputTextfieldStateful
             label={t('users.edit.email') + ' *'}
             placeholder="john.doe@example.com"
-            defaultValue={email}
-            onChange={(value) => setEmail(String(value))}
+            defaultValue={user.email}
+            onChange={(value) => handleChange('email', String(value))}
           />
           <p className="text-xs text-primary/50 mt-1">{t('users.edit.emailHint')}</p>
         </div>
@@ -100,10 +107,10 @@ export default function UserEdit() {
             <p className="text-xs text-primary/50">{t('users.edit.lockAccountHint')}</p>
           </div>
           <button
-            onClick={() => setIsLocked(!isLocked)}
-            className={`w-10 h-6 rounded-full transition-colors cursor-pointer border-none relative ${isLocked ? 'bg-error' : 'bg-primary/20'}`}
+            onClick={() => handleChange('isLocked', !user.isLocked)}
+            className={`w-10 h-6 rounded-full transition-colors cursor-pointer border-none relative ${user.isLocked ? 'bg-error' : 'bg-primary/20'}`}
           >
-            <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${isLocked ? 'left-5' : 'left-1'}`} />
+            <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${user.isLocked ? 'left-5' : 'left-1'}`} />
           </button>
         </div>
       </div>

@@ -6,19 +6,27 @@ import { useTranslation } from 'react-i18next';
 import bcrypt from 'bcryptjs';
 import parseClient from '../../services/parseClient';
 import Icon from '../../components/Icon';
+import { User } from '../../types/types';
+
+type NewUser = Pick<User, 'fullName' | 'email' | 'role'>;
 
 export default function UserNew() {
   const { t } = useTranslation();
   const history = useHistory();
 
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
+  const [user, setUser] = useState<NewUser>({
+    fullName: '', email: '', role: 'Organizer',
+  });
   const [password, setPassword] = useState('password');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleChange = <K extends keyof NewUser>(field: K, value: NewUser[K]) => {
+    setUser(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleSubmit = () => {
-    if (!fullName || !email) {
+    if (!user.fullName || !user.email) {
       setError(t('users.new.fullName') + ' and ' + t('users.new.email') + ' are required.');
       return;
     }
@@ -29,11 +37,11 @@ export default function UserNew() {
     const hashedPassword = bcrypt.hashSync(password, process.env.REACT_APP_BCRYPT_SALT);
 
     parseClient.post('/users', {
-      username: email,
-      email,
+      username: user.email,
+      email: user.email,
       password: hashedPassword,
-      fullName,
-      role: 'Organizer',
+      fullName: user.fullName,
+      role: user.role,
     })
       .then(() => history.push('/admin/users'))
       .catch(err => setError(err.response?.data?.error || err.message))
@@ -52,16 +60,16 @@ export default function UserNew() {
         <InputTextfieldStateful
           label={t('users.new.fullName') + ' *'}
           placeholder="John Doe"
-          defaultValue={fullName}
-          onChange={(value) => setFullName(String(value))}
+          defaultValue={user.fullName ?? ''}
+          onChange={(value) => handleChange('fullName', String(value))}
         />
 
         <div>
           <InputTextfieldStateful
             label={t('users.new.email') + ' *'}
             placeholder="john.doe@example.com"
-            defaultValue={email}
-            onChange={(value) => setEmail(String(value))}
+            defaultValue={user.email}
+            onChange={(value) => handleChange('email', String(value))}
           />
           <p className="text-xs text-primary/50 mt-1">{t('users.new.emailHint')}</p>
         </div>

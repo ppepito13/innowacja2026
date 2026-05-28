@@ -11,7 +11,7 @@ const parseClient = axios.create({
 
 // Interceptor — dołącza token sesji jeśli użytkownik jest zalogowany
 parseClient.interceptors.request.use((config) => {
-    const sessionToken = localStorage.getItem('parseSessionToken');
+    const sessionToken = localStorage.getItem('sessionToken');
     if (sessionToken) {
         config.headers['X-Parse-Session-Token'] = sessionToken;
     }
