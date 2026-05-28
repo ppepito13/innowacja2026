@@ -9,75 +9,117 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
+jest.mock('../services/parseService', () => ({
+  parseService: {
+    getById: jest.fn(),
+  },
+}));
+
+jest.mock('react-icons/lu', () => ({
+  LuCalendarDays: 'LuCalendarDays',
+  LuMapPin: 'LuMapPin',
+  LuChevronDown: 'LuChevronDown',
+}));
+
+jest.mock('../components/Icon', () => ({
+  __esModule: true,
+  default: ({ icon }: any) => <span>{icon}</span>,
+}));
+
 const mockEvent = {
   objectId: 'event123',
   title: 'Tech Conference 2024',
-  date: '2024-06-15',
+  startDate: new Date('2024-06-15'),
   location: 'Warsaw, Poland',
   heroImageUrl: 'https://example.com/hero.jpg',
-  descriptionHtml: '<p>An amazing tech event.</p>',
-  brandingHexColor: '#ff6600',
+  description: '<p>An amazing tech event.</p>',
+  primaryColor: '#ff6600',
+  dateType: 'single' as const,
+  eventFormat: 'on-site' as const,
+  isActive: true,
   formConfig: {},
+  createdAt: '2024-01-01T00:00:00.000Z',
+  updatedAt: '2024-01-01T00:00:00.000Z',
 };
 
-jest.mock('../services/MockEventService', () => ({
-  getMockEvent: () => mockEvent,
-}));
-
-jest.mock('../assets/calendar-icon.svg', () => ({
-  ReactComponent: () => <svg data-testid="calendar-icon" />,
-}));
-
-jest.mock('../assets/location-icon.svg', () => ({
-  ReactComponent: () => <svg data-testid="location-icon" />,
-}));
-
-jest.mock('../assets/chevron-down-icon.svg', () => ({
-  ReactComponent: () => <svg data-testid="chevron-down-icon" />,
-}));
-
 describe('EventDetails', () => {
-  it('Renders properly', () => {
+  let mockGetById: jest.Mock;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    const { parseService } = require('../services/parseService');
+
+    mockGetById = parseService.getById as jest.Mock;
+
+    mockGetById.mockResolvedValue(mockEvent);
+  });
+
+  it('Renders properly', async () => {
     const { asFragment } = render(<EventDetails />);
+
+    await screen.findByText('Tech Conference 2024');
+
     expect(asFragment()).toMatchSnapshot();
   });
 
-  it('Renders event title', () => {
+  it('Renders event title', async () => {
     render(<EventDetails />);
-    expect(screen.getByText('Tech Conference 2024')).toBeInTheDocument();
+
+    expect(await screen.findByText('Tech Conference 2024')).toBeInTheDocument();
   });
 
-  it('Renders event date and location', () => {
+  it('Renders event date and location', async () => {
     render(<EventDetails />);
-    expect(screen.getByText('2024-06-15')).toBeInTheDocument();
-    expect(screen.getByText('Warsaw, Poland')).toBeInTheDocument();
+
+    expect(await screen.findByText('6/15/2024')).toBeInTheDocument();
+
+    expect(await screen.findByText('Warsaw, Poland')).toBeInTheDocument();
   });
 
-  it('Renders event description HTML', () => {
+  it('Renders event description HTML', async () => {
     render(<EventDetails />);
-    expect(screen.getByText('An amazing tech event.')).toBeInTheDocument();
+
+    expect(await screen.findByText('An amazing tech event.')).toBeInTheDocument();
   });
 
-  it('Renders hero image with correct src', () => {
+  it('Renders hero image with correct src', async () => {
     render(<EventDetails />);
-    const img = screen.getByRole('img', { name: 'Tech Conference 2024' });
+
+    const img = await screen.findByRole('img', {
+      name: 'Tech Conference 2024',
+    });
+
     expect(img).toHaveAttribute('src', 'https://example.com/hero.jpg');
   });
 
-  it('Renders registration form fields', () => {
+  it('Renders registration form fields', async () => {
     render(<EventDetails />);
-    expect(screen.getByLabelText(/eventDetails.fullName/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/eventDetails.email/i)).toBeInTheDocument();
+
+    expect(await screen.findByLabelText(/eventDetails.fullName/i)).toBeInTheDocument();
+
+    expect(await screen.findByLabelText(/eventDetails.email/i)).toBeInTheDocument();
   });
 
-  it('Applies branding color to register button', () => {
+  it('Applies branding color to register button', async () => {
     render(<EventDetails />);
-    const button = screen.getByRole('button');
-    expect(button).toHaveStyle({ backgroundColor: '#ff6600' });
+
+    const button = await screen.findByRole('button', {
+      name: 'eventDetails.register',
+    });
+
+    expect(button).toHaveStyle({
+      backgroundColor: '#ff6600',
+    });
   });
 
-  it('Renders register button with correct text', () => {
+  it('Renders register button with correct text', async () => {
     render(<EventDetails />);
-    expect(screen.getByRole('button', { name: 'eventDetails.register' })).toBeInTheDocument();
+
+    expect(
+      await screen.findByRole('button', {
+        name: 'eventDetails.register',
+      }),
+    ).toBeInTheDocument();
   });
 });

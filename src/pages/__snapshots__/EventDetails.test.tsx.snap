@@ -53,19 +53,19 @@ exports[`EventDetails Renders properly 1`] = `
               <div
                 class="flex items-center gap-2"
               >
-                <svg
-                  data-testid="calendar-icon"
-                />
                 <span>
-                  2024-06-15
+                  LuCalendarDays
+                </span>
+                <span>
+                  6/15/2024
                 </span>
               </div>
               <div
                 class="flex items-center gap-2"
               >
-                <svg
-                  data-testid="location-icon"
-                />
+                <span>
+                  LuMapPin
+                </span>
                 <span>
                   Warsaw, Poland
                 </span>
@@ -175,9 +175,9 @@ exports[`EventDetails Renders properly 1`] = `
                 <div
                   class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400"
                 >
-                  <svg
-                    data-testid="chevron-down-icon"
-                  />
+                  <span>
+                    LuChevronDown
+                  </span>
                 </div>
               </div>
             </div>
