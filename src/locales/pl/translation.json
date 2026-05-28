@@ -161,7 +161,8 @@
       "email": "Nieprawidłowy adres e-mail",
       "phone": "Nieprawidłowy numer telefonu",
       "number": "Musi być liczbą"
-    }
+    },
+    "success": "Rejestracja przebiegła pomyślnie"
   },
   "users": {
     "title": "Użytkownicy",

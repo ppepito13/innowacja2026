@@ -161,7 +161,8 @@
       "email": "Invalid email address",
       "phone": "Invalid phone number",
       "number": "Must be a number"
-    }
+    },
+    "success": "You have been registered successfully"
   },
   "users": {
     "title": "Users",
