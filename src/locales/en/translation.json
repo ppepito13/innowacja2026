@@ -229,6 +229,7 @@
       "start": "Start Scanner",
       "stop": "Stop Scanner",
       "successTitle": "Success!",
+      "successInlineTitle": "Check-in Successful!",
       "success": "{{name}}: Check-in successful!",
       "warningTitle": "Scan Result",
       "warning": "{{name}}: User already checked in at {{time}}.",

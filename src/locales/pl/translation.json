@@ -229,6 +229,7 @@
       "start": "Uruchom Skaner",
       "stop": "Zatrzymaj Skaner",
       "successTitle": "Sukces!",
+      "successInlineTitle": "Zameldowanie powiodło się!",
       "success": "{{name}}: Zameldowano pomyślnie!",
       "warningTitle": "Wynik Skanowania",
       "warning": "{{name}}: Uczestnik jest już zameldowany z dnia {{time}}.",

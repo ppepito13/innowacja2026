@@ -3,24 +3,96 @@ import { useTranslation } from 'react-i18next';
 import { parseService } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
 import Icon from '../../components/Icon';
-import { LuDownload, LuChevronDown } from 'react-icons/lu';
+import { LuDownload, LuChevronDown, LuZap, LuZapOff } from 'react-icons/lu';
 
-import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
+
+// Synthesize pleasant sound effects using Web Audio API
+const playBeep = (type: 'success' | 'error') => {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    
+    if (type === 'success') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime); // A5 note
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.25);
+    } else {
+      const now = ctx.currentTime;
+      const playBuzz = (startTime: number, duration: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(120, startTime); // Low frequency
+        gain.gain.setValueAtTime(0.12, startTime);
+        gain.gain.linearRampToValueAtTime(0.001, startTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      };
+      // Play a short double-buzz
+      playBuzz(now, 0.15);
+      playBuzz(now + 0.2, 0.15);
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('Audio feedback blocked or not supported:', e);
+  }
+};
+
+// Device vibration feedback
+const triggerVibration = (type: 'success' | 'error') => {
+  if (typeof navigator !== 'undefined' && navigator.vibrate) {
+    if (type === 'success') {
+      navigator.vibrate(100);
+    } else {
+      navigator.vibrate([120, 80, 120]);
+    }
+  }
+};
 
 export default function CheckIn() {
   const { t } = useTranslation();
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'qr' | 'manual'>('qr');
-
+  
   // Scanner state
   const [scanStatus, setScanStatus] = useState<'idle' | 'success' | 'warning' | 'error'>('idle');
-  const [scanMessage, setScanMessage] = useState<{ title: string; body: string } | null>(null);
+  const [scanMessage, setScanMessage] = useState<{
+    toastTitle: string;
+    toastBody: string;
+    inlineTitle: string;
+    inlineBody: string;
+  } | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  
+  // Flashlight state
+  const [hasFlashlight, setHasFlashlight] = useState(false);
+  const [flashlightOn, setFlashlightOn] = useState(false);
 
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  // Recent scans state (last 3 in this session)
+  const [recentScans, setRecentScans] = useState<Array<{
+    id: string;
+    name: string;
+    status: 'success' | 'warning' | 'error';
+    time: string;
+  }>>([]);
+  
+  const scannerRef = useRef<Html5Qrcode | null>(null);
 
   useEffect(() => {
-    // Fetch all events for the dropdown
     parseService.getAll<Event>('TestEvent')
       .then(data => {
         setEvents(data);
@@ -32,111 +104,235 @@ export default function CheckIn() {
       .catch(console.error);
   }, []);
 
+  // Cleanup scanner on unmount
+  useEffect(() => {
+    return () => {
+      if (scannerRef.current && isScanning) {
+        // eslint-disable-next-line no-console
+        scannerRef.current.stop().catch(console.error);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isScanning]);
+
   const handleScan = async (decodedText: string) => {
+    if (scannerRef.current) {
+      await scannerRef.current.pause();
+    }
+
     try {
       const registration = await parseService.getById<Registration>('Registration', decodedText);
-
+      
       if (!registration || registration.status !== 'approved') {
+        const errorMsg = registration 
+          ? t('checkIn.scanner.error', { name: 'User', message: 'Registration not found or not approved.' })
+          : t('checkIn.scanner.error', { name: '', message: 'Registration not found.' });
+        
+        const cleanMsg = errorMsg.replace(/^:\s*/, '');
+        
         setScanStatus('error');
         setScanMessage({
-          title: t('checkIn.scanner.errorTitle'),
-          body: t('checkIn.scanner.error', {
-            name: registration ? 'User' : '',
-            message: 'Registration not found or not approved.'
-          }).replace(/^:\s*/, '')
+          toastTitle: t('checkIn.scanner.warningTitle'), // "Scan Result"
+          toastBody: cleanMsg,
+          inlineTitle: t('checkIn.scanner.errorTitle'), // "Scan Failed"
+          inlineBody: cleanMsg,
         });
-        return;
-      }
 
-      const name = registration.formData?.fullName || registration.formData?.name || 'Attendee';
+        playBeep('error');
+        triggerVibration('error');
 
-      if (registration.checkInTime) {
-        // Already checked in
-        const checkInDate = new Date(registration.checkInTime);
-        const timeStr = checkInDate.toLocaleString();
-        setScanStatus('warning');
-        setScanMessage({
-          title: t('checkIn.scanner.warningTitle'),
-          body: t('checkIn.scanner.warning', { name, time: timeStr })
-        });
+        setRecentScans(prev => [
+          {
+            id: Math.random().toString(),
+            name: registration ? 'User' : 'Unknown',
+            status: 'error' as const,
+            time: new Date().toLocaleTimeString(),
+          },
+          ...prev
+        ].slice(0, 3));
       } else {
-        await parseService.update<Registration>('Registration', registration.objectId, {
-          checkInTime: new Date()
-        });
-        setScanStatus('success');
-        setScanMessage({
-          title: t('checkIn.scanner.successTitle'),
-          body: t('checkIn.scanner.success', { name })
-        });
-      }
+        const name = (registration.formData?.fullName as string) || (registration.formData?.name as string) || 'Attendee';
 
+        if (registration.checkInTime) {
+          const checkInDate = new Date(registration.checkInTime);
+          const timeStr = checkInDate.toLocaleString();
+          const warningMsg = t('checkIn.scanner.warning', { name, time: timeStr });
+          
+          setScanStatus('warning');
+          setScanMessage({
+            toastTitle: t('checkIn.scanner.warningTitle'), // "Scan Result"
+            toastBody: warningMsg,
+            inlineTitle: t('checkIn.scanner.errorTitle'), // "Scan Failed"
+            inlineBody: warningMsg,
+          });
+
+          playBeep('error');
+          triggerVibration('error');
+
+          setRecentScans(prev => [
+            {
+              id: Math.random().toString(),
+              name,
+              status: 'warning' as const,
+              time: new Date().toLocaleTimeString(),
+            },
+            ...prev
+          ].slice(0, 3));
+        } else {
+          await parseService.update<Registration>('Registration', registration.objectId, {
+            checkInTime: new Date()
+          });
+          
+          const successMsg = t('checkIn.scanner.success', { name });
+          
+          setScanStatus('success');
+          setScanMessage({
+            toastTitle: t('checkIn.scanner.successTitle'), // "Success!"
+            toastBody: successMsg,
+            inlineTitle: t('checkIn.scanner.successInlineTitle'), // "Check-in Successful!"
+            inlineBody: successMsg,
+          });
+
+          playBeep('success');
+          triggerVibration('success');
+
+          setRecentScans(prev => [
+            {
+              id: Math.random().toString(),
+              name,
+              status: 'success' as const,
+              time: new Date().toLocaleTimeString(),
+            },
+            ...prev
+          ].slice(0, 3));
+        }
+      }
     } catch (err: any) {
+      const errorMsg = t('checkIn.scanner.error', { name: '', message: 'Registration not found.' });
+      const cleanMsg = errorMsg.replace(/^:\s*/, '');
+      
       setScanStatus('error');
       setScanMessage({
-        title: t('checkIn.scanner.errorTitle'),
-        body: t('checkIn.scanner.error', { name: '', message: 'Registration not found.' }).replace(/^:\s*/, '')
+        toastTitle: t('checkIn.scanner.warningTitle'), // "Scan Result"
+        toastBody: cleanMsg,
+        inlineTitle: t('checkIn.scanner.errorTitle'), // "Scan Failed"
+        inlineBody: cleanMsg,
       });
+
+      playBeep('error');
+      triggerVibration('error');
+
+      setRecentScans(prev => [
+        {
+          id: Math.random().toString(),
+          name: 'Unknown',
+          status: 'error' as const,
+          time: new Date().toLocaleTimeString(),
+        },
+        ...prev
+      ].slice(0, 3));
+    }
+
+    setTimeout(() => {
+      setScanMessage(null);
+      setScanStatus('idle');
+      if (scannerRef.current && isScanning) {
+        scannerRef.current.resume();
+      }
+    }, 2500);
+  };
+
+  const toggleScanner = async () => {
+    if (isScanning) {
+      if (scannerRef.current) {
+        try {
+          await scannerRef.current.stop();
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error(e);
+        }
+        scannerRef.current = null;
+      }
+      setIsScanning(false);
+      setHasFlashlight(false);
+      setFlashlightOn(false);
+    } else {
+      if (!scannerRef.current) {
+        scannerRef.current = new Html5Qrcode("qr-reader");
+      }
+      try {
+        await scannerRef.current.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 250, height: 250 } },
+          (decodedText) => handleScan(decodedText),
+          // eslint-disable-next-line no-console
+          (error) => { /* ignore */ }
+        );
+        setIsScanning(true);
+
+        // Capability checking has to happen shortly after camera initializes
+        setTimeout(() => {
+          try {
+            if (scannerRef.current) {
+              const capabilities = scannerRef.current.getRunningTrackCapabilities();
+              if (capabilities && (capabilities as any).torch) {
+                setHasFlashlight(true);
+              }
+            }
+          } catch (e) {
+            // ignore capability failures
+          }
+        }, 500);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("Camera start failed:", err);
+      }
     }
   };
 
-  // Setup Scanner
-  useEffect(() => {
-    if (activeTab === 'qr') {
-      const scanner = new Html5QrcodeScanner(
-        "qr-reader",
-        { fps: 10, qrbox: { width: 250, height: 250 }, supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA] },
-        false
-      );
-
-      scanner.render(
-        (text) => handleScan(text),
-        // eslint-disable-next-line no-console
-        (error) => { /* ignore normal scanning errors */ }
-      );
-
-      scannerRef.current = scanner;
-      
-      return () => {
-        // eslint-disable-next-line no-console
-        scanner.clear().catch(console.error);
-      };
-    } else {
-      if (scannerRef.current) {
-        // eslint-disable-next-line no-console
-        scannerRef.current.clear().catch(console.error);
-        scannerRef.current = null;
-      }
+  const toggleFlashlight = async () => {
+    if (!scannerRef.current || !hasFlashlight) return;
+    try {
+      const nextState = !flashlightOn;
+      await scannerRef.current.applyVideoConstraints({
+        advanced: [{ torch: nextState } as any]
+      });
+      setFlashlightOn(nextState);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to toggle flashlight", e);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
+  };
 
   return (
-    <div className="min-h-screen bg-[#0b1521] text-white font-sans flex flex-col items-center p-4">
-
+    <div className="fixed inset-0 z-[100] bg-[#0c1626] text-white overflow-x-hidden overflow-y-auto flex flex-col items-center">
       {/* Toast Notification */}
       {scanMessage && (
-        <div className={`fixed top-4 left-4 right-4 z-50 p-4 rounded-xl shadow-lg border-l-4
-          ${scanStatus === 'success' ? 'bg-[#162436] border-green-500' : ''}
-          ${scanStatus === 'warning' ? 'bg-[#162436] border-yellow-500' : ''}
-          ${scanStatus === 'error' ? 'bg-red-500 border-red-700 text-white' : ''}
+        <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 p-4 rounded-xl shadow-2xl border toast-enter flex flex-col justify-center w-[90%] max-w-[400px] min-h-[80px]
+          ${scanStatus === 'success' ? 'bg-[#0f1b2c] border-[#1e324a]' : ''}
+          ${scanStatus === 'warning' || scanStatus === 'error' ? 'bg-[#f05252] border-red-600 text-white' : ''}
         `}>
-          <h4 className="font-bold mb-1">{scanMessage.title}</h4>
-          <p className="text-sm opacity-90">{scanMessage.body}</p>
+          <h4 className="font-headline font-bold mb-1 text-base">{scanMessage.toastTitle}</h4>
+          <p className="text-sm opacity-90">{scanMessage.toastBody}</p>
         </div>
       )}
 
-      {/* Main Container */}
-      <div className="w-full max-w-md mt-16">
-        <h1 className="text-2xl font-bold mb-2">{t('checkIn.title')}</h1>
-        <p className="text-sm text-gray-400 mb-6">{t('checkIn.subtitle')}</p>
-
-        {/* Dropdown and Export */}
-        <div className="flex flex-col gap-3 mb-6">
-          <div className="relative w-full box-border">
+      {/* Main Content - Mobile Width Constrained */}
+      <main className="w-full max-w-[480px] p-4 sm:p-6 lg:p-8 flex flex-col min-h-full font-sans">
+        
+        {/* Header Section */}
+        <div className="w-full mb-8 pt-4">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-wide">{t('checkIn.title')}</h1>
+          <p className="text-sm text-gray-400 mt-2">{t('checkIn.subtitle')}</p>
+        </div>
+        
+        {/* Controls Row */}
+        <div className="flex flex-col gap-4 mb-8">
+          <div className="relative w-full">
             <select
               value={selectedEventId}
               onChange={(e) => setSelectedEventId(e.target.value)}
-              className="w-full box-border bg-[#162436] border border-gray-700/50 rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 appearance-none"
+              className="w-full bg-[#162436] border border-[#24364b] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none appearance-none font-medium shadow-sm"
             >
               {events.map(ev => (
                 <option key={ev.objectId} value={ev.objectId}>{ev.title}</option>
@@ -147,67 +343,159 @@ export default function CheckIn() {
             </div>
           </div>
 
-          <button
-            type="button"
-            className="flex items-center justify-center gap-2 w-full bg-[#162436] border border-gray-700/50 rounded-md px-4 py-3 text-sm hover:bg-[#1e2e40] transition-colors"
+          <button 
+            type="button" 
+            className="flex items-center justify-center gap-2 w-full bg-[#162436] border border-[#24364b] rounded-xl px-4 py-3.5 text-sm text-white hover:bg-[#1e2e40] transition-colors shadow-sm font-medium"
           >
             <Icon icon={LuDownload} size={16} />
-            {t('checkIn.export')} <Icon icon={LuChevronDown} size={14} />
+            {t('checkIn.export')}
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex bg-[#162436] rounded-md p-1 mb-6">
-          <button
+        {/* Tabs Container */}
+        <div className="flex bg-[#24364b] rounded-xl mb-6 p-1 shadow-sm shrink-0 font-sans">
+          <button 
             onClick={() => setActiveTab('qr')}
-            className={`flex-1 py-2 text-sm rounded-md transition-colors ${activeTab === 'qr' ? 'bg-[#24364b] font-semibold' : 'text-gray-400 hover:text-white'}`}
+            className={`flex-1 py-3 text-sm transition-all font-semibold rounded-lg
+              ${activeTab === 'qr' ? 'bg-[#0b1521] text-white shadow-md' : 'text-gray-400 hover:text-gray-300'}`}
           >
             {t('checkIn.tabs.qrScanner')}
           </button>
-          <button
+          <button 
             onClick={() => setActiveTab('manual')}
-            className={`flex-1 py-2 text-sm rounded-md transition-colors ${activeTab === 'manual' ? 'bg-[#24364b] font-semibold' : 'text-gray-400 hover:text-white'}`}
+            className={`flex-1 py-3 text-sm transition-all font-semibold rounded-lg
+              ${activeTab === 'manual' ? 'bg-[#0b1521] text-white shadow-md' : 'text-gray-400 hover:text-gray-300'}`}
           >
             {t('checkIn.tabs.manual')}
           </button>
         </div>
 
-        {/* Scanner Card */}
+        {/* Scanner Area */}
         {activeTab === 'qr' && (
-          <div className="bg-[#162436] border border-gray-700/50 rounded-xl p-6 shadow-2xl">
-            <h2 className="text-xl font-bold mb-2">{t('checkIn.scanner.title')}</h2>
-            <p className="text-sm text-gray-400 mb-6">{t('checkIn.scanner.description')}</p>
-
-            <div className="bg-[#0b1521] rounded-lg overflow-hidden mb-6 min-h-[250px] flex items-center justify-center relative">
-              <div id="qr-reader" className="w-full h-full text-black"></div>
+          <div className="flex-1 bg-[#162436] border border-[#24364b] rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col mb-6">
+            
+            <div className="w-full text-left mb-6">
+              <h2 className="text-xl font-bold mb-1">{t('checkIn.scanner.title')}</h2>
+              <p className="text-sm text-gray-400">{t('checkIn.scanner.description')}</p>
             </div>
 
-            {/* Scan Result Box */}
+            <div className="flex justify-center mb-6">
+              <button
+                onClick={toggleScanner}
+                className={`py-3 px-8 rounded-xl font-bold text-sm transition-all shadow-md
+                  ${isScanning 
+                    ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/50' 
+                    : 'bg-[#fbbd23] text-black hover:bg-[#fbbd23]/90'
+                  }
+                `}
+              >
+                {isScanning ? t('checkIn.scanner.stop') : t('checkIn.scanner.start')}
+              </button>
+            </div>
+
+            {/* QR Video Area with Glowing/Pulsing Borders */}
+            <div className={`w-full relative bg-black rounded-xl overflow-hidden flex flex-col items-center justify-center border aspect-square transition-all duration-300
+              ${scanStatus === 'success' ? 'border-[#10b981] shadow-[0_0_20px_rgba(16,185,129,0.35)]' : ''}
+              ${scanStatus === 'warning' || scanStatus === 'error' ? 'border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.35)]' : ''}
+              ${scanStatus === 'idle' && isScanning ? 'border-[#24364b] shadow-[0_0_15px_rgba(36,54,75,0.25)]' : 'border-[#24364b]'}
+            `}>
+              <div id="qr-reader" className="w-full h-full flex items-center justify-center"></div>
+              {!isScanning && (
+                <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+                  <p className="text-sm font-medium">Camera is off.</p>
+                </div>
+              )}
+
+              {/* Flashlight/Torch Trigger Button */}
+              {isScanning && hasFlashlight && (
+                <button
+                  type="button"
+                  onClick={toggleFlashlight}
+                  className={`absolute top-4 right-4 p-3 rounded-full transition-all shadow-lg backdrop-blur-md border z-10
+                    ${flashlightOn 
+                      ? 'bg-yellow-400 text-black border-yellow-500 scale-110 shadow-yellow-500/20' 
+                      : 'bg-black/60 text-white border-white/20 hover:bg-black/80'
+                    }
+                  `}
+                >
+                  <Icon icon={flashlightOn ? LuZap : LuZapOff} size={18} />
+                </button>
+              )}
+            </div>
+            
+            {/* Scan Result Box shown below video */}
             {scanMessage && (
-              <div className={`p-4 rounded-xl border mt-4
-                ${scanStatus === 'success' ? 'bg-[#0b1521] border-gray-700/50' : ''}
-                ${scanStatus === 'warning' ? 'bg-[#0b1521] border-yellow-500 text-yellow-500' : ''}
-                ${scanStatus === 'error' ? 'bg-[#0b1521] border-red-500 text-red-500' : ''}
+              <div className={`w-full mt-6 p-4 rounded-xl border transition-all duration-300 scale-in
+                ${scanStatus === 'success' ? 'bg-[#0b1521] border-[#24364b]' : ''}
+                ${scanStatus === 'warning' || scanStatus === 'error' ? 'bg-[#0b1521] border-red-500/70' : ''}
               `}>
-                <h4 className={`font-bold mb-1
+                <h4 className={`font-bold mb-1 text-sm
                   ${scanStatus === 'success' ? 'text-white' : ''}
-                `}>{scanMessage.title}</h4>
+                  ${scanStatus === 'warning' || scanStatus === 'error' ? 'text-red-500' : ''}
+                `}>{scanMessage.inlineTitle}</h4>
                 <p className={`text-sm
                   ${scanStatus === 'success' ? 'text-gray-300' : ''}
-                `}>{scanMessage.body}</p>
+                  ${scanStatus === 'warning' || scanStatus === 'error' ? 'text-red-500' : ''}
+                `}>{scanMessage.inlineBody}</p>
               </div>
             )}
           </div>
         )}
 
-        {/* Manual Check-in Placeholder */}
-        {activeTab === 'manual' && (
-          <div className="bg-[#162436] border border-gray-700/50 rounded-xl p-6 shadow-2xl text-center py-12 text-gray-400">
-            Manual check-in feature coming soon.
+        {/* Recent Scans Session Log */}
+        {activeTab === 'qr' && recentScans.length > 0 && (
+          <div className="w-full bg-[#162436]/40 border border-[#24364b]/40 rounded-2xl p-5 shadow-lg scale-in mb-8">
+            <h3 className="text-xs font-bold text-gray-400 mb-3 tracking-wider uppercase">Ostatnie skanowania</h3>
+            <div className="flex flex-col gap-2.5">
+              {recentScans.map(scan => (
+                <div key={scan.id} className="flex items-center justify-between bg-[#0b1521]/60 px-4 py-3 rounded-xl border border-[#24364b]/20">
+                  <div className="flex items-center gap-3">
+                    <span className={`w-2.5 h-2.5 rounded-full ${
+                      scan.status === 'success' ? 'bg-[#10b981] shadow-[0_0_8px_#10b981]' : 'bg-[#ef4444] shadow-[0_0_8px_#ef4444]'
+                    }`} />
+                    <span className="text-sm font-medium text-white truncate max-w-[200px]">{scan.name}</span>
+                  </div>
+                  <span className="text-xs text-gray-500 font-mono">{scan.time}</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-      </div>
+        {/* Manual Check-in Placeholder */}
+        {activeTab === 'manual' && (
+          <div className="flex-1 bg-[#162436] border border-[#24364b] rounded-2xl p-6 shadow-xl text-center py-16 text-gray-400 flex flex-col items-center justify-center mb-8">
+            <p>Manual check-in feature coming soon.</p>
+          </div>
+        )}
+      </main>
+
+      {/* Global styles for scanner */}
+      <style>{`
+        .toast-enter {
+          animation: slideDown 0.3s ease-out forwards;
+        }
+        @keyframes slideDown {
+          from { transform: translate(-50%, -100%); opacity: 0; }
+          to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        .scale-in {
+          animation: scaleIn 0.2s ease-out forwards;
+        }
+        @keyframes scaleIn {
+          from { transform: scale(0.95); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Enforce absolute styling on video to match the container */
+        #qr-reader video {
+          object-fit: cover !important;
+          border-radius: 0.75rem;
+          width: 100% !important;
+          height: 100% !important;
+        }
+      `}</style>
     </div>
   );
 }
