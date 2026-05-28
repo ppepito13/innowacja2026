@@ -5,7 +5,6 @@ import { Registration, Event } from '../../types/types';
 import Icon from '../../components/Icon';
 import { LuDownload, LuChevronDown } from 'react-icons/lu';
 
-// Assuming we use html5-qrcode once it's installed
 import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
 
 export default function CheckIn() {
@@ -13,11 +12,11 @@ export default function CheckIn() {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'qr' | 'manual'>('qr');
-  
+
   // Scanner state
   const [scanStatus, setScanStatus] = useState<'idle' | 'success' | 'warning' | 'error'>('idle');
   const [scanMessage, setScanMessage] = useState<{ title: string; body: string } | null>(null);
-  
+
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
 
   useEffect(() => {
@@ -29,28 +28,26 @@ export default function CheckIn() {
           setSelectedEventId(data[0].objectId);
         }
       })
+      // eslint-disable-next-line no-console
       .catch(console.error);
   }, []);
 
   const handleScan = async (decodedText: string) => {
-    // Stop scanner temporarily or keep scanning?
-    // According to AC: "Po wykryciu poprawnego kodu QR, system automatycznie wysyła zapytanie..."
     try {
       const registration = await parseService.getById<Registration>('Registration', decodedText);
-      
+
       if (!registration || registration.status !== 'approved') {
         setScanStatus('error');
         setScanMessage({
           title: t('checkIn.scanner.errorTitle'),
-          body: t('checkIn.scanner.error', { 
-            name: registration ? 'User' : '', 
-            message: 'Registration not found or not approved.' 
+          body: t('checkIn.scanner.error', {
+            name: registration ? 'User' : '',
+            message: 'Registration not found or not approved.'
           }).replace(/^:\s*/, '')
         });
         return;
       }
 
-      // We need a name to display. Form data could have name or username.
       const name = registration.formData?.fullName || registration.formData?.name || 'Attendee';
 
       if (registration.checkInTime) {
@@ -63,7 +60,6 @@ export default function CheckIn() {
           body: t('checkIn.scanner.warning', { name, time: timeStr })
         });
       } else {
-        // Not checked in, let's check them in!
         await parseService.update<Registration>('Registration', registration.objectId, {
           checkInTime: new Date()
         });
@@ -91,28 +87,32 @@ export default function CheckIn() {
         { fps: 10, qrbox: { width: 250, height: 250 }, supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA] },
         false
       );
-      
+
       scanner.render(
         (text) => handleScan(text),
+        // eslint-disable-next-line no-console
         (error) => { /* ignore normal scanning errors */ }
       );
-      
+
       scannerRef.current = scanner;
       
       return () => {
+        // eslint-disable-next-line no-console
         scanner.clear().catch(console.error);
       };
     } else {
       if (scannerRef.current) {
+        // eslint-disable-next-line no-console
         scannerRef.current.clear().catch(console.error);
         scannerRef.current = null;
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   return (
     <div className="min-h-screen bg-[#0b1521] text-white font-sans flex flex-col items-center p-4">
-      
+
       {/* Toast Notification */}
       {scanMessage && (
         <div className={`fixed top-4 left-4 right-4 z-50 p-4 rounded-xl shadow-lg border-l-4
@@ -147,8 +147,8 @@ export default function CheckIn() {
             </div>
           </div>
 
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="flex items-center justify-center gap-2 w-full bg-[#162436] border border-gray-700/50 rounded-md px-4 py-3 text-sm hover:bg-[#1e2e40] transition-colors"
           >
             <Icon icon={LuDownload} size={16} />
@@ -158,13 +158,13 @@ export default function CheckIn() {
 
         {/* Tabs */}
         <div className="flex bg-[#162436] rounded-md p-1 mb-6">
-          <button 
+          <button
             onClick={() => setActiveTab('qr')}
             className={`flex-1 py-2 text-sm rounded-md transition-colors ${activeTab === 'qr' ? 'bg-[#24364b] font-semibold' : 'text-gray-400 hover:text-white'}`}
           >
             {t('checkIn.tabs.qrScanner')}
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('manual')}
             className={`flex-1 py-2 text-sm rounded-md transition-colors ${activeTab === 'manual' ? 'bg-[#24364b] font-semibold' : 'text-gray-400 hover:text-white'}`}
           >
