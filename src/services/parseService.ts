@@ -110,7 +110,12 @@ export const authService = {
   async getCurrentUser(): Promise<ParseObject | null> {
     const token = localStorage.getItem(SESSION_TOKEN_KEY);
     if (!token) return null;
-    const { data } = await parseClient.get('/users/me');
-    return data;
+    try {
+      const { data } = await parseClient.get('/users/me');
+      return data;
+    } catch (error) {
+      // Interceptor już posprzątał localStorage przy 209.
+      return null;
+    }
   },
 };

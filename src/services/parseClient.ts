@@ -19,4 +19,17 @@ parseClient.interceptors.request.use((config) => {
     return config;
 });
 
+// Response interceptor — czyści zły/przedawniony token przy błędzie 209
+parseClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+      if (error?.response?.data?.code === 209) {
+          localStorage.removeItem(SESSION_TOKEN_KEY);
+          // powiadom AuthProvider, żeby zresetował usera
+          window.dispatchEvent(new Event('auth:session-invalid'));
+      }
+      return Promise.reject(error);
+  },
+);
+
 export default parseClient;
