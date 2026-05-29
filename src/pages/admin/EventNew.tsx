@@ -15,7 +15,8 @@ export default function EventNew() {
     const { t } = useTranslation();
     const history = useHistory();
 
-    const [event, setEvent] = useState<Partial<Event>>({
+    const [event, setEvent] = useState<Event>({
+        objectId: '',
         title: '',
         description: '',
         dateType: 'single',
@@ -26,6 +27,10 @@ export default function EventNew() {
         primaryColor: DEFAULT_PRIMARY_COLOR,
         accentColor: DEFAULT_ACCENT_COLOR,
         heroImageUrl: '',
+        isActive: false,
+        formConfig: {},
+        createdAt: '',
+        updatedAt: '',
     });
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -70,23 +75,26 @@ export default function EventNew() {
         setSaving(true);
         setError(null);
 
-        const payload: Record<string, unknown> = {
+        const payload: Event = {
+            objectId: '',
             title: event.title,
             description: event.description,
+            startDate: event.startDate,
+            endDate: event.endDate,
             dateType: event.dateType,
             eventFormat: event.eventFormat,
             location: event.location,
             primaryColor: event.primaryColor,
             accentColor: event.accentColor,
             heroImageUrl: event.heroImageUrl,
-            ...(event.startDate && { startDate: { __type: 'Date', iso: event.startDate.toISOString() } }),
-            ...(event.dateType === 'multi' && event.endDate
-                ? { endDate: { __type: 'Date', iso: event.endDate.toISOString() } }
-                : { endDate: { __op: 'Delete' } }),
+            isActive: event.isActive,
+            formConfig: event.formConfig,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
         };
 
         parseService
-            .create<Event>(EVENT_CLASS, payload as any)
+            .create<Event>(EVENT_CLASS, payload)
             .then(({ objectId }) => history.push(`/admin/events/${objectId}/edit`))
             .catch((e: any) => setError(e.message))
             .finally(() => setSaving(false));
