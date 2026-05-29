@@ -1,9 +1,9 @@
 export interface Event {
-    objectId: string;
+    objectId?: string;
     title: string;
     description: string; // HTML/String
-    startDate: Date | undefined;
-    endDate?: Date | undefined;
+    startDate: MongoDate;
+    endDate?: MongoDate;
     dateType: 'single' | 'multi';
     eventFormat: 'virtual' | 'on-site';
     location: string;
@@ -12,9 +12,10 @@ export interface Event {
     heroImageUrl: string;
     isActive: boolean;
     formConfig: Record<string, unknown>; // JSON/Object
-    createdAt: string;
-    updatedAt: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
+
 export interface Registration {
   objectId: string;
   event: Event; // Pointer
@@ -33,4 +34,11 @@ export interface User {
   role: 'Admin' | 'Organizer'; // String: Admin/Organizer
   createdAt: string;
   updatedAt: string;
+}
+
+export interface MongoDate {
+    date?: Date;
+    __type?: 'Date';
+    iso?: string;
+    __op?: 'Delete';
 }
