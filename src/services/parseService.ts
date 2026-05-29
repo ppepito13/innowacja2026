@@ -1,7 +1,7 @@
+import parseClient from './parseClient';
 import bcrypt from 'bcryptjs';
 
-import parseClient from './parseClient';
-
+export const SESSION_TOKEN_KEY = 'sessionToken';
 // Typy
 
 export interface ParseObject {
@@ -85,25 +85,37 @@ export const parseService = {
 //  Auth
 
 export const authService = {
-  async login(
-    email: string,
-    password: string,
-  ): Promise<{ sessionToken: string; objectId: string }> {
+  async login(email: string, password: string) {
     const passwordHash = bcrypt.hashSync(password, process.env.REACT_APP_BCRYPT_SALT);
-    const { data } = await parseClient.get('/login', { params: { email, password: passwordHash } });
-    localStorage.setItem('parseSessionToken', data.sessionToken);
+    const { data } = await parseClient.get('/login', {
+      params: { username: email, password: passwordHash }
+    });
+    localStorage.setItem(SESSION_TOKEN_KEY, data.sessionToken);
+
+    // zapisz datę ostatniego logowania
+    await parseClient.put(`/users/${data.objectId}`, {
+      lastLoginAt: new Date().toISOString()
+    }, {
+      headers: { 'X-Parse-Session-Token': data.sessionToken }
+    });
+
     return data;
   },
 
   async logout(): Promise<void> {
     await parseClient.post('/logout');
-    localStorage.removeItem('parseSessionToken');
+    localStorage.removeItem(SESSION_TOKEN_KEY);
   },
 
   async getCurrentUser(): Promise<ParseObject | null> {
-    const token = localStorage.getItem('parseSessionToken');
+    const token = localStorage.getItem(SESSION_TOKEN_KEY);
     if (!token) return null;
-    const { data } = await parseClient.get('/users/me');
-    return data;
+    try {
+      const { data } = await parseClient.get('/users/me');
+      return data;
+    } catch (error) {
+      // Interceptor już posprzątał localStorage przy 209.
+      return null;
+    }
   },
 };
