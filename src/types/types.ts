@@ -2,8 +2,8 @@ export interface Event {
     objectId: string;
     title: string;
     description: string; // HTML/String
-    startDate: Date;
-    endDate?: Date;
+    startDate: Date | undefined;
+    endDate?: Date | undefined;
     dateType: 'single' | 'multi';
     eventFormat: 'virtual' | 'on-site';
     location: string;
@@ -14,14 +14,6 @@ export interface Event {
     formConfig: Record<string, unknown>; // JSON/Object
     createdAt: string;
     updatedAt: string;
-
-    // Frontend (Mock) fields
-    id?: string;
-    date?: string;
-    location?: string;
-    descriptionHtml?: string;
-    brandingHexColor?: string;
-    heroImageUrl?: string;
 }
 export interface Registration {
   objectId: string;
