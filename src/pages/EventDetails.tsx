@@ -6,6 +6,7 @@ import { formatColumnName } from '../utils/formatters';
 import { parseService, createPointer } from '../services/parseService';
 import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle } from 'react-icons/lu';
 import Icon from '../components/Icon';
+import { EMAIL_REGEX, PHONE_REGEX } from '../utils/regex';
 
 const LANGUAGES = [
   { code: 'en', label: 'EN' },
@@ -38,12 +39,11 @@ export default function EventDetails() {
     if (!value) return '';
 
     if (field.type === 'email') {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-      if (!emailRegex.test(value)) return t('eventDetails.validation.email');
+      if (!EMAIL_REGEX.test(value)) return t('eventDetails.validation.email');
     }
 
     if (field.type === 'phone') {
-      if (!/^[0-9+\-() ]+$/.test(value)) return t('eventDetails.validation.phone');
+      if (!PHONE_REGEX.test(value)) return t('eventDetails.validation.phone');
     }
 
     return '';
