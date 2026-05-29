@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { SESSION_TOKEN_KEY } from './parseService';
 
 const parseClient = axios.create({
     baseURL: '/parse',
@@ -11,7 +12,7 @@ const parseClient = axios.create({
 
 // Interceptor — dołącza token sesji jeśli użytkownik jest zalogowany
 parseClient.interceptors.request.use((config) => {
-    const sessionToken = localStorage.getItem('sessionToken');
+    const sessionToken = localStorage.getItem(SESSION_TOKEN_KEY);
     if (sessionToken) {
         config.headers['X-Parse-Session-Token'] = sessionToken;
     }

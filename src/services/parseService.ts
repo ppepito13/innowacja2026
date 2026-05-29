@@ -1,5 +1,7 @@
 import parseClient from './parseClient';
 import bcrypt from 'bcryptjs';
+
+export const SESSION_TOKEN_KEY = 'sessionToken';
 // Typy
 
 export interface ParseObject {
@@ -88,7 +90,7 @@ export const authService = {
     const { data } = await parseClient.get('/login', {
       params: { username: email, password: passwordHash }
     });
-    localStorage.setItem('sessionToken', data.sessionToken);
+    localStorage.setItem(SESSION_TOKEN_KEY, data.sessionToken);
 
     // zapisz datę ostatniego logowania
     await parseClient.put(`/users/${data.objectId}`, {
@@ -102,11 +104,11 @@ export const authService = {
 
   async logout(): Promise<void> {
     await parseClient.post('/logout');
-    localStorage.removeItem('sessionToken');
+    localStorage.removeItem(SESSION_TOKEN_KEY);
   },
 
   async getCurrentUser(): Promise<ParseObject | null> {
-    const token = localStorage.getItem('sessionToken');
+    const token = localStorage.getItem(SESSION_TOKEN_KEY);
     if (!token) return null;
     const { data } = await parseClient.get('/users/me');
     return data;

@@ -10,15 +10,28 @@ import { User } from '../../types/types';
 
 interface Params { id: string; }
 
+type UserEditPayload = {
+  fullName: string;
+  email: string;
+  isLocked: boolean;
+  password?: string;
+};
+
 export default function UserEdit() {
   const { t } = useTranslation();
   const { id } = useParams<Params>();
   const history = useHistory();
 
   const [user, setUser] = useState<User>({
-    objectId: '', username: '', email: '', emailVerified: false,
-    role: 'Organizer', fullName: '', isLocked: false,
-    createdAt: '', updatedAt: '',
+    objectId: '',
+    username: '',
+    email: '',
+    emailVerified: false,
+    role: 'Organizer',
+    fullName: '',
+    isLocked: false,
+    createdAt: '',
+    updatedAt: '',
   });
   const [newPassword, setNewPassword] = useState('');
   const [loading, setLoading] = useState(true);
@@ -42,10 +55,10 @@ export default function UserEdit() {
     setSaving(true);
     setError(null);
 
-    const payload: Record<string, unknown> = {
-      fullName: user.fullName,
+    const payload: UserEditPayload = {
+      fullName: user.fullName ?? '',
       email: user.email,
-      isLocked: user.isLocked,
+      isLocked: user.isLocked ?? false,
     };
     if (newPassword) payload.password = bcrypt.hashSync(newPassword, process.env.REACT_APP_BCRYPT_SALT);
 

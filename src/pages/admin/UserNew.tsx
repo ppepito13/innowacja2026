@@ -6,17 +6,23 @@ import { useTranslation } from 'react-i18next';
 import bcrypt from 'bcryptjs';
 import parseClient from '../../services/parseClient';
 import Icon from '../../components/Icon';
-import { User } from '../../types/types';
 
-type NewUser = Pick<User, 'fullName' | 'email' | 'role'>;
+type NewUser = {
+  fullName: string;
+  email: string;
+  role: string;
+};
 
 export default function UserNew() {
   const { t } = useTranslation();
   const history = useHistory();
 
   const [user, setUser] = useState<NewUser>({
-    fullName: '', email: '', role: 'Organizer',
+    fullName: '',
+    email: '',
+    role: 'Organizer',
   });
+
   const [password, setPassword] = useState('password');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
