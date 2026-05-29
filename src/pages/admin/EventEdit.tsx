@@ -3,7 +3,7 @@ import { useParams, useHistory } from 'react-router';
 import { LuSave, LuArrowLeft, LuUpload } from 'react-icons/lu';
 import { InputDatepicker, InputTextfieldStateful } from '@lsg/components';
 import { parseService } from '../../services/parseService';
-import { Event } from '../../types/types';
+import {Event, MongoDate} from '../../types/types';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import ColorField from '../../components/ColorField';
@@ -13,10 +13,10 @@ import { EVENT_CLASS, DEFAULT_PRIMARY_COLOR, DEFAULT_ACCENT_COLOR } from '../../
 
 type EventEditParams = { id: string };
 
-function parseParseDate(value: any): Date | undefined {
+function parseParseDate(value: any): MongoDate | undefined {
     if (!value) return undefined;
-    if (value.iso) return new Date(value.iso);
-    return new Date(value);
+    if (value.iso) return {date: new Date(value.iso)};
+    return {date: new Date(value)};
 }
 
 export default function EventEdit() {
@@ -39,7 +39,7 @@ export default function EventEdit() {
         parseService
             .getById<Event>(EVENT_CLASS, id)
             .then((rawEvent) => {
-                const e = rawEvent as any;
+                const e = rawEvent;
                 setEvent({
                     ...rawEvent,
                     dateType: e.dateType ?? 'single',
@@ -99,14 +99,13 @@ export default function EventEdit() {
             primaryColor: event.primaryColor,
             accentColor: event.accentColor,
             heroImageUrl: event.heroImageUrl,
-            ...(event.startDate && { startDate: { __type: 'Date', iso: event.startDate.toISOString() } }),
+            ...(event.startDate && { startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() } }),
             ...(event.dateType === 'multi' && event.endDate
-                ? { endDate: { __type: 'Date', iso: event.endDate.toISOString() } }
-                : { endDate: { __op: 'Delete' } }),
+                ? { endDate: { __type: 'Date', iso: event.endDate.date?.toISOString() } } : {endDate: {__op: 'Delete'}}),
         };
 
         parseService
-            .update<Event>(EVENT_CLASS, id, payload as any)
+            .update<Event>(EVENT_CLASS, id, payload)
             .then(() => history.goBack())
             .catch((e: any) => setError(e.message))
             .finally(() => setSaving(false));
@@ -180,16 +179,16 @@ export default function EventEdit() {
                     <div className="flex-1">
                         <InputDatepicker
                             label={t('eventEdit.fields.startDate')}
-                            value={event.startDate ?? ''}
-                            onChange={(v) => handleFieldChange('startDate', v ? new Date(v as any) : undefined)}
+                            value={event.startDate?.date ?? ''}
+                            onChange={(v) => handleFieldChange('startDate', v ? {date: new Date(v)} : undefined)}
                         />
                     </div>
                     {event.dateType === 'multi' && (
                         <div className="flex-1">
                             <InputDatepicker
                                 label={t('eventEdit.fields.endDate')}
-                                value={event.endDate ?? ''}
-                                onChange={(v) => handleFieldChange('endDate', v ? new Date(v as any) : undefined)}
+                                value={event.endDate?.date ?? ''}
+                                onChange={(v) => handleFieldChange('endDate', v ? {date: new Date(v)} : undefined)}
                             />
                         </div>
                     )}

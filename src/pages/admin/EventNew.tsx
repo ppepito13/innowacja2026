@@ -16,12 +16,11 @@ export default function EventNew() {
     const history = useHistory();
 
     const [event, setEvent] = useState<Event>({
-        objectId: '',
         title: '',
         description: '',
         dateType: 'single',
-        startDate: undefined,
-        endDate: undefined,
+        startDate: {},
+        endDate: {},
         eventFormat: 'on-site',
         location: '',
         primaryColor: DEFAULT_PRIMARY_COLOR,
@@ -29,8 +28,6 @@ export default function EventNew() {
         heroImageUrl: '',
         isActive: false,
         formConfig: {},
-        createdAt: '',
-        updatedAt: '',
     });
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -76,11 +73,11 @@ export default function EventNew() {
         setError(null);
 
         const payload: Event = {
-            objectId: '',
             title: event.title,
             description: event.description,
-            startDate: event.startDate,
-            endDate: event.endDate,
+            ...(event.startDate && { startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() } }),
+            ...(event.dateType === 'multi' && event.endDate
+                ? { endDate: { __type: 'Date', iso: event.endDate.date?.toISOString() } } : undefined),
             dateType: event.dateType,
             eventFormat: event.eventFormat,
             location: event.location,
@@ -89,8 +86,6 @@ export default function EventNew() {
             heroImageUrl: event.heroImageUrl,
             isActive: event.isActive,
             formConfig: event.formConfig,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
         };
 
         parseService
@@ -154,16 +149,16 @@ export default function EventNew() {
                     <div className="flex-1">
                         <InputDatepicker
                             label={t('eventNew.fields.startDate')}
-                            value={event.startDate ?? ''}
-                            onChange={(v) => handleFieldChange('startDate', v ? new Date(v as any) : undefined)}
+                            value={event.startDate?.date ?? ''}
+                            onChange={(v) => handleFieldChange('startDate', v ? {date: new Date(v)} : undefined)}
                         />
                     </div>
                     {event.dateType === 'multi' && (
                         <div className="flex-1">
                             <InputDatepicker
                                 label={t('eventNew.fields.endDate')}
-                                value={event.endDate ?? ''}
-                                onChange={(v) => handleFieldChange('endDate', v ? new Date(v as any) : undefined)}
+                                value={event.endDate?.date ?? ''}
+                                onChange={(v) => handleFieldChange('endDate', v ? {date: new Date(v)} : undefined)}
                             />
                         </div>
                     )}

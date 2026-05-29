@@ -54,7 +54,7 @@ export default function EventDetails() {
               <div className="flex flex-wrap gap-6 text-sm text-gray-400 mb-8 pb-6 border-b border-gray-700/50">
                 <div className="flex items-center gap-2">
                   <CalendarIcon className="h-4 w-4" />
-                  <span>{event.startDate?.toISOString()}</span>
+                  <span>{event.startDate.date?.toString()}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <LocationIcon className="h-4 w-4" />
