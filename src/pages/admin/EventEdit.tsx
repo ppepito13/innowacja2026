@@ -99,7 +99,7 @@ export default function EventEdit() {
             description: event.description,
             ...(event.startDate && { startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() } }),
             ...(event.dateType === 'multi' && event.endDate
-                ? { endDate: { __type: 'Date', iso: event.endDate.date?.toISOString() } } : undefined),
+                ? { endDate: { __type: 'Date', iso: event.endDate.date?.toISOString() } } : {endDate: {__op: 'Delete'}}),
             dateType: event.dateType,
             eventFormat: event.eventFormat,
             location: event.location,
