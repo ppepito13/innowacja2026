@@ -9,30 +9,41 @@ import Icon from '../../components/Icon';
 import ColorField from '../../components/ColorField';
 import RadioGroup from '../../components/RadioGroup';
 import parseClient from '../../services/parseClient';
-import { EVENT_CLASS } from '../../constants/eventDefaults';
+import {DEFAULT_ACCENT_COLOR, DEFAULT_PRIMARY_COLOR, EVENT_CLASS} from '../../constants/eventDefaults';
 
 export default function EventNew() {
     const { t } = useTranslation();
     const history = useHistory();
 
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [dateType, setDateType] = useState<'single' | 'multi'>('single');
-    const [startDate, setStartDate] = useState<Date | null>(null);
-    const [endDate, setEndDate] = useState<Date | null>(null);
-    const [eventFormat, setEventFormat] = useState<'virtual' | 'on-site'>('on-site');
-    const [location, setLocation] = useState('');
-    const [primaryColor, setPrimaryColor] = useState('#002e3c');
-    const [accentColor, setAccentColor] = useState('#ffd700');
-    const [heroImageUrl, setHeroImageUrl] = useState('');
+    const [event, setEvent] = useState<Event>({
+        title: '',
+        description: '',
+        dateType: 'single',
+        startDate: {},
+        endDate: {},
+        eventFormat: 'on-site',
+        location: '',
+        primaryColor: DEFAULT_PRIMARY_COLOR,
+        accentColor: DEFAULT_ACCENT_COLOR,
+        heroImageUrl: '',
+        isActive: false,
+        formConfig: {},
+    });
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const handleFieldChange = <K extends keyof Event>(field: K, value: Event[K] | undefined) => {
+        setEvent((prev) => ({ ...prev, [field]: value }));
+    };
+
     const handleDateTypeChange = (value: 'single' | 'multi') => {
-        setDateType(value);
-        if (value === 'single') setEndDate(null);
+        setEvent((prev) => ({
+            ...prev,
+            dateType: value,
+            ...(value === 'single' && { endDate: undefined }),
+        }));
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,7 +60,7 @@ export default function EventNew() {
                 file,
                 { headers: { 'Content-Type': file.type } },
             );
-            setHeroImageUrl(data.url);
+            handleFieldChange('heroImageUrl', data.url);
         } catch (e: any) {
             setError(e.message);
         } finally {
@@ -61,25 +72,24 @@ export default function EventNew() {
         setSaving(true);
         setError(null);
 
-        const payload: Record<string, unknown> = {
-            title,
-            description,
-            dateType,
-            eventFormat,
-            location,
-            primaryColor,
-            accentColor,
-            heroImageUrl,
-            isActive: false,
-            formConfig: {},
-            ...(startDate && { startDate: { __type: 'Date', iso: startDate.toISOString() } }),
-            ...(dateType === 'multi' && endDate
-                ? { endDate: { __type: 'Date', iso: endDate.toISOString() } }
-                : {}),
+        const payload: Event = {
+            title: event.title,
+            description: event.description,
+            ...(event.startDate && { startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() } }),
+            ...(event.dateType === 'multi' && event.endDate
+                ? { endDate: { __type: 'Date', iso: event.endDate.date?.toISOString() } } : undefined),
+            dateType: event.dateType,
+            eventFormat: event.eventFormat,
+            location: event.location,
+            primaryColor: event.primaryColor,
+            accentColor: event.accentColor,
+            heroImageUrl: event.heroImageUrl,
+            isActive: event.isActive,
+            formConfig: event.formConfig,
         };
 
         parseService
-            .create<Event>(EVENT_CLASS, payload as any)
+            .create<Event>(EVENT_CLASS, payload)
             .then(({ objectId }) => history.push(`/admin/events/${objectId}/edit`))
             .catch((e: any) => setError(e.message))
             .finally(() => setSaving(false));
@@ -110,23 +120,23 @@ export default function EventNew() {
                 <InputTextfieldStateful
                     label={t('eventNew.fields.title')}
                     placeholder={t('eventNew.fields.title')}
-                    defaultValue=""
-                    onChange={(v) => setTitle(String(v))}
+                    defaultValue={event.title ?? ''}
+                    onChange={(v) => handleFieldChange('title',String(v))}
                 />
 
                 {/* Description */}
                 <InputTextfieldStateful
                     label={t('eventNew.fields.description')}
                     placeholder={t('eventNew.fields.descriptionPlaceholder')}
-                    defaultValue=""
+                    defaultValue={event.description ?? ''}
                     textArea={true}
-                    onChange={(v) => setDescription(String(v))}
+                    onChange={(v) => handleFieldChange('description',String(v))}
                 />
 
                 {/* Date Type */}
                 <RadioGroup
                     label={t('eventNew.fields.dateType')}
-                    value={dateType}
+                    value={event.dateType ?? 'single'}
                     onChange={handleDateTypeChange}
                     options={[
                         { value: 'single', label: t('eventNew.fields.dateTypeSingle') },
@@ -139,16 +149,16 @@ export default function EventNew() {
                     <div className="flex-1">
                         <InputDatepicker
                             label={t('eventNew.fields.startDate')}
-                            value={startDate ?? ''}
-                            onChange={(v) => setStartDate(v ? new Date(v as any) : null)}
+                            value={event.startDate?.date ?? ''}
+                            onChange={(v) => handleFieldChange('startDate', v ? {date: new Date(v)} : undefined)}
                         />
                     </div>
-                    {dateType === 'multi' && (
+                    {event.dateType === 'multi' && (
                         <div className="flex-1">
                             <InputDatepicker
                                 label={t('eventNew.fields.endDate')}
-                                value={endDate ?? ''}
-                                onChange={(v) => setEndDate(v ? new Date(v as any) : null)}
+                                value={event.endDate?.date ?? ''}
+                                onChange={(v) => handleFieldChange('endDate', v ? {date: new Date(v)} : undefined)}
                             />
                         </div>
                     )}
@@ -157,8 +167,8 @@ export default function EventNew() {
                 {/* Event Format */}
                 <RadioGroup
                     label={t('eventNew.fields.eventFormat')}
-                    value={eventFormat}
-                    onChange={setEventFormat}
+                    value={event.eventFormat ?? 'on-site'}
+                    onChange={(v) => handleFieldChange('eventFormat', v)}
                     options={[
                         { value: 'virtual', label: t('eventNew.fields.formatVirtual') },
                         { value: 'on-site', label: t('eventNew.fields.formatOnSite') },
@@ -168,17 +178,17 @@ export default function EventNew() {
                 {/* Location — label and placeholder adapt to event format */}
                 <InputTextfieldStateful
                     label={
-                        eventFormat === 'virtual'
+                        event.eventFormat === 'virtual'
                             ? t('eventNew.fields.locationVirtual')
                             : t('eventNew.fields.locationOnSite')
                     }
                     placeholder={
-                        eventFormat === 'virtual'
+                        event.eventFormat === 'virtual'
                             ? t('eventNew.fields.locationVirtualPlaceholder')
                             : t('eventNew.fields.locationOnSitePlaceholder')
                     }
-                    defaultValue=""
-                    onChange={(v) => setLocation(String(v))}
+                    defaultValue={event.location ?? ''}
+                    onChange={(v) => handleFieldChange('location', String(v))}
                 />
 
                 {/* Colors */}
@@ -188,20 +198,20 @@ export default function EventNew() {
                 <div className="flex gap-4">
                     <ColorField
                         label={t('eventNew.fields.primaryColor')}
-                        value={primaryColor}
-                        onChange={setPrimaryColor}
+                        value={event.primaryColor ?? DEFAULT_PRIMARY_COLOR}
+                        onChange={(v) =>handleFieldChange('primaryColor', v)}
                     />
                     <ColorField
                         label={t('eventNew.fields.accentColor')}
-                        value={accentColor}
-                        onChange={setAccentColor}
+                        value={event.accentColor ?? DEFAULT_ACCENT_COLOR}
+                        onChange={(v) => handleFieldChange('accentColor', v)}
                     />
                 </div>
 
                 {/* Color Preview */}
                 <div className="h-8 rounded-lg border border-primary/10 flex overflow-hidden mt-1">
-                    <div className="flex-1" style={{ backgroundColor: primaryColor }} />
-                    <div className="flex-1" style={{ backgroundColor: accentColor }} />
+                    <div className="flex-1" style={{ backgroundColor: event.primaryColor ?? DEFAULT_PRIMARY_COLOR }} />
+                    <div className="flex-1" style={{ backgroundColor: event.accentColor ?? DEFAULT_ACCENT_COLOR }} />
                 </div>
 
                 {/* Hero Image */}
@@ -215,8 +225,8 @@ export default function EventNew() {
                     <div className="flex gap-2">
                         <input
                             type="text"
-                            value={heroImageUrl}
-                            onChange={(e) => setHeroImageUrl(e.target.value)}
+                            value={event.heroImageUrl ?? ''}
+                            onChange={(e) => handleFieldChange('heroImageUrl', e.target.value)}
                             placeholder="https://..."
                             className="flex-1 border border-primary/20 rounded-lg px-3 py-2 text-sm text-primary focus:outline-none focus:border-primary/60"
                         />
@@ -239,9 +249,9 @@ export default function EventNew() {
                     </div>
                 </div>
 
-                {heroImageUrl && (
+                {event.heroImageUrl && (
                     <img
-                        src={heroImageUrl}
+                        src={event.heroImageUrl}
                         alt={t('eventNew.fields.heroImagePreview')}
                         className="mt-1 h-36 w-full object-cover rounded-lg border border-primary/10"
                         onError={(e) => {

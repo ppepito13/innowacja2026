@@ -54,7 +54,7 @@ export default function EventDetails() {
               <div className="flex flex-wrap gap-6 text-sm text-gray-400 mb-8 pb-6 border-b border-gray-700/50">
                 <div className="flex items-center gap-2">
                   <CalendarIcon className="h-4 w-4" />
-                  <span>{event.date}</span>
+                  <span>{event.startDate.date?.toString()}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <LocationIcon className="h-4 w-4" />
@@ -64,7 +64,7 @@ export default function EventDetails() {
 
               <div
                 className="prose prose-invert max-w-none text-gray-300 leading-relaxed text-sm md:text-base"
-                dangerouslySetInnerHTML={{ __html: event.descriptionHtml || '' }}
+                dangerouslySetInnerHTML={{ __html: event.description || '' }}
               />
             </div>
           </section>
@@ -127,7 +127,7 @@ export default function EventDetails() {
                       id="consent"
                       type="checkbox"
                       className="w-4 h-4 rounded-full border border-gray-500 bg-[#162436] focus:ring-0 cursor-pointer appearance-none checked:bg-current"
-                      style={{ color: event.brandingHexColor, borderColor: event.brandingHexColor }}
+                      style={{ color: event.primaryColor, borderColor: event.accentColor }}
                     />
                   </div>
                   <div>
@@ -146,7 +146,7 @@ export default function EventDetails() {
               <button
                 type="button"
                 className="w-full mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                style={{ backgroundColor: event.brandingHexColor }}
+                style={{ backgroundColor: event.accentColor }}
               >
                 {t('eventDetails.register')}
               </button>
