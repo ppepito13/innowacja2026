@@ -1,19 +1,20 @@
 export interface Event {
-    objectId?: string;
-    title: string;
-    description: string; // HTML/String
-    startDate: MongoDate;
-    endDate?: MongoDate;
-    dateType: 'single' | 'multi';
-    eventFormat: 'virtual' | 'on-site';
-    location: string;
-    primaryColor: string;
-    accentColor: string;
-    heroImageUrl: string;
-    isActive: boolean;
-    formConfig: Record<string, unknown>; // JSON/Object
-    createdAt?: string;
-    updatedAt?: string;
+  objectId?: string;
+  title: string;
+  description: string; // HTML/String
+  date?: MongoDate;
+  startDate: MongoDate;
+  endDate?: MongoDate;
+  location?: string;
+  dateType: 'single' | 'multi';
+  eventFormat: 'virtual' | 'on-site';
+  primaryColor: string;
+  accentColor?: string;
+  heroImageUrl?: string;
+  isActive: boolean;
+  formConfig: Record<string, unknown>; // JSON/Object
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Registration {
@@ -40,8 +41,8 @@ export interface User {
 }
 
 export interface MongoDate {
-    date?: Date;
-    __type?: 'Date';
-    iso?: string;
-    __op?: 'Delete';
+  date?: Date;
+  __type?: 'Date';
+  iso?: string;
+  __op?: 'Delete';
 }

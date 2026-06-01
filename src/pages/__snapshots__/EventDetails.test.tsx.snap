@@ -6,16 +6,26 @@ exports[`EventDetails Renders properly 1`] = `
     class="min-h-screen bg-[#0b1521] text-white font-sans relative pb-16"
   >
     <header
-      class="bg-[#1f2937] p-4 flex items-center shadow-md relative z-20"
+      class="bg-[#1f2937] p-4 flex items-center justify-between shadow-md relative z-20"
     >
       <div
-        class="max-w-7xl mx-auto w-full flex items-center gap-3"
+        class="text-xl font-bold text-white"
       >
-        <div
-          class="text-xl font-bold text-white"
+        Commerzbank Events
+      </div>
+      <div
+        class="flex gap-2 text-sm"
+      >
+        <span
+          class="px-3 py-1 rounded cursor-pointer transition bg-[#2f4661] text-white"
         >
-          Logo
-        </div>
+          EN
+        </span>
+        <span
+          class="px-3 py-1 rounded cursor-pointer transition bg-[#24364b] text-gray-300 hover:bg-[#2f4661]"
+        >
+          PL
+        </span>
       </div>
     </header>
     <div
@@ -53,19 +63,19 @@ exports[`EventDetails Renders properly 1`] = `
               <div
                 class="flex items-center gap-2"
               >
-                <svg
-                  data-testid="calendar-icon"
-                />
                 <span>
-                  2024-06-15
+                  LuCalendarDays
+                </span>
+                <span>
+                  15.06.2024, 02:00
                 </span>
               </div>
               <div
                 class="flex items-center gap-2"
               >
-                <svg
-                  data-testid="location-icon"
-                />
+                <span>
+                  LuMapPin
+                </span>
                 <span>
                   Warsaw, Poland
                 </span>
@@ -96,91 +106,6 @@ exports[`EventDetails Renders properly 1`] = `
           <form
             class="flex flex-col gap-6"
           >
-            <div>
-              <label
-                class="block text-xs font-bold text-white mb-2"
-                for="fullName"
-              >
-                eventDetails.fullName 
-                <span
-                  class="text-red-500"
-                >
-                  *
-                </span>
-              </label>
-              <input
-                class="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
-                id="fullName"
-                placeholder="John Doe"
-                type="text"
-              />
-            </div>
-            <div>
-              <label
-                class="block text-xs font-bold text-white mb-2"
-                for="email"
-              >
-                eventDetails.email 
-                <span
-                  class="text-red-500"
-                >
-                  *
-                </span>
-              </label>
-              <input
-                class="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
-                id="email"
-                placeholder="john.doe@example.com"
-                type="email"
-              />
-            </div>
-            <div>
-              <label
-                class="block text-xs font-bold text-white mb-2"
-                for="dropdown"
-              >
-                eventDetails.dropdown
-              </label>
-              <div
-                class="relative w-full box-border"
-              >
-                <select
-                  class="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors appearance-none"
-                  id="dropdown"
-                >
-                  <option
-                    disabled=""
-                    hidden=""
-                    selected=""
-                    value=""
-                  >
-                    eventDetails.selectOption
-                  </option>
-                  <option
-                    value="option1"
-                  >
-                    eventDetails.option1
-                  </option>
-                  <option
-                    value="option2"
-                  >
-                    eventDetails.option2
-                  </option>
-                  <option
-                    value="option3"
-                  >
-                    eventDetails.option3
-                  </option>
-                </select>
-                <div
-                  class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400"
-                >
-                  <svg
-                    data-testid="chevron-down-icon"
-                  />
-                </div>
-              </div>
-            </div>
             <div
               class="bg-[#1e2e40] border border-gray-600/50 rounded-md p-4 mt-2"
             >
@@ -193,7 +118,7 @@ exports[`EventDetails Renders properly 1`] = `
                   <input
                     class="w-4 h-4 rounded-full border border-gray-500 bg-[#162436] focus:ring-0 cursor-pointer appearance-none checked:bg-current"
                     id="consent"
-                    style="color: rgb(255, 102, 0); border-color: #ff6600;"
+                    style="color: rgb(255, 102, 0);"
                     type="checkbox"
                   />
                 </div>
@@ -231,7 +156,7 @@ exports[`EventDetails Renders properly 1`] = `
             </p>
             <button
               class="w-full mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
-              style="background-color: rgb(255, 102, 0);"
+              disabled=""
               type="button"
             >
               eventDetails.register
