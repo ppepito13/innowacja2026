@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Event } from '../types/types';
-import { formatColumnName } from '../utils/formatters';
+import { formatColumnName, formatDate } from '../utils/formatters';
 import { parseService, createPointer } from '../services/parseService';
 import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle } from 'react-icons/lu';
 import Icon from '../components/Icon';
@@ -65,7 +65,7 @@ export default function EventDetails() {
 
     try {
       await parseService.create('Registration', {
-        event: createPointer('TestEvent', event.objectId),
+        event: createPointer('TestEvent', event.objectId!),
         formData,
         status: 'pending',
       });
@@ -127,11 +127,15 @@ export default function EventDetails() {
               <div className="flex flex-wrap gap-6 text-sm text-gray-400 mb-8 pb-6 border-b border-gray-700/50">
                 <div className="flex items-center gap-2">
                   <Icon icon={LuCalendarDays} size={16} />
-                  <span>{event.startDate.date?.toString()}</span>
+                  <span>
+                    {formatDate(event.startDate.iso ?? event.startDate.date?.toISOString() ?? '')}
+                  </span>
                   {event.endDate && (
                     <>
                       <span>&ndash;</span>
-                      <span>{event.startDate.date?.toString()}</span>
+                      <span>
+                        {formatDate(event.endDate.iso ?? event.endDate.date?.toISOString() ?? '')}
+                      </span>
                     </>
                   )}
                 </div>

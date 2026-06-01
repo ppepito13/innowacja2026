@@ -1,8 +1,8 @@
 export interface Event {
-  objectId: string;
+  objectId?: string;
   title: string;
   description: string; // HTML/String
-  date?: string;
+  date?: MongoDate;
   startDate: MongoDate;
   endDate?: MongoDate;
   location?: string;

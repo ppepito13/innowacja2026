@@ -67,7 +67,7 @@ exports[`EventDetails Renders properly 1`] = `
                   LuCalendarDays
                 </span>
                 <span>
-                  6/15/2024
+                  15.06.2024, 02:00
                 </span>
               </div>
               <div
@@ -118,7 +118,7 @@ exports[`EventDetails Renders properly 1`] = `
                   <input
                     class="w-4 h-4 rounded-full border border-gray-500 bg-[#162436] focus:ring-0 cursor-pointer appearance-none checked:bg-current"
                     id="consent"
-                    style="color: rgb(255, 102, 0); border-color: #ff6600;"
+                    style="color: rgb(255, 102, 0);"
                     type="checkbox"
                   />
                 </div>
@@ -157,7 +157,6 @@ exports[`EventDetails Renders properly 1`] = `
             <button
               class="w-full mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
               disabled=""
-              style="background-color: rgb(255, 102, 0);"
               type="button"
             >
               eventDetails.register

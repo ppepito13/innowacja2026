@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import EventDetails from './EventDetails';
+import { MongoDate } from '../types/types';
 
 jest.mock('react-router-dom', () => ({
   useParams: () => ({ eventId: 'event123' }),
@@ -17,6 +18,10 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('../utils/formatters', () => ({
   formatColumnName: (key: string) => key,
+  formatDate: (date: string) =>
+    new Intl.DateTimeFormat('pl-PL', { dateStyle: 'short', timeStyle: 'short' }).format(
+      new Date(date),
+    ),
 }));
 
 jest.mock('../services/parseService', () => ({
@@ -41,7 +46,7 @@ jest.mock('../components/Icon', () => ({
 const mockEvent = {
   objectId: 'event123',
   title: 'Tech Conference 2024',
-  startDate: new Date('2024-06-15'),
+  startDate: { iso: '2024-06-15T00:00:00.000Z', __type: 'Date' } as MongoDate,
   location: 'Warsaw, Poland',
   heroImageUrl: 'https://example.com/hero.jpg',
   description: '<p>An amazing tech event.</p>',
@@ -83,7 +88,7 @@ describe('EventDetails', () => {
   it('Renders event date and location', async () => {
     render(<EventDetails />);
 
-    expect(await screen.findByText('6/15/2024')).toBeInTheDocument();
+    expect(await screen.findByText('15.06.2024, 02:00')).toBeInTheDocument();
     expect(await screen.findByText('Warsaw, Poland')).toBeInTheDocument();
   });
 
