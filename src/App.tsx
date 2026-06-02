@@ -28,11 +28,11 @@ import FormConfig from './pages/FormConfig';
 
 function App() {
   return (
-<AuthProvider>
+    <AuthProvider>
       <Router>
         <Switch>
           {/* Public Fullscreen Routes */}
-          <Route exact path="/events/:slug" component={EventDetails} />
+          <Route exact path="/events/:eventId" component={EventDetails} />
 
           {/* Routes with Layout */}
           <Route>
@@ -64,7 +64,12 @@ function App() {
                   component={RegistrationEdit}
                   requiredRole="Admin"
                 />
-                <ProtectedRoute exact path="/admin/check-in" component={CheckIn} requiredRole="Admin" />
+                <ProtectedRoute
+                  exact
+                  path="/admin/check-in"
+                  component={CheckIn}
+                  requiredRole="Admin"
+                />
                 <ProtectedRoute exact path="/admin/users" component={Users} requiredRole="Admin" />
                 <ProtectedRoute
                   exact
@@ -78,7 +83,12 @@ function App() {
                   component={UserEdit}
                   requiredRole="Admin"
                 />
-                <ProtectedRoute exact path="/admin/account" component={Account} requiredRole="Admin" />
+                <ProtectedRoute
+                  exact
+                  path="/admin/account"
+                  component={Account}
+                  requiredRole="Admin"
+                />
 
                 {/* Other Public Routes */}
                 <Route exact path="/login" component={AdminLogin} />

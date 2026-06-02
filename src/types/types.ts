@@ -44,22 +44,22 @@ export type FormConfig = Record<string, FormConfigEntry>;
 // --- Domain Models ---
 
 export interface Event {
-  objectId: string;
+  objectId?: string;
   title: string;
   description: string; // HTML/String
-  startDate: Date;
-  isActive: boolean;
-  formConfig: FormConfig;
-  createdAt: string;
-  updatedAt: string;
-
-  // Frontend (Mock) fields
-  id?: string;
-  date?: string;
+  date?: MongoDate;
+  startDate: MongoDate;
+  endDate?: MongoDate;
   location?: string;
-  descriptionHtml?: string;
-  brandingHexColor?: string;
+  dateType: 'single' | 'multi';
+  eventFormat: 'virtual' | 'on-site';
+  primaryColor: string;
+  accentColor?: string;
   heroImageUrl?: string;
+  isActive: boolean;
+  formConfig: Record<string, unknown>; // JSON/Object
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Registration {
@@ -77,7 +77,17 @@ export interface User {
   username: string;
   email: string;
   emailVerified: boolean;
-  role: "Admin" | "Organizer"; // String: Admin/Organizer
+  role: 'Admin' | 'Organizer'; // String: Admin/Organizer
+  lastLoginAt?: string;
+  fullName?: string;
+  isLocked?: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface MongoDate {
+  date?: Date;
+  __type?: 'Date';
+  iso?: string;
+  __op?: 'Delete';
 }

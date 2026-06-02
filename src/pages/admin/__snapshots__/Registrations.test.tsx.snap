@@ -1,0 +1,202 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Registrations Renders properly 1`] = `
+<DocumentFragment>
+  <div
+    class="flex flex-col bg-white px-8 py-4 rounded-2xl sm:min-w-[1024px]"
+  >
+    <div
+      class="flex flex-row items-center justify-between"
+    >
+      <div
+        class="flex flex-col"
+      >
+        <h1
+          class="text-3xl mb-0"
+        >
+          registrations.title:Test Event
+        </h1>
+        <p
+          class="text-lg mt-0 text-primary/75"
+        >
+          registrations.description
+        </p>
+      </div>
+      <button>
+        <span
+          class="flex flex-row items-center gap-2 text-lg"
+        >
+          <span>
+            LuDownload
+          </span>
+          <span>
+            registrations.export
+          </span>
+        </span>
+      </button>
+    </div>
+    <div
+      class="flex flex-row gap-4 mt-4"
+    >
+      <input
+        aria-label="registrations.filters.search"
+      />
+      <input
+        aria-label="registrations.filters.from"
+        type="date"
+      />
+      <input
+        aria-label="registrations.filters.to"
+        type="date"
+      />
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>
+            createdAt
+          </th>
+          <th>
+            fullName
+          </th>
+          <th>
+            email
+          </th>
+          <th>
+            status
+          </th>
+          <th>
+            registrations.actions
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            2024-01-01T00:00:00.000Z
+          </td>
+          <td>
+            Alice
+          </td>
+          <td>
+            alice@example.com
+          </td>
+          <td>
+            <div
+              style="text-align: center;"
+            >
+              <span>
+                LuCircleCheck
+              </span>
+            </div>
+          </td>
+          <td>
+            <div
+              class="relative flex gap-2 justify-center"
+            >
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
+              >
+                <span>
+                  LuEye
+                </span>
+              </button>
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
+              >
+                <span>
+                  LuPencil
+                </span>
+              </button>
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95 opacity-75 cursor-not-allowed"
+                disabled=""
+              >
+                <span>
+                  LuEllipsis
+                </span>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            2024-02-01T00:00:00.000Z
+          </td>
+          <td>
+            Bob
+          </td>
+          <td>
+            bob@example.com
+          </td>
+          <td>
+            <div
+              style="text-align: center;"
+            >
+              <span>
+                LuClock
+              </span>
+            </div>
+          </td>
+          <td>
+            <div
+              class="relative flex gap-2 justify-center"
+            >
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
+              >
+                <span>
+                  LuEye
+                </span>
+              </button>
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
+              >
+                <span>
+                  LuPencil
+                </span>
+              </button>
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95 "
+              >
+                <span>
+                  LuEllipsis
+                </span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div
+      class="mt-4 flex justify-between"
+    >
+      <span
+        class="text-xs text-primary/60 sm:text-sm"
+      >
+        registrations.pagination.current 1 registrations.pagination.total 1
+      </span>
+      <div
+        class="flex gap-2"
+      >
+        <button
+          class="rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95 opacity-75 cursor-not-allowed"
+          disabled=""
+        >
+          <span>
+            LuChevronLeft
+          </span>
+        </button>
+        <button
+          class="rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95 opacity-75 cursor-not-allowed"
+          disabled=""
+        >
+          <span>
+            LuChevronRight
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

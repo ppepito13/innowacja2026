@@ -1,0 +1,170 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EventDetails Renders properly 1`] = `
+<DocumentFragment>
+  <div
+    class="min-h-screen bg-[#0b1521] text-white font-sans relative pb-16"
+  >
+    <header
+      class="bg-[#1f2937] p-4 flex items-center justify-between shadow-md relative z-20"
+    >
+      <div
+        class="text-xl font-bold text-white"
+      >
+        Commerzbank Events
+      </div>
+      <div
+        class="flex gap-2 text-sm"
+      >
+        <span
+          class="px-3 py-1 rounded cursor-pointer transition bg-[#2f4661] text-white"
+        >
+          EN
+        </span>
+        <span
+          class="px-3 py-1 rounded cursor-pointer transition bg-[#24364b] text-gray-300 hover:bg-[#2f4661]"
+        >
+          PL
+        </span>
+      </div>
+    </header>
+    <div
+      class="w-full h-[50vh] relative z-0"
+    >
+      <img
+        alt="Tech Conference 2024"
+        class="w-full h-full object-cover"
+        src="https://example.com/hero.jpg"
+      />
+      <div
+        class="absolute inset-0 bg-gradient-to-b from-transparent via-[#0b1521]/40 to-[#0b1521]"
+      />
+    </div>
+    <main
+      class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-40"
+    >
+      <div
+        class="flex flex-col lg:flex-row gap-8 items-start"
+      >
+        <section
+          class="w-full lg:w-[60%] bg-[#162436] rounded-xl shadow-2xl overflow-hidden"
+        >
+          <div
+            class="p-8 md:p-10"
+          >
+            <h1
+              class="text-3xl md:text-4xl font-bold mb-4 text-white tracking-tight"
+            >
+              Tech Conference 2024
+            </h1>
+            <div
+              class="flex flex-wrap gap-6 text-sm text-gray-400 mb-8 pb-6 border-b border-gray-700/50"
+            >
+              <div
+                class="flex items-center gap-2"
+              >
+                <span>
+                  LuCalendarDays
+                </span>
+                <span>
+                  15.06.2024, 02:00
+                </span>
+              </div>
+              <div
+                class="flex items-center gap-2"
+              >
+                <span>
+                  LuMapPin
+                </span>
+                <span>
+                  Warsaw, Poland
+                </span>
+              </div>
+            </div>
+            <div
+              class="prose prose-invert max-w-none text-gray-300 leading-relaxed text-sm md:text-base"
+            >
+              <p>
+                An amazing tech event.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section
+          class="w-full lg:w-[40%] bg-[#162436] rounded-xl shadow-2xl p-8 sticky top-8"
+        >
+          <h2
+            class="text-xl font-bold mb-1 text-white"
+          >
+            eventDetails.registerNow
+          </h2>
+          <p
+            class="text-sm text-gray-400 mb-8"
+          >
+            eventDetails.fillForm
+          </p>
+          <form
+            class="flex flex-col gap-6"
+          >
+            <div
+              class="bg-[#1e2e40] border border-gray-600/50 rounded-md p-4 mt-2"
+            >
+              <div
+                class="flex items-start gap-3"
+              >
+                <div
+                  class="flex items-center mt-1"
+                >
+                  <input
+                    class="w-4 h-4 rounded-full border border-gray-500 bg-[#162436] focus:ring-0 cursor-pointer appearance-none checked:bg-current"
+                    id="consent"
+                    style="color: rgb(255, 102, 0);"
+                    type="checkbox"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="text-sm font-medium text-white cursor-pointer block mb-1"
+                    for="consent"
+                  >
+                    eventDetails.dataConsent 
+                    <span
+                      class="text-red-500"
+                    >
+                      *
+                    </span>
+                  </label>
+                  <p
+                    class="text-xs text-gray-300"
+                  >
+                    eventDetails.readMoreIn 
+                    <a
+                      class="underline text-gray-200 hover:text-white"
+                      href="#terms"
+                    >
+                      eventDetails.termsAndConditions
+                    </a>
+                    .
+                  </p>
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-[11px] text-gray-400 -mt-2"
+            >
+              * eventDetails.requiredField
+            </p>
+            <button
+              class="w-full mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              disabled=""
+              type="button"
+            >
+              eventDetails.register
+            </button>
+          </form>
+        </section>
+      </div>
+    </main>
+  </div>
+</DocumentFragment>
+`;
