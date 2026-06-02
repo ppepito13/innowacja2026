@@ -1,3 +1,9 @@
+export interface EventOrganizer {
+  __type: 'Pointer';
+  className: '_User';
+  objectId: string;
+}
+
 export interface Event {
   objectId?: string;
   title: string;
@@ -13,6 +19,7 @@ export interface Event {
   heroImageUrl?: string;
   isActive: boolean;
   formConfig: Record<string, unknown>; // JSON/Object
+  organizer: EventOrganizer; // Pointer do _User
   createdAt?: string;
   updatedAt?: string;
 }
