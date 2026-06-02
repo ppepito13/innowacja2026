@@ -83,5 +83,41 @@
     "termsAndConditions": "regulaminie",
     "requiredField": "Pole wymagane.",
     "register": "Zarejestruj"
+  },
+  "formConfig": {
+    "title": "Kreator formularza",
+    "subtitle": "Zdefiniuj dodatkowe pola rejestracji dla swojego eventu",
+    "showJson": "Pokaż JSON",
+    "hideJson": "Ukryj JSON",
+    "save": "Zapisz formConfig",
+    "saved": "Zapisano",
+    "addField": "Dodaj pole",
+    "removeField": "Usuń pole",
+    "label": "Etykieta",
+    "labelPlaceholder": "np. Imię i nazwisko",
+    "placeholder": "Placeholder",
+    "placeholderPlaceholder": "np. Jan Kowalski",
+    "type": "Typ",
+    "required": "Wymagane",
+    "options": "Opcje",
+    "option": "Opcja",
+    "addOption": "Dodaj opcję",
+    "removeOption": "Usuń opcję",
+    "fieldType": {
+      "text": "Tekst",
+      "email": "Email",
+      "phone": "Telefon",
+      "textarea": "Pole tekstowe",
+      "checkbox": "Checkbox (zgoda)",
+      "radio": "Jednokrotny wybór (Radio)",
+      "multiselect": "Wielokrotny wybór (Checkbox)",
+      "dropdown": "Lista rozwijana"
+    },
+    "errors": {
+      "labelRequired": "Etykieta jest wymagana",
+      "duplicateLabel": "Zduplikowana etykieta",
+      "optionRequired": "Wymagana co najmniej jedna opcja",
+      "validationFailed": "Walidacja schematu nie powiodła się — popraw podświetlone pola przed zapisem."
+    }
   }
 }

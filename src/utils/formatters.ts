@@ -12,6 +12,7 @@ export const formatColumnName = (columnName: string) =>
     .replace(/\b\w/g, (c) => c.toUpperCase());
 
 export const formatBoolean = (value: string | boolean) => {
+  // @ts-ignore
   const t = i18n.getFixedT();
 
   switch (String(value)) {
