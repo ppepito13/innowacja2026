@@ -108,6 +108,7 @@ export default function EventEdit() {
             heroImageUrl: event.heroImageUrl,
             isActive: event.isActive,
             formConfig: event.formConfig,
+            organizer: event.organizer,
         };
 
         parseService

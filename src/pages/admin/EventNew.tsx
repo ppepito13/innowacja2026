@@ -28,6 +28,11 @@ export default function EventNew() {
         heroImageUrl: '',
         isActive: false,
         formConfig: {},
+        organizer: {
+            __type: 'Pointer',
+            className: '_User',
+            objectId: '',
+        },
     });
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -72,27 +77,37 @@ export default function EventNew() {
         setSaving(true);
         setError(null);
 
-        const payload: Event = {
-            title: event.title,
-            description: event.description,
-            ...(event.startDate && { startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() } }),
-            ...(event.dateType === 'multi' && event.endDate
-                ? { endDate: { __type: 'Date', iso: event.endDate.date?.toISOString() } } : undefined),
-            dateType: event.dateType,
-            eventFormat: event.eventFormat,
-            location: event.location,
-            primaryColor: event.primaryColor,
-            accentColor: event.accentColor,
-            heroImageUrl: event.heroImageUrl,
-            isActive: event.isActive,
-            formConfig: event.formConfig,
-        };
+        parseClient.get('/users/me').then(({ data }) => {
+            const payload: Event = {
+                title: event.title,
+                description: event.description,
+                ...(event.startDate && { startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() } }),
+                ...(event.dateType === 'multi' && event.endDate
+                  ? { endDate: { __type: 'Date', iso: event.endDate.date?.toISOString() } } : undefined),
+                dateType: event.dateType,
+                eventFormat: event.eventFormat,
+                location: event.location,
+                primaryColor: event.primaryColor,
+                accentColor: event.accentColor,
+                heroImageUrl: event.heroImageUrl,
+                isActive: event.isActive,
+                formConfig: event.formConfig,
+                organizer: {
+                    __type: 'Pointer',
+                    className: '_User',
+                    objectId: data.objectId,
+                },
+            };
 
-        parseService
-            .create<Event>(EVENT_CLASS, payload)
-            .then(({ objectId }) => history.push(`/admin/events/${objectId}/edit`))
-            .catch((e: any) => setError(e.message))
-            .finally(() => setSaving(false));
+            parseService
+              .create<Event>(EVENT_CLASS, payload)
+              .then(({ objectId }) => history.push(`/admin/events/${objectId}/edit`))
+              .catch((e: any) => setError(e.message))
+              .finally(() => setSaving(false));
+        }).catch((e: any) => {
+            setError(e.message);
+            setSaving(false);
+        });
     };
 
     return (
