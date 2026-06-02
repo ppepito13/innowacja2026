@@ -5,51 +5,7 @@ import { Registration, Event } from '../../types/types';
 import Icon from '../../components/Icon';
 import { LuDownload, LuChevronDown, LuZap, LuZapOff } from 'react-icons/lu';
 
-import { Html5Qrcode } from 'html5-qrcode';
-
-// Synthesize pleasant sound effects using Web Audio API
-const playBeep = (type: 'success' | 'error') => {
-  try {
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContextClass) return;
-    const ctx = new AudioContextClass();
-    
-    if (type === 'success') {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, ctx.currentTime); // A5 note
-      gain.gain.setValueAtTime(0.08, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-      
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.25);
-    } else {
-      const now = ctx.currentTime;
-      const playBuzz = (startTime: number, duration: number) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(120, startTime); // Low frequency
-        gain.gain.setValueAtTime(0.12, startTime);
-        gain.gain.linearRampToValueAtTime(0.001, startTime + duration);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(startTime);
-        osc.stop(startTime + duration);
-      };
-      // Play a short double-buzz
-      playBuzz(now, 0.15);
-      playBuzz(now + 0.2, 0.15);
-    }
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.warn('Audio feedback blocked or not supported:', e);
-  }
-};
+import { useScanner } from '../../hooks/useScanner';
 
 // Device vibration feedback
 const triggerVibration = (type: 'success' | 'error') => {
@@ -76,49 +32,16 @@ export default function CheckIn() {
     inlineTitle: string;
     inlineBody: string;
   } | null>(null);
-  const [isScanning, setIsScanning] = useState(false);
-  
-  // Flashlight state
-  const [hasFlashlight, setHasFlashlight] = useState(false);
-  const [flashlightOn, setFlashlightOn] = useState(false);
 
   // Recent scans state (last 3 in this session)
   const [recentScans, setRecentScans] = useState<Array<{
-    id: string;
     name: string;
     status: 'success' | 'warning' | 'error';
     time: string;
   }>>([]);
-  
-  const scannerRef = useRef<Html5Qrcode | null>(null);
-
-  useEffect(() => {
-    parseService.getAll<Event>('TestEvent')
-      .then(data => {
-        setEvents(data);
-        if (data.length > 0) {
-          setSelectedEventId(data[0].objectId);
-        }
-      })
-      // eslint-disable-next-line no-console
-      .catch(console.error);
-  }, []);
-
-  // Cleanup scanner on unmount
-  useEffect(() => {
-    return () => {
-      if (scannerRef.current && isScanning) {
-        // eslint-disable-next-line no-console
-        scannerRef.current.stop().catch(console.error);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isScanning]);
 
   const handleScan = async (decodedText: string) => {
-    if (scannerRef.current) {
-      await scannerRef.current.pause();
-    }
+    pauseScanner();
 
     try {
       const registration = await parseService.getById<Registration>('Registration', decodedText);
@@ -138,12 +61,10 @@ export default function CheckIn() {
           inlineBody: cleanMsg,
         });
 
-        playBeep('error');
         triggerVibration('error');
 
         setRecentScans(prev => [
           {
-            id: Math.random().toString(),
             name: registration ? 'User' : 'Unknown',
             status: 'error' as const,
             time: new Date().toLocaleTimeString(),
@@ -166,12 +87,10 @@ export default function CheckIn() {
             inlineBody: warningMsg,
           });
 
-          playBeep('error');
           triggerVibration('error');
 
           setRecentScans(prev => [
             {
-              id: Math.random().toString(),
               name,
               status: 'warning' as const,
               time: new Date().toLocaleTimeString(),
@@ -193,12 +112,10 @@ export default function CheckIn() {
             inlineBody: successMsg,
           });
 
-          playBeep('success');
           triggerVibration('success');
 
           setRecentScans(prev => [
             {
-              id: Math.random().toString(),
               name,
               status: 'success' as const,
               time: new Date().toLocaleTimeString(),
@@ -219,12 +136,10 @@ export default function CheckIn() {
         inlineBody: cleanMsg,
       });
 
-      playBeep('error');
       triggerVibration('error');
 
       setRecentScans(prev => [
         {
-          id: Math.random().toString(),
           name: 'Unknown',
           status: 'error' as const,
           time: new Date().toLocaleTimeString(),
@@ -236,73 +151,31 @@ export default function CheckIn() {
     setTimeout(() => {
       setScanMessage(null);
       setScanStatus('idle');
-      if (scannerRef.current && isScanning) {
-        scannerRef.current.resume();
-      }
+      resumeScanner();
     }, 2500);
   };
 
-  const toggleScanner = async () => {
-    if (isScanning) {
-      if (scannerRef.current) {
-        try {
-          await scannerRef.current.stop();
-        } catch (e) {
-          // eslint-disable-next-line no-console
-          console.error(e);
+  const {
+    isScanning,
+    hasFlashlight,
+    flashlightOn,
+    toggleScanner,
+    toggleFlashlight,
+    pauseScanner,
+    resumeScanner,
+  } = useScanner(handleScan);
+
+  useEffect(() => {
+    parseService.getAll<Event>('TestEvent')
+      .then(data => {
+        setEvents(data);
+        if (data.length > 0) {
+          setSelectedEventId(data[0].objectId);
         }
-        scannerRef.current = null;
-      }
-      setIsScanning(false);
-      setHasFlashlight(false);
-      setFlashlightOn(false);
-    } else {
-      if (!scannerRef.current) {
-        scannerRef.current = new Html5Qrcode("qr-reader");
-      }
-      try {
-        await scannerRef.current.start(
-          { facingMode: "environment" },
-          { fps: 10, qrbox: { width: 250, height: 250 } },
-          (decodedText) => handleScan(decodedText),
-          // eslint-disable-next-line no-console
-          (error) => { /* ignore */ }
-        );
-        setIsScanning(true);
-
-        // Capability checking has to happen shortly after camera initializes
-        setTimeout(() => {
-          try {
-            if (scannerRef.current) {
-              const capabilities = scannerRef.current.getRunningTrackCapabilities();
-              if (capabilities && (capabilities as any).torch) {
-                setHasFlashlight(true);
-              }
-            }
-          } catch (e) {
-            // ignore capability failures
-          }
-        }, 500);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error("Camera start failed:", err);
-      }
-    }
-  };
-
-  const toggleFlashlight = async () => {
-    if (!scannerRef.current || !hasFlashlight) return;
-    try {
-      const nextState = !flashlightOn;
-      await scannerRef.current.applyVideoConstraints({
-        advanced: [{ torch: nextState } as any]
-      });
-      setFlashlightOn(nextState);
-    } catch (e) {
+      })
       // eslint-disable-next-line no-console
-      console.error("Failed to toggle flashlight", e);
-    }
-  };
+      .catch(console.error);
+  }, []);
 
   return (
     <div className="fixed inset-0 z-[100] bg-[#0c1626] text-white overflow-x-hidden overflow-y-auto flex flex-col items-center">
@@ -447,8 +320,8 @@ export default function CheckIn() {
           <div className="w-full bg-[#162436]/40 border border-[#24364b]/40 rounded-2xl p-5 shadow-lg scale-in mb-8">
             <h3 className="text-xs font-bold text-gray-400 mb-3 tracking-wider uppercase">Ostatnie skanowania</h3>
             <div className="flex flex-col gap-2.5">
-              {recentScans.map(scan => (
-                <div key={scan.id} className="flex items-center justify-between bg-[#0b1521]/60 px-4 py-3 rounded-xl border border-[#24364b]/20">
+              {recentScans.map((scan, index) => (
+                <div key={index} className="flex items-center justify-between bg-[#0b1521]/60 px-4 py-3 rounded-xl border border-[#24364b]/20">
                   <div className="flex items-center gap-3">
                     <span className={`w-2.5 h-2.5 rounded-full ${
                       scan.status === 'success' ? 'bg-[#10b981] shadow-[0_0_8px_#10b981]' : 'bg-[#ef4444] shadow-[0_0_8px_#ef4444]'
@@ -470,32 +343,6 @@ export default function CheckIn() {
         )}
       </main>
 
-      {/* Global styles for scanner */}
-      <style>{`
-        .toast-enter {
-          animation: slideDown 0.3s ease-out forwards;
-        }
-        @keyframes slideDown {
-          from { transform: translate(-50%, -100%); opacity: 0; }
-          to { transform: translate(-50%, 0); opacity: 1; }
-        }
-
-        .scale-in {
-          animation: scaleIn 0.2s ease-out forwards;
-        }
-        @keyframes scaleIn {
-          from { transform: scale(0.95); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-
-        /* Enforce absolute styling on video to match the container */
-        #qr-reader video {
-          object-fit: cover !important;
-          border-radius: 0.75rem;
-          width: 100% !important;
-          height: 100% !important;
-        }
-      `}</style>
     </div>
   );
 }
