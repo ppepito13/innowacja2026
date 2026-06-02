@@ -169,7 +169,7 @@ export default function CheckIn() {
     parseService.getAll<Event>('TestEvent')
       .then(data => {
         setEvents(data);
-        if (data.length > 0) {
+        if (data.length > 0 && data[0].objectId) {
           setSelectedEventId(data[0].objectId);
         }
       })
