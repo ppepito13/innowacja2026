@@ -22,7 +22,7 @@ export interface Registration {
   event: Event; // Pointer
   formData: Record<string, unknown>; // JSON/Object
   status: 'pending' | 'approved'; // String: pending/approved
-  checkInTime: Date | null; // Date/Nullable
+  checkInTime: Date | MongoDate | null; // Date/Nullable
   createdAt: string;
   updatedAt: string;
 }
