@@ -57,6 +57,35 @@
     "loading": "Loading data",
     "error": "Error"
   },
+  "dashboard": {
+    "title": "Events",
+    "subtitle": "Manage your events and view their status.",
+    "addEvent": "New Event",
+    "allEvents": "All Events",
+    "allEventsDescription": "Below is a list of events you have access to.",
+    "search": "Search events...",
+    "filter": {
+      "all": "All Statuses",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "found": "Found {{count}} events",
+    "loading": "Loading...",
+    "empty": "No events found.",
+    "col": {
+      "active": "Active",
+      "name": "Event Name",
+      "date": "Date",
+      "location": "Location",
+      "actions": "Actions"
+    },
+    "virtual": "Virtual",
+    "onSite": "On-site",
+    "rowsPerPage": "Rows per page",
+    "page": "Page",
+    "of": "of",
+    "deleteConfirm": "Are you sure you want to delete \"{{title}}\"?"
+  },
   "eventNew": {
     "title": "New Event",
     "subtitle": "Fill in the details to create a new event",

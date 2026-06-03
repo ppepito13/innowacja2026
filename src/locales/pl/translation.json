@@ -57,6 +57,35 @@
     "loading": "Ładowanie danych",
     "error": "Błąd"
   },
+  "dashboard": {
+    "title": "Wydarzenia",
+    "subtitle": "Zarządzaj swoimi wydarzeniami i sprawdzaj ich status.",
+    "addEvent": "Nowe wydarzenie",
+    "allEvents": "Wszystkie wydarzenia",
+    "allEventsDescription": "Poniżej znajduje się lista wydarzeń, do których masz dostęp.",
+    "search": "Szukaj wydarzeń...",
+    "filter": {
+      "all": "Wszystkie statusy",
+      "active": "Aktywne",
+      "inactive": "Nieaktywne"
+    },
+    "found": "Znaleziono {{count}} wydarzeń",
+    "loading": "Ładowanie...",
+    "empty": "Brak wydarzeń.",
+    "col": {
+      "active": "Aktywne",
+      "name": "Nazwa wydarzenia",
+      "date": "Data",
+      "location": "Lokalizacja",
+      "actions": "Akcje"
+    },
+    "virtual": "Wirtualne",
+    "onSite": "Stacjonarne",
+    "rowsPerPage": "Wierszy na stronę",
+    "page": "Strona",
+    "of": "z",
+    "deleteConfirm": "Czy na pewno chcesz usunąć \"{{title}}\"?"
+  },
   "eventNew": {
     "title": "Nowe wydarzenie",
     "subtitle": "Wypełnij szczegóły, aby utworzyć nowe wydarzenie",

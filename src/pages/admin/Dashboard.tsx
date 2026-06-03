@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import { LuPlus, LuPencil, LuLink, LuEllipsis, LuChevronLeft, LuChevronRight, LuChevronsLeft, LuChevronsRight } from 'react-icons/lu';
+import { LuPlus, LuPencil, LuLink, LuTrash2, LuChevronLeft, LuChevronRight, LuChevronsLeft, LuChevronsRight } from 'react-icons/lu';
 import { parseService } from '../../services/parseService';
 import { useAuth } from '../../auth/AuthProvider';
 import { Event, EventOrganizer } from '../../types/types';
@@ -74,26 +74,25 @@ export default function Dashboard() {
     setPage(Math.min(Math.max(1, next), totalPages));
   };
 
-  const handleToggleActive = (event: Event) => {
-    // 1. Zmień natychmiast w UI
-    setEvents((prev) =>
-      prev.map((e) =>
-        e.objectId === event.objectId ? { ...e, isActive: !e.isActive } : e
-      )
-    );
+  const handleDelete = (event: Event) => {
+    if (!window.confirm(t('dashboard.deleteConfirm', { title: event.title }))) return;    parseService
+      .remove(EVENT_CLASS, event.objectId!)
+      .then(() => setEvents((prev) => prev.filter((e) => e.objectId !== event.objectId)))
+      .catch((e: any) => setError(e.message));
+  };
 
-    // 2. Wyślij do serwera, przy błędzie cofnij
+  const handleToggleActive = (event: Event) => {
+    const updated = { isActive: !event.isActive };
     parseService
-      .update<Event>(EVENT_CLASS, event.objectId!, { isActive: !event.isActive })
-      .catch((e: any) => {
-        setError(e.message);
-        // cofnij zmianę
+      .update<Event>(EVENT_CLASS, event.objectId!, updated)
+      .then(() => {
         setEvents((prev) =>
           prev.map((e) =>
-            e.objectId === event.objectId ? { ...e, isActive: event.isActive } : e
+            e.objectId === event.objectId ? { ...e, isActive: !e.isActive } : e
           )
         );
-      });
+      })
+      .catch((e: any) => setError(e.message));
   };
 
   return (
@@ -208,8 +207,11 @@ export default function Dashboard() {
                   >
                     <Icon icon={LuLink} />
                   </button>
-                  <button className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/40 hover:text-primary cursor-pointer border-none bg-transparent">
-                    <Icon icon={LuEllipsis} />
+                  <button
+                    onClick={() => handleDelete(event)}
+                    className="p-2 rounded-lg hover:bg-red-50 transition-colors text-primary/40 hover:text-red-600 cursor-pointer border-none bg-transparent"
+                  >
+                    <Icon icon={LuTrash2} />
                   </button>
                 </div>
               </td>
