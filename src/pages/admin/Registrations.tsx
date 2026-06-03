@@ -10,7 +10,7 @@ import {
   LuPencil,
   LuX,
   LuCircleX,
-  LuClock,
+  LuClock, LuUserCheck,
 } from 'react-icons/lu';
 import { Button, InputDatepicker, InputTextfieldStateful, ComplexTable } from '@lsg/components';
 import { parseService, createPointer } from '../../services/parseService';
@@ -269,6 +269,15 @@ export default function Registrations() {
 
                   return (
                     <div className="relative flex gap-2 justify-center">
+                      <button
+                          className={`w-8 h-8 flex items-center justify-center rounded-lg border p-2 transition active:scale-95 
+                          border-primary/10 bg-white text-primary hover:bg-background'
+                          }`}
+                          //onClick={}
+                          //disabled={}
+                      >
+                        <Icon icon={LuUserCheck} size={14} />
+                      </button>
                       <button
                         className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
                         onClick={() => {
