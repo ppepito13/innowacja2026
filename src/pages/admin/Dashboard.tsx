@@ -113,7 +113,7 @@ export default function Dashboard() {
   };
 
   const handleDelete = (event: Event) => {
-    if (!window.confirm(t('dashboard.deleteConfirm', `Czy na pewno chcesz usunąć "${event.title}"?`))) return;
+    if (!window.confirm(t('dashboard.deleteConfirm'))) return;
     parseService
       .remove(EVENT_CLASS, event.objectId!)
       .then(() => setEvents((prev) => prev.filter((e) => e.objectId !== event.objectId)))
@@ -140,9 +140,9 @@ export default function Dashboard() {
       {/* HEADER */}
       <div className="flex items-start justify-between mb-1">
         <div>
-          <h1 className="text-3xl mb-0">{t('dashboard.title', 'Wydarzenia')}</h1>
+          <h1 className="text-3xl mb-0">{t('dashboard.title')}</h1>
           <p className="text-lg mt-0 text-primary/75">
-            {t('dashboard.subtitle', 'Zarządzaj swoimi wydarzeniami i sprawdzaj ich status.')}
+            {t('dashboard.subtitle')}
           </p>
         </div>
         <button
@@ -150,15 +150,15 @@ export default function Dashboard() {
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-primary bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
         >
           <Icon icon={LuPlus} />
-          <span>{t('dashboard.addEvent', 'Nowe wydarzenie')}</span>
+          <span>{t('dashboard.addEvent')}</span>
         </button>
       </div>
 
       {/* SUBHEADER */}
       <div>
-        <h2 className="text-xl mb-0">{t('dashboard.allEvents', 'Wszystkie wydarzenia')}</h2>
+        <h2 className="text-xl mb-0">{t('dashboard.allEvents')}</h2>
         <p className="text-sm mt-0 text-primary/75">
-          {t('dashboard.allEventsDescription', 'Poniżej znajduje się lista wydarzeń, do których masz dostęp.')}
+          {t('dashboard.allEventsDescription')}
         </p>
       </div>
 
@@ -166,7 +166,7 @@ export default function Dashboard() {
       <div className="flex items-center gap-3 mb-4">
         <input
           type="text"
-          placeholder={t('dashboard.search', 'Szukaj wydarzeń...')}
+          placeholder={t('dashboard.search')}
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           className="border border-primary/20 rounded-lg px-3 py-2 text-sm w-64 focus:outline-none focus:border-primary"
@@ -176,12 +176,12 @@ export default function Dashboard() {
           onChange={(e) => { setStatusFilter(e.target.value as typeof statusFilter); setPage(1); }}
           className="border border-primary/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
         >
-          <option value="all">{t('dashboard.filter.all', 'Wszystkie statusy')}</option>
-          <option value="active">{t('dashboard.filter.active', 'Aktywne')}</option>
-          <option value="inactive">{t('dashboard.filter.inactive', 'Nieaktywne')}</option>
+          <option value="all">{t('dashboard.filter.all')}</option>
+          <option value="active">{t('dashboard.filter.active')}</option>
+          <option value="inactive">{t('dashboard.filter.inactive')}</option>
         </select>
         <span className="ml-auto text-sm text-primary/50">
-                    {t('dashboard.found', { count: sorted.length, defaultValue: `Znaleziono ${sorted.length} wydarzeń` })}
+                    {t('dashboard.found', { count: sorted.length})}
                 </span>
       </div>
 
@@ -190,25 +190,25 @@ export default function Dashboard() {
 
       {/* TABLE */}
       {loading ? (
-        <p className="text-primary/50 text-sm">{t('dashboard.loading', 'Ładowanie...')}</p>
+        <p className="text-primary/50 text-sm">{t('dashboard.loading')}</p>
       ) : (
         <table className="w-full text-sm">
           <thead>
           <tr className="border-b border-primary/10 text-left">
             <th className="pb-3 font-medium text-primary/50 w-28 cursor-pointer select-none" onClick={() => handleSort('isActive')}>
-              {t('dashboard.col.active', 'Aktywne')} <SortIcon field="isActive" />
+              {t('dashboard.col.active')} <SortIcon field="isActive" />
             </th>
             <th className="pb-3 font-medium text-primary/50 cursor-pointer select-none" onClick={() => handleSort('title')}>
-              {t('dashboard.col.name', 'Nazwa wydarzenia')} <SortIcon field="title" />
+              {t('dashboard.col.name')} <SortIcon field="title" />
             </th>
             <th className="pb-3 font-medium text-primary/50 w-32 cursor-pointer select-none" onClick={() => handleSort('startDate')}>
-              {t('dashboard.col.date', 'Data')} <SortIcon field="startDate" />
+              {t('dashboard.col.date')} <SortIcon field="startDate" />
             </th>
             <th className="pb-3 font-medium text-primary/50 cursor-pointer select-none" onClick={() => handleSort('location')}>
-              {t('dashboard.col.location', 'Lokalizacja')} <SortIcon field="location" />
+              {t('dashboard.col.location')} <SortIcon field="location" />
             </th>
             <th className="pb-3 font-medium text-primary/50">
-              {t('dashboard.col.actions', 'Akcje')}
+              {t('dashboard.col.actions')}
             </th>
           </tr>
           </thead>
@@ -229,8 +229,8 @@ export default function Dashboard() {
               <td className="py-3 text-primary/50">{formatDate(event.startDate)}</td>
               <td className="py-3 text-primary/50">
                 {event.eventFormat === 'virtual'
-                  ? t('dashboard.virtual', 'Wirtualne')
-                  : event.location || t('dashboard.onSite', 'Stacjonarne')}
+                  ? t('dashboard.virtual')
+                  : event.location || t('dashboard.onSite')}
               </td>
               <td className="py-3">
                 <div className="flex items-center gap-2">
@@ -259,7 +259,7 @@ export default function Dashboard() {
           {paginated.length === 0 && (
             <tr>
               <td colSpan={5} className="py-8 text-center text-primary/40">
-                {t('dashboard.empty', 'Brak wydarzeń.')}
+                {t('dashboard.empty')}
               </td>
             </tr>
           )}
@@ -271,7 +271,7 @@ export default function Dashboard() {
       {!loading && !error && sorted.length > 0 && (
         <div className="flex items-center justify-between mt-4 pt-3 border-t border-primary/10">
           <div className="flex items-center gap-2 text-sm text-primary/60">
-            <span>{t('dashboard.rowsPerPage', 'Wierszy na stronę')}</span>
+            <span>{t('dashboard.rowsPerPage')}</span>
             <select
               value={rowsPerPage}
               onChange={(e) => { setRowsPerPage(Number(e.target.value)); setPage(1); }}
@@ -281,7 +281,7 @@ export default function Dashboard() {
             </select>
           </div>
           <div className="flex items-center gap-1 text-sm text-primary/60">
-            <span>{t('dashboard.page', 'Strona')} {page} {t('dashboard.of', 'z')} {totalPages}</span>
+            <span>{t('dashboard.page')} {page} {t('dashboard.of')} {totalPages}</span>
             <button onClick={() => handlePageChange(1)} disabled={page === 1} className="w-7 h-7 flex items-center justify-center rounded hover:bg-primary/10 disabled:opacity-30">
               <Icon icon={LuChevronsLeft} size={14} />
             </button>
