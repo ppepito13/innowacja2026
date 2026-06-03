@@ -28,8 +28,26 @@ export default function Dashboard() {
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [sortField, setSortField] = useState<'isActive' | 'title' | 'startDate' | 'location' | null>(null);
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
+
+  const handleSort = (field: 'isActive' | 'title' | 'startDate' | 'location') => {
+    if (sortField === field) {
+      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+    setPage(1);
+  };
+
+  const SortIcon = ({ field }: { field: 'isActive' | 'title' | 'startDate' | 'location' }) => (
+    <span className="text-xs ml-1">
+            {sortField === field ? (sortDir === 'asc' ? '↑' : '↓') : '↑↓'}
+        </span>
+  );
 
   useEffect(() => {
     if (!user) {
@@ -67,15 +85,36 @@ export default function Dashboard() {
     return matchesSearch && matchesStatus;
   });
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
-  const paginated = filtered.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const sorted = [...filtered].sort((a, b) => {
+    if (!sortField) return 0;
+    const dir = sortDir === 'asc' ? 1 : -1;
+    if (sortField === 'isActive') {
+      return ((a.isActive ? 1 : 0) - (b.isActive ? 1 : 0)) * dir;
+    }
+    if (sortField === 'title') {
+      return (a.title ?? '').localeCompare(b.title ?? '') * dir;
+    }
+    if (sortField === 'startDate') {
+      const aIso = a.startDate?.iso ?? a.startDate?.date?.toISOString() ?? '';
+      const bIso = b.startDate?.iso ?? b.startDate?.date?.toISOString() ?? '';
+      return aIso.localeCompare(bIso) * dir;
+    }
+    if (sortField === 'location') {
+      return (a.location ?? '').localeCompare(b.location ?? '') * dir;
+    }
+    return 0;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / rowsPerPage));
+  const paginated = sorted.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
   const handlePageChange = (next: number) => {
     setPage(Math.min(Math.max(1, next), totalPages));
   };
 
   const handleDelete = (event: Event) => {
-    if (!window.confirm(t('dashboard.deleteConfirm', { title: event.title }))) return;    parseService
+    if (!window.confirm(t('dashboard.deleteConfirm', `Czy na pewno chcesz usunąć "${event.title}"?`))) return;
+    parseService
       .remove(EVENT_CLASS, event.objectId!)
       .then(() => setEvents((prev) => prev.filter((e) => e.objectId !== event.objectId)))
       .catch((e: any) => setError(e.message));
@@ -142,7 +181,7 @@ export default function Dashboard() {
           <option value="inactive">{t('dashboard.filter.inactive', 'Nieaktywne')}</option>
         </select>
         <span className="ml-auto text-sm text-primary/50">
-                    {t('dashboard.found', { count: filtered.length, defaultValue: `Znaleziono ${filtered.length} wydarzeń` })}
+                    {t('dashboard.found', { count: sorted.length, defaultValue: `Znaleziono ${sorted.length} wydarzeń` })}
                 </span>
       </div>
 
@@ -156,17 +195,17 @@ export default function Dashboard() {
         <table className="w-full text-sm">
           <thead>
           <tr className="border-b border-primary/10 text-left">
-            <th className="pb-3 font-medium text-primary/50 w-20">
-              {t('dashboard.col.active', 'Aktywne')}
+            <th className="pb-3 font-medium text-primary/50 w-28 cursor-pointer select-none" onClick={() => handleSort('isActive')}>
+              {t('dashboard.col.active', 'Aktywne')} <SortIcon field="isActive" />
             </th>
-            <th className="pb-3 font-medium text-primary/50">
-              {t('dashboard.col.name', 'Nazwa wydarzenia')}
+            <th className="pb-3 font-medium text-primary/50 cursor-pointer select-none" onClick={() => handleSort('title')}>
+              {t('dashboard.col.name', 'Nazwa wydarzenia')} <SortIcon field="title" />
             </th>
-            <th className="pb-3 font-medium text-primary/50 w-32">
-              {t('dashboard.col.date', 'Data')}
+            <th className="pb-3 font-medium text-primary/50 w-32 cursor-pointer select-none" onClick={() => handleSort('startDate')}>
+              {t('dashboard.col.date', 'Data')} <SortIcon field="startDate" />
             </th>
-            <th className="pb-3 font-medium text-primary/50">
-              {t('dashboard.col.location', 'Lokalizacja')}
+            <th className="pb-3 font-medium text-primary/50 cursor-pointer select-none" onClick={() => handleSort('location')}>
+              {t('dashboard.col.location', 'Lokalizacja')} <SortIcon field="location" />
             </th>
             <th className="pb-3 font-medium text-primary/50">
               {t('dashboard.col.actions', 'Akcje')}
@@ -229,7 +268,7 @@ export default function Dashboard() {
       )}
 
       {/* PAGINATION */}
-      {!loading && !error && filtered.length > 0 && (
+      {!loading && !error && sorted.length > 0 && (
         <div className="flex items-center justify-between mt-4 pt-3 border-t border-primary/10">
           <div className="flex items-center gap-2 text-sm text-primary/60">
             <span>{t('dashboard.rowsPerPage', 'Wierszy na stronę')}</span>
