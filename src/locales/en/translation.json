@@ -191,6 +191,7 @@
       "duplicateLabel": "Duplicate label",
       "optionRequired": "At least one option is required",
       "validationFailed": "Schema validation failed — fix highlighted fields before saving."
+    },
     "register": "Register",
     "validation": {
       "required": "This field is required",

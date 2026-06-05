@@ -191,6 +191,7 @@
       "duplicateLabel": "Zduplikowana etykieta",
       "optionRequired": "Wymagana co najmniej jedna opcja",
       "validationFailed": "Walidacja schematu nie powiodła się — popraw podświetlone pola przed zapisem."
+    },
     "register": "Zarejestruj",
     "validation": {
       "required": "To pole jest wymagane",
