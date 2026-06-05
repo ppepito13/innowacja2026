@@ -39,18 +39,23 @@ function App() {
             <Layout>
               <Switch>
                 {/* Admin Routes */}
-                <ProtectedRoute exact path="/admin" component={Dashboard} requiredRole="Admin" />
+                <ProtectedRoute
+                  exact
+                  path="/admin"
+                  component={Dashboard}
+                  requiredRole={['Admin', 'Organizer']}
+                />
                 <ProtectedRoute
                   exact
                   path="/admin/events/new"
                   component={EventNew}
-                  requiredRole="Admin"
+                  requiredRole={['Admin', 'Organizer']}
                 />
                 <ProtectedRoute
                   exact
                   path="/admin/events/:id/edit"
                   component={EventEdit}
-                  requiredRole="Admin"
+                  requiredRole={['Admin', 'Organizer']}
                 />
                 <ProtectedRoute
                   exact
@@ -87,7 +92,7 @@ function App() {
                   exact
                   path="/admin/account"
                   component={Account}
-                  requiredRole="Admin"
+                  requiredRole={['Admin', 'Organizer']}
                 />
 
                 {/* Other Public Routes */}

@@ -1,3 +1,14 @@
+export interface EventOrganizer {
+  __type: 'Pointer';
+  className: '_User';
+  objectId: string;
+}
+
+export interface EventACL {
+  read?: boolean;
+  write?: boolean;
+}
+
 // --- FormConfig Types ---
 
 export type FieldType =
@@ -58,6 +69,8 @@ export interface Event {
   heroImageUrl?: string;
   isActive: boolean;
   formConfig: Record<string, unknown>; // JSON/Object
+  organizer: EventOrganizer; // Pointer do _User
+  ACL?: Record<string, EventACL>; // Access Control List, kompatybilność wsteczna
   createdAt?: string;
   updatedAt?: string;
 }

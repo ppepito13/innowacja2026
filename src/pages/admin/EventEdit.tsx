@@ -10,6 +10,7 @@ import ColorField from '../../components/ColorField';
 import RadioGroup from '../../components/RadioGroup';
 import parseClient from '../../services/parseClient';
 import { EVENT_CLASS, DEFAULT_PRIMARY_COLOR, DEFAULT_ACCENT_COLOR } from '../../constants/eventDefaults';
+import { useAuth } from '../../auth/AuthProvider';
 
 type EventEditParams = { id: string };
 
@@ -22,6 +23,7 @@ function parseParseDate(value: any): MongoDate {
 export default function EventEdit() {
     const { t } = useTranslation();
     const { id } = useParams<EventEditParams>();
+    const { user } = useAuth();
     const history = useHistory();
 
     const [event, setEvent] = useState<Event | null>(null);
@@ -39,6 +41,14 @@ export default function EventEdit() {
         parseService
             .getById<Event>(EVENT_CLASS, id)
             .then((rawEvent) => {
+                // Sprawdź czy organizer zgadza się z zalogowanym userem
+                if (
+                  user?.role !== 'Admin' &&
+                  rawEvent.organizer?.objectId !== user?.objectId
+                ) {
+                    history.replace('/admin');
+                    return;
+                }
                 const e = rawEvent;
                 setEvent({
                     ...rawEvent,
@@ -54,7 +64,7 @@ export default function EventEdit() {
                 setLoaded(true);
             })
             .catch((e: any) => setError(e.message));
-    }, [id]);
+    }, [id, history, user?.objectId, user?.role]);
 
     const handleDateTypeChange = (value: 'single' | 'multi') => {
         setEvent((prev) => {
@@ -108,6 +118,7 @@ export default function EventEdit() {
             heroImageUrl: event.heroImageUrl,
             isActive: event.isActive,
             formConfig: event.formConfig,
+            organizer: event.organizer,
         };
 
         parseService
