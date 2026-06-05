@@ -153,8 +153,8 @@ export default function EventManagement({ mode }: Props) {
     request.catch((e: any) => setError(e.message)).finally(() => setSaving(false));
   };
 
-  const i = (key: string) => t(`eventManagement.${key}`);
-  const im = (key: string) => t(`eventManagement.${isEdit ? 'edit' : 'new'}.${key}`);
+  const tt = (key: string) => t(`eventManagement.${key}`);
+  const ttm = (key: string) => t(`eventManagement.${isEdit ? 'edit' : 'new'}.${key}`);
 
   if (!loaded && !error) {
     return <p className="p-8 text-primary/60">{t('eventManagement.loading')}...</p>;
@@ -172,13 +172,13 @@ export default function EventManagement({ mode }: Props) {
     <div className="flex flex-col bg-white px-8 py-4 rounded-2xl w-[640px]">
       <div className="flex flex-row items-center justify-between mb-2">
         <div className="flex flex-col">
-          <h1 className="text-3xl mb-0">{im('title')}</h1>
+          <h1 className="text-3xl mb-0">{ttm('title')}</h1>
           <p className="text-lg mt-0 text-primary/75">
             {isEdit
               ? event?.title
                 ? t('eventManagement.edit.subtitle', { title: event.title })
                 : ''
-              : im('subtitle')}
+              : ttm('subtitle')}
           </p>
         </div>
         <button
@@ -193,31 +193,31 @@ export default function EventManagement({ mode }: Props) {
 
       <div className="flex flex-col gap-2 mt-2">
         <InputTextfieldStateful
-          label={i('fields.title')}
-          placeholder={i('fields.title')}
+          label={tt('fields.title')}
+          placeholder={tt('fields.title')}
           defaultValue={event?.title ?? ''}
           onChange={(v) => handleFieldChange('title', String(v))}
         />
         <InputTextfieldStateful
-          label={i('fields.description')}
-          placeholder={i('fields.descriptionPlaceholder')}
+          label={tt('fields.description')}
+          placeholder={tt('fields.descriptionPlaceholder')}
           defaultValue={event?.description ?? ''}
           textArea={true}
           onChange={(v) => handleFieldChange('description', String(v))}
         />
         <RadioGroup
-          label={i('fields.dateType')}
+          label={tt('fields.dateType')}
           value={event?.dateType ?? 'single'}
           onChange={handleDateTypeChange}
           options={[
-            { value: 'single', label: i('fields.dateTypeSingle') },
-            { value: 'multi', label: i('fields.dateTypeMulti') },
+            { value: 'single', label: tt('fields.dateTypeSingle') },
+            { value: 'multi', label: tt('fields.dateTypeMulti') },
           ]}
         />
         <div className="flex gap-4">
           <div className="flex-1">
             <InputDatepicker
-              label={i('fields.startDate')}
+              label={tt('fields.startDate')}
               value={event?.startDate?.date ?? ''}
               onChange={(v) =>
                 handleFieldChange('startDate', v ? { date: new Date(v) } : undefined)
@@ -227,7 +227,7 @@ export default function EventManagement({ mode }: Props) {
           {event?.dateType === 'multi' && (
             <div className="flex-1">
               <InputDatepicker
-                label={i('fields.endDate')}
+                label={tt('fields.endDate')}
                 value={event.endDate?.date ?? ''}
                 onChange={(v) =>
                   handleFieldChange('endDate', v ? { date: new Date(v) } : undefined)
@@ -237,37 +237,37 @@ export default function EventManagement({ mode }: Props) {
           )}
         </div>
         <RadioGroup
-          label={i('fields.eventFormat')}
+          label={tt('fields.eventFormat')}
           value={event?.eventFormat ?? 'on-site'}
           onChange={(v) => handleFieldChange('eventFormat', v)}
           options={[
-            { value: 'virtual', label: i('fields.formatVirtual') },
-            { value: 'on-site', label: i('fields.formatOnSite') },
+            { value: 'virtual', label: tt('fields.formatVirtual') },
+            { value: 'on-site', label: tt('fields.formatOnSite') },
           ]}
         />
         <InputTextfieldStateful
           label={
             event?.eventFormat === 'virtual'
-              ? i('fields.locationVirtual')
-              : i('fields.locationOnSite')
+              ? tt('fields.locationVirtual')
+              : tt('fields.locationOnSite')
           }
           placeholder={
             event?.eventFormat === 'virtual'
-              ? i('fields.locationVirtualPlaceholder')
-              : i('fields.locationOnSitePlaceholder')
+              ? tt('fields.locationVirtualPlaceholder')
+              : tt('fields.locationOnSitePlaceholder')
           }
           defaultValue={event?.location ?? ''}
           onChange={(v) => handleFieldChange('location', String(v))}
         />
-        <p className="text-sm font-semibold text-primary mt-3">{i('sections.colors')}</p>
+        <p className="text-sm font-semibold text-primary mt-3">{tt('sections.colors')}</p>
         <div className="flex gap-4">
           <ColorField
-            label={i('fields.primaryColor')}
+            label={tt('fields.primaryColor')}
             value={event?.primaryColor ?? DEFAULT_PRIMARY_COLOR}
             onChange={(v) => handleFieldChange('primaryColor', v)}
           />
           <ColorField
-            label={i('fields.accentColor')}
+            label={tt('fields.accentColor')}
             value={event?.accentColor ?? DEFAULT_ACCENT_COLOR}
             onChange={(v) => handleFieldChange('accentColor', v)}
           />
@@ -282,10 +282,10 @@ export default function EventManagement({ mode }: Props) {
             style={{ backgroundColor: event?.accentColor ?? DEFAULT_ACCENT_COLOR }}
           />
         </div>
-        <p className="text-sm font-semibold text-primary mt-3">{i('sections.heroImage')}</p>
+        <p className="text-sm font-semibold text-primary mt-3">{tt('sections.heroImage')}</p>
         <div className="flex flex-col gap-1">
           <label className="block text-xs font-medium text-primary/70">
-            {i('fields.heroImageUrl')}
+            {tt('fields.heroImageUrl')}
           </label>
           <div className="flex gap-2">
             <input
@@ -302,7 +302,7 @@ export default function EventManagement({ mode }: Props) {
               className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/20 text-sm text-primary hover:bg-background transition-colors disabled:opacity-50 whitespace-nowrap"
             >
               <Icon icon={LuUpload} size={14} />
-              <span>{uploading ? i('fields.uploading') : i('fields.upload')}</span>
+              <span>{uploading ? tt('fields.uploading') : tt('fields.upload')}</span>
             </button>
             <input
               ref={fileInputRef}
@@ -316,7 +316,7 @@ export default function EventManagement({ mode }: Props) {
         {event?.heroImageUrl && (
           <img
             src={event.heroImageUrl}
-            alt={i('fields.heroImagePreview')}
+            alt={tt('fields.heroImagePreview')}
             className="mt-1 h-36 w-full object-cover rounded-lg border border-primary/10"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).hidden = true;
@@ -327,7 +327,7 @@ export default function EventManagement({ mode }: Props) {
           />
         )}
         <InputTextfieldStateful
-          label={i('fields.dataProcessingAgreement')}
+          label={tt('fields.dataProcessingAgreement')}
           placeholder="https://..."
           defaultValue={event?.dataProcessingAgreement ?? ''}
           onChange={(v) => handleFieldChange('dataProcessingAgreement', String(v))}
@@ -349,7 +349,7 @@ export default function EventManagement({ mode }: Props) {
           className="flex items-center gap-2 px-8 py-3 rounded-full bg-secondary text-primary text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
         >
           <Icon icon={isEdit ? LuSave : LuPlus} size={16} />
-          <span>{saving ? `${im('submit.pending')}...` : im('submit.idle')}</span>
+          <span>{saving ? `${ttm('submit.pending')}...` : ttm('submit.idle')}</span>
         </button>
       </div>
     </div>
