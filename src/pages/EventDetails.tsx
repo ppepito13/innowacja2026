@@ -96,17 +96,16 @@ export default function EventDetails() {
 
         <div className="flex gap-2 text-sm">
           {LANGUAGES.map(({ code, label }) => (
-            <span
+            <button
               key={code}
+              type="button"
               onClick={() => i18n.changeLanguage(code)}
-              className={`px-3 py-1 rounded cursor-pointer transition ${
-                i18n.language === code
-                  ? 'bg-[#2f4661] text-white'
-                  : 'bg-[#24364b] text-gray-300 hover:bg-[#2f4661]'
+              className={`cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide ${
+                i18n.language === code ? 'text-white' : 'text-gray-500 hover:text-gray-300'
               }`}
             >
               {label}
-            </span>
+            </button>
           ))}
         </div>
       </header>
