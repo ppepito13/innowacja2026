@@ -1,3 +1,48 @@
+// --- FormConfig Types ---
+
+export type FieldType =
+  | "text"
+  | "email"
+  | "phone"
+  | "textarea"
+  | "checkbox"
+  | "radio"
+  | "multiselect"
+  | "dropdown";
+
+export interface FieldTypeOption {
+  value: FieldType;
+  labelKey: string;
+  icon: string;
+}
+
+export interface FormField {
+  /**
+   * Local-only identifier used for React list keys and UI state (e.g. tracking
+   * which dropdown is open). NOT persisted to the database — Parse Server
+   * generates its own `objectId` for DB records.
+   * @see https://docs.parseplatform.org/rest/guide/#relational-queries
+   */
+  id: string;
+  label: string;
+  type: FieldType;
+  placeholder: string;
+  required: boolean;
+  options: string[];
+}
+
+export interface FormConfigEntry {
+  type: FieldType;
+  required: boolean;
+  placeholder?: string;
+  label?: string;
+  options?: string[];
+}
+
+export type FormConfig = Record<string, FormConfigEntry>;
+
+// --- Domain Models ---
+
 export interface Event {
   objectId?: string;
   title: string;

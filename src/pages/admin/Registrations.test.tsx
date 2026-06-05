@@ -30,7 +30,7 @@ jest.mock('../../services/parseService', () => ({
 jest.mock('../../utils/formatters', () => ({
   formatDate: (d: string) => d,
   formatColumnName: (key: string) => key,
-  formatBoolean: (v: string) => v,
+  formatCellValue: (v: string | boolean,t:(key: string) => string) => v,
 }));
 
 jest.mock('@lsg/components', () => ({

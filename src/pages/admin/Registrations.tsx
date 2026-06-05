@@ -15,7 +15,7 @@ import {
 import { Button, InputDatepicker, InputTextfieldStateful, ComplexTable } from '@lsg/components';
 import { parseService, createPointer } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
-import { formatDate, formatColumnName, formatBoolean } from '../../utils/formatters';
+import { formatDate, formatColumnName, formatCellValue } from '../../utils/formatters';
 import { useTranslation } from 'react-i18next';
 
 import Icon from '../../components/Icon';
@@ -275,7 +275,7 @@ export default function Registrations() {
                       {renderStatus(value as Registration['status'])}
                     </div>
                   ) : (
-                    formatBoolean(value)
+                    formatCellValue(value,t)
                   ),
               })),
               {
@@ -429,7 +429,7 @@ export default function Registrations() {
                 {Object.entries(selectedRegistration.formData ?? {}).map(([key, value]) => (
                   <div key={key} className="flex gap-2 items-center">
                     <span className="font-semibold">{formatColumnName(key)}:</span>
-                    {formatBoolean(String(value))}
+                    {formatCellValue(String(value),t)}
                   </div>
                 ))}
               </div>
