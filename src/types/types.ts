@@ -67,6 +67,7 @@ export interface Event {
   primaryColor: string;
   accentColor?: string;
   heroImageUrl?: string;
+  dataProcessingAgreement?: string;
   isActive: boolean;
   formConfig: Record<string, unknown>; // JSON/Object
   organizer: EventOrganizer; // Pointer do _User

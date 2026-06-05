@@ -118,6 +118,7 @@
       "accentColor": "Kolor akcentu",
       "heroImageUrl": "URL zdjęcia",
       "heroImagePreview": "Podgląd zdjęcia głównego",
+      "dataProcessingAgreement": "URL polityki przetwarzania danych",
       "upload": "Wgraj",
       "uploading": "Wgrywanie..."
     }
@@ -156,6 +157,7 @@
       "accentColor": "Kolor akcentu",
       "heroImageUrl": "URL zdjęcia",
       "heroImagePreview": "Podgląd zdjęcia głównego",
+      "dataProcessingAgreement": "URL polityki przetwarzania danych",
       "upload": "Wgraj",
       "uploading": "Wgrywanie..."
     }

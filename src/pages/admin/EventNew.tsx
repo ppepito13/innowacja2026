@@ -9,7 +9,11 @@ import Icon from '../../components/Icon';
 import ColorField from '../../components/ColorField';
 import RadioGroup from '../../components/RadioGroup';
 import parseClient from '../../services/parseClient';
-import { DEFAULT_ACCENT_COLOR, DEFAULT_PRIMARY_COLOR, EVENT_CLASS } from '../../constants/eventDefaults';
+import {
+  DEFAULT_ACCENT_COLOR,
+  DEFAULT_PRIMARY_COLOR,
+  EVENT_CLASS,
+} from '../../constants/eventDefaults';
 
 export default function EventNew() {
   const { t } = useTranslation();
@@ -60,11 +64,9 @@ export default function EventNew() {
   const handleFileUpload = async (file: File) => {
     setUploading(true);
     try {
-      const { data } = await parseClient.post(
-        `/files/${encodeURIComponent(file.name)}`,
-        file,
-        { headers: { 'Content-Type': file.type } },
-      );
+      const { data } = await parseClient.post(`/files/${encodeURIComponent(file.name)}`, file, {
+        headers: { 'Content-Type': file.type },
+      });
       handleFieldChange('heroImageUrl', data.url);
     } catch (e: any) {
       setError(e.message);
@@ -80,56 +82,58 @@ export default function EventNew() {
     Promise.all([
       parseClient.get('/users/me'),
       parseClient.get('/users', {
-        params: {
-          where: JSON.stringify({ role: 'Admin' }),
-        },
+        params: { where: JSON.stringify({ role: 'Admin' }) },
         headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY },
       }),
-    ]).then(([{ data: me }, { data: admins }]) => {
-      const acl: Record<string, { read: boolean; write: boolean }> = {
-        [me.objectId]: { read: true, write: true },
-      };
+    ])
+      .then(([{ data: me }, { data: admins }]) => {
+        const acl: Record<string, { read: boolean; write: boolean }> = {
+          [me.objectId]: { read: true, write: true },
+        };
+        admins.results.forEach((admin: { objectId: string }) => {
+          acl[admin.objectId] = { read: true, write: true };
+        });
 
-      admins.results.forEach((admin: { objectId: string }) => {
-        acl[admin.objectId] = { read: true, write: true };
+        const payload: Event = {
+          title: event.title,
+          description: event.description,
+          ...(event.startDate && {
+            startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() },
+          }),
+          ...(event.dateType === 'multi' && event.endDate
+            ? { endDate: { __type: 'Date', iso: event.endDate.date?.toISOString() } }
+            : undefined),
+          dateType: event.dateType,
+          eventFormat: event.eventFormat,
+          location: event.location,
+          primaryColor: event.primaryColor,
+          accentColor: event.accentColor,
+          heroImageUrl: event.heroImageUrl,
+          isActive: event.isActive,
+          dataProcessingAgreement: event.dataProcessingAgreement,
+          formConfig: event.formConfig,
+          organizer: {
+            __type: 'Pointer',
+            className: '_User',
+            objectId: me.objectId,
+          },
+          ACL: acl,
+        };
+
+        parseService
+          .create<Event>(EVENT_CLASS, payload)
+          .then(({ objectId }) => history.push(`/admin/events/${objectId}/edit`))
+          .catch((e: any) => setError(e.message))
+          .finally(() => setSaving(false));
+      })
+      .catch((e: any) => {
+        setError(e.message);
+        setSaving(false);
       });
-
-      const payload: Event = {
-        title: event.title,
-        description: event.description,
-        ...(event.startDate && { startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() } }),
-        ...(event.dateType === 'multi' && event.endDate
-          ? { endDate: { __type: 'Date', iso: event.endDate.date?.toISOString() } } : undefined),
-        dateType: event.dateType,
-        eventFormat: event.eventFormat,
-        location: event.location,
-        primaryColor: event.primaryColor,
-        accentColor: event.accentColor,
-        heroImageUrl: event.heroImageUrl,
-        isActive: event.isActive,
-        formConfig: event.formConfig,
-        organizer: {
-          __type: 'Pointer',
-          className: '_User',
-          objectId: me.objectId,
-        },
-        ACL: acl,
-      };
-
-      parseService
-        .create<Event>(EVENT_CLASS, payload)
-        .then(({ objectId }) => history.push(`/admin/events/${objectId}/edit`))
-        .catch((e: any) => setError(e.message))
-        .finally(() => setSaving(false));
-    }).catch((e: any) => {
-      setError(e.message);
-      setSaving(false);
-    });
   };
 
   return (
     <div className="flex flex-col bg-white px-8 py-4 rounded-2xl w-[640px]">
-      {/* HEADER */}
       <div className="flex flex-row items-center justify-between mb-2">
         <div className="flex flex-col">
           <h1 className="text-3xl mb-0">{t('eventNew.title')}</h1>
@@ -145,18 +149,13 @@ export default function EventNew() {
 
       {error && <p className="mb-2 text-sm text-red-600">{error}</p>}
 
-      {/* FORM */}
       <div className="flex flex-col gap-2 mt-2">
-
-        {/* Title */}
         <InputTextfieldStateful
           label={t('eventNew.fields.title')}
           placeholder={t('eventNew.fields.title')}
           defaultValue={event.title ?? ''}
           onChange={(v) => handleFieldChange('title', String(v))}
         />
-
-        {/* Description */}
         <InputTextfieldStateful
           label={t('eventNew.fields.description')}
           placeholder={t('eventNew.fields.descriptionPlaceholder')}
@@ -164,8 +163,6 @@ export default function EventNew() {
           textArea={true}
           onChange={(v) => handleFieldChange('description', String(v))}
         />
-
-        {/* Date Type */}
         <RadioGroup
           label={t('eventNew.fields.dateType')}
           value={event.dateType ?? 'single'}
@@ -175,14 +172,14 @@ export default function EventNew() {
             { value: 'multi', label: t('eventNew.fields.dateTypeMulti') },
           ]}
         />
-
-        {/* Dates */}
         <div className="flex gap-4">
           <div className="flex-1">
             <InputDatepicker
               label={t('eventNew.fields.startDate')}
               value={event.startDate?.date ?? ''}
-              onChange={(v) => handleFieldChange('startDate', v ? { date: new Date(v) } : undefined)}
+              onChange={(v) =>
+                handleFieldChange('startDate', v ? { date: new Date(v) } : undefined)
+              }
             />
           </div>
           {event.dateType === 'multi' && (
@@ -190,13 +187,13 @@ export default function EventNew() {
               <InputDatepicker
                 label={t('eventNew.fields.endDate')}
                 value={event.endDate?.date ?? ''}
-                onChange={(v) => handleFieldChange('endDate', v ? { date: new Date(v) } : undefined)}
+                onChange={(v) =>
+                  handleFieldChange('endDate', v ? { date: new Date(v) } : undefined)
+                }
               />
             </div>
           )}
         </div>
-
-        {/* Event Format */}
         <RadioGroup
           label={t('eventNew.fields.eventFormat')}
           value={event.eventFormat ?? 'on-site'}
@@ -206,8 +203,6 @@ export default function EventNew() {
             { value: 'on-site', label: t('eventNew.fields.formatOnSite') },
           ]}
         />
-
-        {/* Location — label and placeholder adapt to event format */}
         <InputTextfieldStateful
           label={
             event.eventFormat === 'virtual'
@@ -222,11 +217,7 @@ export default function EventNew() {
           defaultValue={event.location ?? ''}
           onChange={(v) => handleFieldChange('location', String(v))}
         />
-
-        {/* Colors */}
-        <p className="text-sm font-semibold text-primary mt-3">
-          {t('eventNew.sections.colors')}
-        </p>
+        <p className="text-sm font-semibold text-primary mt-3">{t('eventNew.sections.colors')}</p>
         <div className="flex gap-4">
           <ColorField
             label={t('eventNew.fields.primaryColor')}
@@ -239,14 +230,16 @@ export default function EventNew() {
             onChange={(v) => handleFieldChange('accentColor', v)}
           />
         </div>
-
-        {/* Color Preview */}
         <div className="h-8 rounded-lg border border-primary/10 flex overflow-hidden mt-1">
-          <div className="flex-1" style={{ backgroundColor: event.primaryColor ?? DEFAULT_PRIMARY_COLOR }} />
-          <div className="flex-1" style={{ backgroundColor: event.accentColor ?? DEFAULT_ACCENT_COLOR }} />
+          <div
+            className="flex-1"
+            style={{ backgroundColor: event.primaryColor ?? DEFAULT_PRIMARY_COLOR }}
+          />
+          <div
+            className="flex-1"
+            style={{ backgroundColor: event.accentColor ?? DEFAULT_ACCENT_COLOR }}
+          />
         </div>
-
-        {/* Hero Image */}
         <p className="text-sm font-semibold text-primary mt-3">
           {t('eventNew.sections.heroImage')}
         </p>
@@ -269,7 +262,9 @@ export default function EventNew() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/20 text-sm text-primary hover:bg-background transition-colors disabled:opacity-50 whitespace-nowrap"
             >
               <Icon icon={LuUpload} size={14} />
-              <span>{uploading ? t('eventNew.fields.uploading') : t('eventNew.fields.upload')}</span>
+              <span>
+                {uploading ? t('eventNew.fields.uploading') : t('eventNew.fields.upload')}
+              </span>
             </button>
             <input
               ref={fileInputRef}
@@ -280,7 +275,6 @@ export default function EventNew() {
             />
           </div>
         </div>
-
         {event.heroImageUrl && (
           <img
             src={event.heroImageUrl}
@@ -294,9 +288,14 @@ export default function EventNew() {
             }}
           />
         )}
+        <InputTextfieldStateful
+          label={t('eventNew.fields.dataProcessingAgreement')}
+          placeholder="https://..."
+          defaultValue={event.dataProcessingAgreement ?? ''}
+          onChange={(v) => handleFieldChange('dataProcessingAgreement', String(v))}
+        />
       </div>
 
-      {/* ACTIONS */}
       <div className="flex items-center justify-end mt-6 pb-4 gap-3">
         <button
           type="button"

@@ -141,6 +141,8 @@ exports[`EventDetails Renders properly 1`] = `
                     <a
                       class="underline text-gray-200 hover:text-white"
                       href="#terms"
+                      rel="noopener noreferrer"
+                      target="_blank"
                     >
                       eventDetails.termsAndConditions
                     </a>

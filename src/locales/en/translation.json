@@ -118,6 +118,7 @@
       "accentColor": "Accent Color",
       "heroImageUrl": "Image URL",
       "heroImagePreview": "Hero image preview",
+      "dataProcessingAgreement": "Data Processing Agreement URL",
       "upload": "Upload",
       "uploading": "Uploading..."
     }
@@ -156,6 +157,7 @@
       "accentColor": "Accent Color",
       "heroImageUrl": "Image URL",
       "heroImagePreview": "Hero image preview",
+      "dataProcessingAgreement": "Data Processing Agreement URL",
       "upload": "Upload",
       "uploading": "Uploading..."
     }
