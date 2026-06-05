@@ -10,12 +10,12 @@ import {
   LuPencil,
   LuX,
   LuCircleX,
-  LuClock,
+  LuClock, LuUserCheck,
 } from 'react-icons/lu';
 import { Button, InputDatepicker, InputTextfieldStateful, ComplexTable } from '@lsg/components';
 import { parseService, createPointer } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
-import { formatDate, formatColumnName, formatBoolean } from '../../utils/formatters';
+import { formatDate, formatColumnName, formatCellValue } from '../../utils/formatters';
 import { useTranslation } from 'react-i18next';
 
 import Icon from '../../components/Icon';
@@ -131,6 +131,23 @@ export default function Registrations() {
         previousRegistrations.map((registration) =>
           registration.objectId === registrationId ? { ...registration, status } : registration,
         ),
+      );
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setOpenedActionId(null);
+      setSelectedRegistration(null);
+    }
+  };
+
+  const updateCheckInTime = async (registrationId: string, checkInTime: Registration['checkInTime']) => {
+    try {
+      await parseService.update<Registration>('Registration', registrationId, { checkInTime });
+
+      setRegistrations((previousRegistrations) =>
+          previousRegistrations.map((registration) =>
+              registration.objectId === registrationId ? { ...registration, checkInTime } : registration,
+          ),
       );
     } catch (error: any) {
       setError(error.message);
@@ -258,17 +275,28 @@ export default function Registrations() {
                       {renderStatus(value as Registration['status'])}
                     </div>
                   ) : (
-                    formatBoolean(value)
+                    formatCellValue(value,t)
                   ),
               })),
               {
                 name: 'actions',
                 title: t('registrations.actions'),
                 formatter: (value: string) => {
-                  const { objectId, status } = JSON.parse(value);
+                  const { objectId, status, isCheckedIn} = JSON.parse(value);
 
                   return (
                     <div className="relative flex gap-2 justify-center">
+                      <button
+                          className={`w-8 h-8 flex items-center justify-center rounded-lg border p-2 transition active:scale-95 ${
+                              isCheckedIn
+                                  ? 'border-primary/10 bg-white text-primary hover:bg-background'
+                                  : 'border-red-200 bg-red-50 text-red-600 cursor-not-allowed'
+                          }`}
+                          onClick={() => updateCheckInTime(objectId, {__type: 'Date', iso: new Date().toISOString()})}
+                          disabled={!isCheckedIn}
+                      >
+                        <Icon icon={LuUserCheck} size={14} />
+                      </button>
                       <button
                         className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
                         onClick={() => {
@@ -332,7 +360,11 @@ export default function Registrations() {
                 ...columns.map((column) =>
                   column === 'status' ? registration.status : getCellValue(registration, column),
                 ),
-                JSON.stringify({ objectId: registration.objectId, status: registration.status }),
+                JSON.stringify(
+                    { objectId: registration.objectId,
+                      status: registration.status,
+                      isCheckedIn: registration.checkInTime == null
+                    }),
               ],
             }))}
           />
@@ -397,7 +429,7 @@ export default function Registrations() {
                 {Object.entries(selectedRegistration.formData ?? {}).map(([key, value]) => (
                   <div key={key} className="flex gap-2 items-center">
                     <span className="font-semibold">{formatColumnName(key)}:</span>
-                    {formatBoolean(String(value))}
+                    {formatCellValue(String(value),t)}
                   </div>
                 ))}
               </div>

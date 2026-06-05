@@ -184,6 +184,43 @@
     "readMoreIn": "Read more in",
     "termsAndConditions": "terms and conditions",
     "requiredField": "Required field.",
+    "register": "Register"
+  },
+  "formConfig": {
+    "title": "Form Builder",
+    "subtitle": "Define custom registration fields for your event",
+    "showJson": "Show JSON",
+    "hideJson": "Hide JSON",
+    "save": "Save formConfig",
+    "saved": "Saved",
+    "addField": "Add Field",
+    "removeField": "Remove field",
+    "label": "Label",
+    "labelPlaceholder": "e.g. Full Name",
+    "placeholder": "Placeholder",
+    "placeholderPlaceholder": "e.g. John Doe",
+    "type": "Type",
+    "required": "Required",
+    "options": "Options",
+    "option": "Option",
+    "addOption": "Add Option",
+    "removeOption": "Remove option",
+    "fieldType": {
+      "text": "Text",
+      "email": "Email",
+      "phone": "Phone",
+      "textarea": "Textarea",
+      "checkbox": "Checkbox (agreement)",
+      "radio": "Single Choice (Radio)",
+      "multiselect": "Multiple Choice (Checkbox)",
+      "dropdown": "Dropdown (Single Choice)"
+    },
+    "errors": {
+      "labelRequired": "Label is required",
+      "duplicateLabel": "Duplicate label",
+      "optionRequired": "At least one option is required",
+      "validationFailed": "Schema validation failed — fix highlighted fields before saving."
+    },
     "register": "Register",
     "validation": {
       "required": "This field is required",
