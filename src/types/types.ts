@@ -4,6 +4,11 @@ export interface EventOrganizer {
   objectId: string;
 }
 
+export interface EventACL {
+  read?: boolean;
+  write?: boolean;
+}
+
 export interface Event {
   objectId?: string;
   title: string;
@@ -20,6 +25,7 @@ export interface Event {
   isActive: boolean;
   formConfig: Record<string, unknown>; // JSON/Object
   organizer: EventOrganizer; // Pointer do _User
+  ACL?: Record<string, EventACL>; // Access Control List, kompatybilność wsteczna
   createdAt?: string;
   updatedAt?: string;
 }

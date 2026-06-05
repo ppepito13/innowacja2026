@@ -113,7 +113,7 @@ export default function Dashboard() {
   };
 
   const handleDelete = (event: Event) => {
-    if (!window.confirm(t('dashboard.deleteConfirm'))) return;
+    if (!window.confirm(t('dashboard.deleteConfirm', {title: event.title}))) return;
     parseService
       .remove(EVENT_CLASS, event.objectId!)
       .then(() => setEvents((prev) => prev.filter((e) => e.objectId !== event.objectId)))
@@ -121,17 +121,24 @@ export default function Dashboard() {
   };
 
   const handleToggleActive = (event: Event) => {
-    const updated = { isActive: !event.isActive };
+    // Zmień natychmiast w UI
+    setEvents((prev) =>
+      prev.map((e) =>
+        e.objectId === event.objectId ? { ...e, isActive: !e.isActive } : e
+      )
+    );
+
+    // Wyślij do serwera, przy błędzie cofnij
     parseService
-      .update<Event>(EVENT_CLASS, event.objectId!, updated)
-      .then(() => {
+      .update<Event>(EVENT_CLASS, event.objectId!, { isActive: !event.isActive })
+      .catch((e: any) => {
+        setError(e.message);
         setEvents((prev) =>
           prev.map((e) =>
-            e.objectId === event.objectId ? { ...e, isActive: !e.isActive } : e
+            e.objectId === event.objectId ? { ...e, isActive: event.isActive } : e
           )
         );
-      })
-      .catch((e: any) => setError(e.message));
+      });
   };
 
   return (
