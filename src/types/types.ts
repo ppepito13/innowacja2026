@@ -66,8 +66,8 @@ export interface Registration {
   objectId: string;
   event: Event; // Pointer
   formData: Record<string, unknown>; // JSON/Object
-  status: "pending" | "approved"; // String: pending/approved
-  checkInTime: Date | null; // Date/Nullable
+  status: 'pending' | 'approved'; // String: pending/approved
+  checkInTime: Date | MongoDate | null; // Date/Nullable
   createdAt: string;
   updatedAt: string;
 }
