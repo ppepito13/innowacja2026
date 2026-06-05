@@ -82,6 +82,7 @@ export interface Registration {
   formData: Record<string, unknown>; // JSON/Object
   status: 'pending' | 'approved'; // String: pending/approved
   checkInTime: Date | MongoDate | null; // Date/Nullable
+  consent: boolean;
   createdAt: string;
   updatedAt: string;
 }

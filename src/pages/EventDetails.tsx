@@ -57,7 +57,7 @@ export default function EventDetails() {
     }) && consent;
 
   const handleSubmit = async () => {
-    if (!event || loading) return;
+    if (!event || loading || !isFormValid) return;
 
     setLoading(true);
     setError(null);
@@ -68,6 +68,7 @@ export default function EventDetails() {
         event: createPointer('TestEvent', event.objectId!),
         formData,
         status: 'pending',
+        consent: true,
       });
 
       setFormData({});
