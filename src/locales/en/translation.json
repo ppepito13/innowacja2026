@@ -251,5 +251,27 @@
       "submit": "Save Changes",
       "pending": "Saving"
     }
+  },
+  "checkIn": {
+    "title": "Event Check-in",
+    "subtitle": "Scan QR codes or manually check in attendees for an event.",
+    "export": "Export",
+    "tabs": {
+      "qrScanner": "QR Scanner",
+      "manual": "Manual Check-in"
+    },
+    "scanner": {
+      "title": "QR Code Scanner",
+      "description": "Point the camera at an attendee's QR code to check them in.",
+      "start": "Start Scanner",
+      "stop": "Stop Scanner",
+      "successTitle": "Success!",
+      "successInlineTitle": "Check-in Successful!",
+      "success": "{{name}}: Check-in successful!",
+      "warningTitle": "Scan Result",
+      "warning": "{{name}}: User already checked in at {{time}}.",
+      "errorTitle": "Scan Failed",
+      "error": "{{name}}: {{message}}"
+    }
   }
 }

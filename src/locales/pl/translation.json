@@ -251,5 +251,27 @@
       "submit": "Zapisz zmiany",
       "pending": "Zapisywanie"
     }
+  },
+  "checkIn": {
+    "title": "Zameldowanie na wydarzenie",
+    "subtitle": "Zeskanuj kody QR lub ręcznie zamelduj uczestników.",
+    "export": "Eksport",
+    "tabs": {
+      "qrScanner": "Skaner QR",
+      "manual": "Ręczne zameldowanie"
+    },
+    "scanner": {
+      "title": "Skaner Kodów QR",
+      "description": "Skieruj aparat na kod QR uczestnika, aby go zameldować.",
+      "start": "Uruchom Skaner",
+      "stop": "Zatrzymaj Skaner",
+      "successTitle": "Sukces!",
+      "successInlineTitle": "Zameldowanie powiodło się!",
+      "success": "{{name}}: Zameldowano pomyślnie!",
+      "warningTitle": "Wynik Skanowania",
+      "warning": "{{name}}: Uczestnik jest już zameldowany z dnia {{time}}.",
+      "errorTitle": "Błąd Skanowania",
+      "error": "{{name}}: {{message}}"
+    }
   }
 }
