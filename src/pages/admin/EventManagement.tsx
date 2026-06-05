@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useHistory } from 'react-router';
-import { LuSave, LuArrowLeft, LuUpload } from 'react-icons/lu';
+import { LuSave, LuPlus, LuArrowLeft, LuUpload } from 'react-icons/lu';
 import { InputDatepicker, InputTextfieldStateful } from '@lsg/components';
 import { parseService } from '../../services/parseService';
 import { Event, MongoDate } from '../../types/types';
@@ -16,7 +16,24 @@ import {
 } from '../../constants/eventDefaults';
 import { useAuth } from '../../auth/AuthProvider';
 
+type Props = { mode: 'new' | 'edit' };
 type EventEditParams = { id: string };
+
+const EMPTY_EVENT: Event = {
+  title: '',
+  description: '',
+  dateType: 'single',
+  startDate: {},
+  endDate: {},
+  eventFormat: 'on-site',
+  location: '',
+  primaryColor: DEFAULT_PRIMARY_COLOR,
+  accentColor: DEFAULT_ACCENT_COLOR,
+  heroImageUrl: '',
+  isActive: false,
+  organizer: { __type: 'Pointer', className: '_User', objectId: '' },
+  formConfig: {},
+};
 
 function parseParseDate(value: any): MongoDate {
   if (!value) return {};
@@ -24,14 +41,16 @@ function parseParseDate(value: any): MongoDate {
   return { date: new Date(value) };
 }
 
-export default function EventEdit() {
+export default function EventManagement({ mode }: Props) {
   const { t } = useTranslation();
   const { id } = useParams<EventEditParams>();
   const { user } = useAuth();
   const history = useHistory();
 
-  const [event, setEvent] = useState<Event | null>(null);
-  const [loaded, setLoaded] = useState(false);
+  const isEdit = mode === 'edit';
+
+  const [event, setEvent] = useState<Event | null>(isEdit ? null : EMPTY_EVENT);
+  const [loaded, setLoaded] = useState(!isEdit);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +61,7 @@ export default function EventEdit() {
   };
 
   useEffect(() => {
+    if (!isEdit) return;
     parseService
       .getById<Event>(EVENT_CLASS, id)
       .then((rawEvent) => {
@@ -49,22 +69,21 @@ export default function EventEdit() {
           history.replace('/admin');
           return;
         }
-        const e = rawEvent;
         setEvent({
           ...rawEvent,
-          dateType: e.dateType ?? 'single',
-          eventFormat: e.eventFormat ?? 'on-site',
-          location: e.location ?? '',
-          primaryColor: e.primaryColor ?? DEFAULT_PRIMARY_COLOR,
-          accentColor: e.accentColor ?? DEFAULT_ACCENT_COLOR,
-          heroImageUrl: e.heroImageUrl ?? '',
-          startDate: parseParseDate(e.startDate),
-          endDate: parseParseDate(e.endDate),
+          dateType: rawEvent.dateType ?? 'single',
+          eventFormat: rawEvent.eventFormat ?? 'on-site',
+          location: rawEvent.location ?? '',
+          primaryColor: rawEvent.primaryColor ?? DEFAULT_PRIMARY_COLOR,
+          accentColor: rawEvent.accentColor ?? DEFAULT_ACCENT_COLOR,
+          heroImageUrl: rawEvent.heroImageUrl ?? '',
+          startDate: parseParseDate(rawEvent.startDate),
+          endDate: parseParseDate(rawEvent.endDate),
         });
         setLoaded(true);
       })
       .catch((e: any) => setError(e.message));
-  }, [id, history, user?.objectId, user?.role]);
+  }, [isEdit, id, history, user?.objectId, user?.role]);
 
   const handleDateTypeChange = (value: 'single' | 'multi') => {
     setEvent((prev) => {
@@ -97,7 +116,7 @@ export default function EventEdit() {
     }
   };
 
-  const handleSave = () => {
+  const handleSubmit = () => {
     if (!event) return;
     setSaving(true);
     setError(null);
@@ -110,7 +129,9 @@ export default function EventEdit() {
       }),
       ...(event.dateType === 'multi' && event.endDate
         ? { endDate: { __type: 'Date', iso: event.endDate.date?.toISOString() } }
-        : { endDate: { __op: 'Delete' } }),
+        : isEdit
+          ? { endDate: { __op: 'Delete' } }
+          : undefined),
       dateType: event.dateType,
       eventFormat: event.eventFormat,
       location: event.location,
@@ -123,21 +144,26 @@ export default function EventEdit() {
       organizer: event.organizer,
     };
 
-    parseService
-      .update<Event>(EVENT_CLASS, id, payload)
-      .then(() => history.goBack())
-      .catch((e: any) => setError(e.message))
-      .finally(() => setSaving(false));
+    const request = isEdit
+      ? parseService.update<Event>(EVENT_CLASS, id, payload).then(() => history.goBack())
+      : parseService
+          .create<Event>(EVENT_CLASS, payload)
+          .then(({ objectId }) => history.push(`/admin/events/${objectId}/edit`));
+
+    request.catch((e: any) => setError(e.message)).finally(() => setSaving(false));
   };
 
+  const i = (key: string) => t(`eventManagement.${key}`);
+  const im = (key: string) => t(`eventManagement.${isEdit ? 'edit' : 'new'}.${key}`);
+
   if (!loaded && !error) {
-    return <p className="p-8 text-primary/60">{t('eventEdit.loading')}...</p>;
+    return <p className="p-8 text-primary/60">{t('eventManagement.loading')}...</p>;
   }
 
   if (error && !loaded) {
     return (
       <p className="p-8 text-red-600">
-        {t('eventEdit.error')}: {error}
+        {t('eventManagement.error')}: {error}
       </p>
     );
   }
@@ -146,9 +172,13 @@ export default function EventEdit() {
     <div className="flex flex-col bg-white px-8 py-4 rounded-2xl w-[640px]">
       <div className="flex flex-row items-center justify-between mb-2">
         <div className="flex flex-col">
-          <h1 className="text-3xl mb-0">{t('eventEdit.title')}</h1>
+          <h1 className="text-3xl mb-0">{im('title')}</h1>
           <p className="text-lg mt-0 text-primary/75">
-            {t('eventEdit.subtitle', { title: event?.title ?? id })}
+            {isEdit
+              ? event?.title
+                ? t('eventManagement.edit.subtitle', { title: event.title })
+                : ''
+              : im('subtitle')}
           </p>
         </div>
         <button
@@ -163,31 +193,31 @@ export default function EventEdit() {
 
       <div className="flex flex-col gap-2 mt-2">
         <InputTextfieldStateful
-          label={t('eventEdit.fields.title')}
-          placeholder={t('eventEdit.fields.title')}
+          label={i('fields.title')}
+          placeholder={i('fields.title')}
           defaultValue={event?.title ?? ''}
           onChange={(v) => handleFieldChange('title', String(v))}
         />
         <InputTextfieldStateful
-          label={t('eventEdit.fields.description')}
-          placeholder={t('eventEdit.fields.descriptionPlaceholder')}
+          label={i('fields.description')}
+          placeholder={i('fields.descriptionPlaceholder')}
           defaultValue={event?.description ?? ''}
           textArea={true}
           onChange={(v) => handleFieldChange('description', String(v))}
         />
         <RadioGroup
-          label={t('eventEdit.fields.dateType')}
+          label={i('fields.dateType')}
           value={event?.dateType ?? 'single'}
           onChange={handleDateTypeChange}
           options={[
-            { value: 'single', label: t('eventEdit.fields.dateTypeSingle') },
-            { value: 'multi', label: t('eventEdit.fields.dateTypeMulti') },
+            { value: 'single', label: i('fields.dateTypeSingle') },
+            { value: 'multi', label: i('fields.dateTypeMulti') },
           ]}
         />
         <div className="flex gap-4">
           <div className="flex-1">
             <InputDatepicker
-              label={t('eventEdit.fields.startDate')}
+              label={i('fields.startDate')}
               value={event?.startDate?.date ?? ''}
               onChange={(v) =>
                 handleFieldChange('startDate', v ? { date: new Date(v) } : undefined)
@@ -197,7 +227,7 @@ export default function EventEdit() {
           {event?.dateType === 'multi' && (
             <div className="flex-1">
               <InputDatepicker
-                label={t('eventEdit.fields.endDate')}
+                label={i('fields.endDate')}
                 value={event.endDate?.date ?? ''}
                 onChange={(v) =>
                   handleFieldChange('endDate', v ? { date: new Date(v) } : undefined)
@@ -207,37 +237,37 @@ export default function EventEdit() {
           )}
         </div>
         <RadioGroup
-          label={t('eventEdit.fields.eventFormat')}
+          label={i('fields.eventFormat')}
           value={event?.eventFormat ?? 'on-site'}
           onChange={(v) => handleFieldChange('eventFormat', v)}
           options={[
-            { value: 'virtual', label: t('eventEdit.fields.formatVirtual') },
-            { value: 'on-site', label: t('eventEdit.fields.formatOnSite') },
+            { value: 'virtual', label: i('fields.formatVirtual') },
+            { value: 'on-site', label: i('fields.formatOnSite') },
           ]}
         />
         <InputTextfieldStateful
           label={
             event?.eventFormat === 'virtual'
-              ? t('eventEdit.fields.locationVirtual')
-              : t('eventEdit.fields.locationOnSite')
+              ? i('fields.locationVirtual')
+              : i('fields.locationOnSite')
           }
           placeholder={
             event?.eventFormat === 'virtual'
-              ? t('eventEdit.fields.locationVirtualPlaceholder')
-              : t('eventEdit.fields.locationOnSitePlaceholder')
+              ? i('fields.locationVirtualPlaceholder')
+              : i('fields.locationOnSitePlaceholder')
           }
           defaultValue={event?.location ?? ''}
           onChange={(v) => handleFieldChange('location', String(v))}
         />
-        <p className="text-sm font-semibold text-primary mt-3">{t('eventEdit.sections.colors')}</p>
+        <p className="text-sm font-semibold text-primary mt-3">{i('sections.colors')}</p>
         <div className="flex gap-4">
           <ColorField
-            label={t('eventEdit.fields.primaryColor')}
+            label={i('fields.primaryColor')}
             value={event?.primaryColor ?? DEFAULT_PRIMARY_COLOR}
             onChange={(v) => handleFieldChange('primaryColor', v)}
           />
           <ColorField
-            label={t('eventEdit.fields.accentColor')}
+            label={i('fields.accentColor')}
             value={event?.accentColor ?? DEFAULT_ACCENT_COLOR}
             onChange={(v) => handleFieldChange('accentColor', v)}
           />
@@ -252,12 +282,10 @@ export default function EventEdit() {
             style={{ backgroundColor: event?.accentColor ?? DEFAULT_ACCENT_COLOR }}
           />
         </div>
-        <p className="text-sm font-semibold text-primary mt-3">
-          {t('eventEdit.sections.heroImage')}
-        </p>
+        <p className="text-sm font-semibold text-primary mt-3">{i('sections.heroImage')}</p>
         <div className="flex flex-col gap-1">
           <label className="block text-xs font-medium text-primary/70">
-            {t('eventEdit.fields.heroImageUrl')}
+            {i('fields.heroImageUrl')}
           </label>
           <div className="flex gap-2">
             <input
@@ -274,9 +302,7 @@ export default function EventEdit() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/20 text-sm text-primary hover:bg-background transition-colors disabled:opacity-50 whitespace-nowrap"
             >
               <Icon icon={LuUpload} size={14} />
-              <span>
-                {uploading ? t('eventEdit.fields.uploading') : t('eventEdit.fields.upload')}
-              </span>
+              <span>{uploading ? i('fields.uploading') : i('fields.upload')}</span>
             </button>
             <input
               ref={fileInputRef}
@@ -290,7 +316,7 @@ export default function EventEdit() {
         {event?.heroImageUrl && (
           <img
             src={event.heroImageUrl}
-            alt={t('eventEdit.fields.heroImagePreview')}
+            alt={i('fields.heroImagePreview')}
             className="mt-1 h-36 w-full object-cover rounded-lg border border-primary/10"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).hidden = true;
@@ -301,7 +327,7 @@ export default function EventEdit() {
           />
         )}
         <InputTextfieldStateful
-          label={t('eventEdit.fields.dataProcessingAgreement')}
+          label={i('fields.dataProcessingAgreement')}
           placeholder="https://..."
           defaultValue={event?.dataProcessingAgreement ?? ''}
           onChange={(v) => handleFieldChange('dataProcessingAgreement', String(v))}
@@ -314,16 +340,16 @@ export default function EventEdit() {
           onClick={() => history.goBack()}
           className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
         >
-          {t('eventEdit.cancel')}
+          {t('eventManagement.cancel')}
         </button>
         <button
           type="button"
-          onClick={handleSave}
+          onClick={handleSubmit}
           disabled={saving || uploading}
           className="flex items-center gap-2 px-8 py-3 rounded-full bg-secondary text-primary text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
         >
-          <Icon icon={LuSave} size={16} />
-          <span>{saving ? `${t('eventEdit.save.pending')}...` : t('eventEdit.save.idle')}</span>
+          <Icon icon={isEdit ? LuSave : LuPlus} size={16} />
+          <span>{saving ? `${im('submit.pending')}...` : im('submit.idle')}</span>
         </button>
       </div>
     </div>
