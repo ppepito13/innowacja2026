@@ -67,6 +67,7 @@ export interface Event {
   primaryColor: string;
   accentColor?: string;
   heroImageUrl?: string;
+  dataProcessingAgreement?: string;
   isActive: boolean;
   formConfig: Record<string, unknown>; // JSON/Object
   organizer: EventOrganizer; // Pointer do _User
@@ -81,6 +82,7 @@ export interface Registration {
   formData: Record<string, unknown>; // JSON/Object
   status: 'pending' | 'approved'; // String: pending/approved
   checkInTime: Date | MongoDate | null; // Date/Nullable
+  consent: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -34,7 +34,7 @@ exports[`App renders properly 1`] = `
       class="flex flex-col items-center bg-primary text-secondary text-center px-8 py-4"
     >
       <p>
-        Innovation Project 2026
+        layout.projectName 2026
       </p>
       <div
         class="flex flex-row gap-4"

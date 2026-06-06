@@ -16,16 +16,18 @@ exports[`EventDetails Renders properly 1`] = `
       <div
         class="flex gap-2 text-sm"
       >
-        <span
-          class="px-3 py-1 rounded cursor-pointer transition bg-[#2f4661] text-white"
+        <button
+          class="cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide text-white"
+          type="button"
         >
           EN
-        </span>
-        <span
-          class="px-3 py-1 rounded cursor-pointer transition bg-[#24364b] text-gray-300 hover:bg-[#2f4661]"
+        </button>
+        <button
+          class="cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide text-gray-500 hover:text-gray-300"
+          type="button"
         >
           PL
-        </span>
+        </button>
       </div>
     </header>
     <div
@@ -141,6 +143,8 @@ exports[`EventDetails Renders properly 1`] = `
                     <a
                       class="underline text-gray-200 hover:text-white"
                       href="#terms"
+                      rel="noopener noreferrer"
+                      target="_blank"
                     >
                       eventDetails.termsAndConditions
                     </a>

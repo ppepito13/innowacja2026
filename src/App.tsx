@@ -12,8 +12,7 @@ import AdminLogin from './pages/AdminLogin';
 
 // Admin pages
 import Dashboard from './pages/admin/Dashboard';
-import EventNew from './pages/admin/EventNew';
-import EventEdit from './pages/admin/EventEdit';
+import EventManagement from './pages/admin/EventManagement';
 import Registrations from './pages/admin/Registrations';
 import RegistrationEdit from './pages/admin/RegistrationEdit';
 import CheckIn from './pages/admin/CheckIn';
@@ -25,6 +24,9 @@ import Account from './pages/admin/Account';
 // Test page
 import Test from './pages/Test';
 import FormConfig from './pages/FormConfig';
+
+const EventManagementNew = () => <EventManagement mode="new" />;
+const EventManagementEdit = () => <EventManagement mode="edit" />;
 
 function App() {
   return (
@@ -48,13 +50,13 @@ function App() {
                 <ProtectedRoute
                   exact
                   path="/admin/events/new"
-                  component={EventNew}
+                  component={EventManagementNew}
                   requiredRole={['Admin', 'Organizer']}
                 />
                 <ProtectedRoute
                   exact
                   path="/admin/events/:id/edit"
-                  component={EventEdit}
+                  component={EventManagementEdit}
                   requiredRole={['Admin', 'Organizer']}
                 />
                 <ProtectedRoute

@@ -86,50 +86,24 @@
     "of": "of",
     "deleteConfirm": "Are you sure you want to delete \"{{title}}\"?"
   },
-  "eventNew": {
-    "title": "New Event",
-    "subtitle": "Fill in the details to create a new event",
+  "eventManagement": {
+    "new": {
+      "title": "New Event",
+      "subtitle": "Fill in the details to create a new event",
+      "submit": {
+        "idle": "Create Event",
+        "pending": "Creating"
+      }
+    },
+    "edit": {
+      "title": "Edit Event",
+      "subtitle": "Update the details for \"{{title}}\"",
+      "submit": {
+        "idle": "Save",
+        "pending": "Saving"
+      }
+    },
     "cancel": "Cancel",
-    "create": {
-      "idle": "Create Event",
-      "pending": "Creating"
-    },
-    "sections": {
-      "colors": "Color System",
-      "heroImage": "Hero Image"
-    },
-    "fields": {
-      "title": "Event Name",
-      "description": "Description",
-      "descriptionPlaceholder": "Describe your event...",
-      "dateType": "Date Type",
-      "dateTypeSingle": "Single-day event",
-      "dateTypeMulti": "Multi-day event",
-      "startDate": "Start Date",
-      "endDate": "End Date",
-      "eventFormat": "Event Format",
-      "formatVirtual": "Virtual",
-      "formatOnSite": "On-site",
-      "locationVirtual": "Meeting Link",
-      "locationVirtualPlaceholder": "https://meet.example.com/...",
-      "locationOnSite": "Address",
-      "locationOnSitePlaceholder": "Street address Postal code, City",
-      "primaryColor": "Primary Color",
-      "accentColor": "Accent Color",
-      "heroImageUrl": "Image URL",
-      "heroImagePreview": "Hero image preview",
-      "upload": "Upload",
-      "uploading": "Uploading..."
-    }
-  },
-  "eventEdit": {
-    "title": "Edit Event",
-    "subtitle": "Update the details for \"{{title}}\"",
-    "cancel": "Cancel",
-    "save": {
-      "idle": "Save",
-      "pending": "Saving"
-    },
     "loading": "Loading data",
     "error": "Error",
     "sections": {
@@ -156,6 +130,7 @@
       "accentColor": "Accent Color",
       "heroImageUrl": "Image URL",
       "heroImagePreview": "Hero image preview",
+      "dataProcessingAgreement": "Data Processing Agreement URL",
       "upload": "Upload",
       "uploading": "Uploading..."
     }

@@ -57,7 +57,7 @@ export default function EventDetails() {
     }) && consent;
 
   const handleSubmit = async () => {
-    if (!event || loading) return;
+    if (!event || loading || !isFormValid) return;
 
     setLoading(true);
     setError(null);
@@ -68,6 +68,7 @@ export default function EventDetails() {
         event: createPointer('TestEvent', event.objectId!),
         formData,
         status: 'pending',
+        consent: true,
       });
 
       setFormData({});
@@ -298,7 +299,16 @@ export default function EventDetails() {
                     </label>
                     <p className="text-xs text-gray-300">
                       {t('eventDetails.readMoreIn')}{' '}
-                      <a href="#terms" className="underline text-gray-200 hover:text-white">
+                      <a
+                        href={
+                          event.dataProcessingAgreement !== undefined
+                            ? event.dataProcessingAgreement
+                            : '#terms'
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline text-gray-200 hover:text-white"
+                      >
                         {t('eventDetails.termsAndConditions')}
                       </a>
                       .
