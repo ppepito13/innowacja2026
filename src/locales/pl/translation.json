@@ -9,6 +9,16 @@
     "projectName": "Projekt Innowacja",
     "account": "Konto"
   },
+  "nav": {
+    "brand": "Panel Admina",
+    "brandSub": "Commerzbank Events",
+    "events": "Wydarzenia",
+    "checkIn": "Zameldowanie",
+    "users": "Użytkownicy",
+    "account": "Ustawienia konta",
+    "minimize": "Zwiń menu",
+    "logout": "Wyloguj się"
+  },
   "login": {
     "title": "Logowanie",
     "description": "Zaloguj się, aby uzyskać dostęp",
