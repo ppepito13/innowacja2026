@@ -10,7 +10,8 @@ import {
   LuPencil,
   LuX,
   LuCircleX,
-  LuClock, LuUserCheck,
+  LuClock,
+  LuUserCheck,
 } from 'react-icons/lu';
 import { Button, InputDatepicker, InputTextfieldStateful, ComplexTable } from '@lsg/components';
 import { parseService, createPointer } from '../../services/parseService';
@@ -118,6 +119,8 @@ export default function Registrations() {
         return <Icon icon={LuCircleCheck} size={14} />;
       case 'pending':
         return <Icon icon={LuClock} size={14} />;
+      case 'rejected':
+        return <Icon icon={LuCircleX} size={14} />;
       default:
         return null;
     }
@@ -140,14 +143,19 @@ export default function Registrations() {
     }
   };
 
-  const updateCheckInTime = async (registrationId: string, checkInTime: Registration['checkInTime']) => {
+  const updateCheckInTime = async (
+    registrationId: string,
+    checkInTime: Registration['checkInTime'],
+  ) => {
     try {
       await parseService.update<Registration>('Registration', registrationId, { checkInTime });
 
       setRegistrations((previousRegistrations) =>
-          previousRegistrations.map((registration) =>
-              registration.objectId === registrationId ? { ...registration, checkInTime } : registration,
-          ),
+        previousRegistrations.map((registration) =>
+          registration.objectId === registrationId
+            ? { ...registration, checkInTime }
+            : registration,
+        ),
       );
     } catch (error: any) {
       setError(error.message);
@@ -275,25 +283,30 @@ export default function Registrations() {
                       {renderStatus(value as Registration['status'])}
                     </div>
                   ) : (
-                    formatCellValue(value,t)
+                    formatCellValue(value, t)
                   ),
               })),
               {
                 name: 'actions',
                 title: t('registrations.actions'),
                 formatter: (value: string) => {
-                  const { objectId, status, isCheckedIn} = JSON.parse(value);
+                  const { objectId, status, isCheckedIn } = JSON.parse(value);
 
                   return (
                     <div className="relative flex gap-2 justify-center">
                       <button
-                          className={`w-8 h-8 flex items-center justify-center rounded-lg border p-2 transition active:scale-95 ${
-                              isCheckedIn
-                                  ? 'border-primary/10 bg-white text-primary hover:bg-background'
-                                  : 'border-red-200 bg-red-50 text-red-600 cursor-not-allowed'
-                          }`}
-                          onClick={() => updateCheckInTime(objectId, {__type: 'Date', iso: new Date().toISOString()})}
-                          disabled={!isCheckedIn}
+                        className={`w-8 h-8 flex items-center justify-center rounded-lg border p-2 transition active:scale-95 ${
+                          isCheckedIn
+                            ? 'border-primary/10 bg-white text-primary hover:bg-background'
+                            : 'border-red-200 bg-red-50 text-red-600 cursor-not-allowed'
+                        }`}
+                        onClick={() =>
+                          updateCheckInTime(objectId, {
+                            __type: 'Date',
+                            iso: new Date().toISOString(),
+                          })
+                        }
+                        disabled={!isCheckedIn}
                       >
                         <Icon icon={LuUserCheck} size={14} />
                       </button>
@@ -321,12 +334,12 @@ export default function Registrations() {
                       </button>
 
                       <button
-                        className={`w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95 ${status === 'approved' ? 'opacity-75 cursor-not-allowed' : ''}`}
+                        className={`w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95 ${status !== 'pending' ? 'opacity-75 cursor-not-allowed' : ''}`}
                         onClick={() =>
-                          status !== 'approved' &&
+                          status === 'pending' &&
                           setOpenedActionId((id) => (id === objectId ? null : objectId))
                         }
-                        disabled={status === 'approved'}
+                        disabled={status !== 'pending'}
                       >
                         <Icon icon={LuEllipsis} size={14} />
                       </button>
@@ -342,7 +355,7 @@ export default function Registrations() {
                           </button>
                           <button
                             className="flex w-full items-center gap-2 px-3 py-2 text-xs border rounded-b-xl bg-white hover:bg-background"
-                            onClick={() => updateStatus(objectId, 'pending')}
+                            onClick={() => updateStatus(objectId, 'rejected')}
                           >
                             <Icon icon={LuCircleX} size={14} />
                             <span>{t('registrations.reject')}</span>
@@ -360,11 +373,11 @@ export default function Registrations() {
                 ...columns.map((column) =>
                   column === 'status' ? registration.status : getCellValue(registration, column),
                 ),
-                JSON.stringify(
-                    { objectId: registration.objectId,
-                      status: registration.status,
-                      isCheckedIn: registration.checkInTime == null
-                    }),
+                JSON.stringify({
+                  objectId: registration.objectId,
+                  status: registration.status,
+                  isCheckedIn: registration.checkInTime == null,
+                }),
               ],
             }))}
           />
@@ -421,7 +434,9 @@ export default function Registrations() {
                 <span className="font-semibold">Status:</span>{' '}
                 {selectedRegistration.status === 'approved'
                   ? t('registrations.details.status.approved')
-                  : t('registrations.details.status.pending')}
+                  : selectedRegistration.status === 'rejected'
+                    ? t('registrations.details.status.rejected')
+                    : t('registrations.details.status.pending')}
                 <div className="flex gap-2 items-center">
                   <span className="font-semibold">{t('registrations.details.date')}:</span>
                   {formatDate(selectedRegistration.createdAt)}
@@ -429,7 +444,7 @@ export default function Registrations() {
                 {Object.entries(selectedRegistration.formData ?? {}).map(([key, value]) => (
                   <div key={key} className="flex gap-2 items-center">
                     <span className="font-semibold">{formatColumnName(key)}:</span>
-                    {formatCellValue(String(value),t)}
+                    {formatCellValue(String(value), t)}
                   </div>
                 ))}
               </div>
