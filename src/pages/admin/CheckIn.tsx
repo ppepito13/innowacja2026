@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { parseService } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
@@ -75,7 +75,9 @@ export default function CheckIn() {
         const name = (registration.formData?.fullName as string) || (registration.formData?.name as string) || 'Attendee';
 
         if (registration.checkInTime) {
-          const checkInDate = new Date(registration.checkInTime);
+          const checkInDate = registration.checkInTime instanceof Date
+            ? registration.checkInTime
+            : new Date(registration.checkInTime.iso ?? registration.checkInTime.date ?? '');
           const timeStr = checkInDate.toLocaleString();
           const warningMsg = t('checkIn.scanner.warning', { name, time: timeStr });
           
