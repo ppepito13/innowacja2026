@@ -13,12 +13,14 @@ import {
   LuClock, LuUserCheck,
 } from 'react-icons/lu';
 import { Button, InputDatepicker, InputTextfieldStateful, ComplexTable } from '@lsg/components';
+import { useAuth } from '../../auth/AuthProvider';
 import { parseService, createPointer } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
 import { formatDate, formatColumnName, formatCellValue } from '../../utils/formatters';
 import { useTranslation } from 'react-i18next';
 
 import Icon from '../../components/Icon';
+import parseClient from '../../services/parseClient';
 
 type RegistrationParams = { eventId: string };
 
@@ -26,6 +28,7 @@ const RowsPerPage = 8;
 
 export default function Registrations() {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   const { eventId } = useParams<RegistrationParams>();
   const history = useHistory();
@@ -48,12 +51,17 @@ export default function Registrations() {
 
     Promise.all([
       parseService.getById<Event>('TestEvent', eventId),
+      parseClient.get(`/classes/TestEvent/${eventId}`, {
+        headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY }
+      }).then(({ data }: { data: { ACL?: Record<string, { read?: boolean; write?: boolean }> } }) => data.ACL),
       parseService.query<Registration>('Registration', {
         event: createPointer('TestEvent', eventId),
       }),
     ])
-      .then(([event, registrations]) => {
-        setEvent(event);
+      .then(([event, acl, registrations]) => {
+        console.log('event ACL:', acl);
+        console.log('user objectId:', user?.objectId);
+        setEvent({ ...event, ACL: acl ?? {} });
         setRegistrations(registrations);
       })
       .catch((error) => setError(error.message))
@@ -145,9 +153,9 @@ export default function Registrations() {
       await parseService.update<Registration>('Registration', registrationId, { checkInTime });
 
       setRegistrations((previousRegistrations) =>
-          previousRegistrations.map((registration) =>
-              registration.objectId === registrationId ? { ...registration, checkInTime } : registration,
-          ),
+        previousRegistrations.map((registration) =>
+          registration.objectId === registrationId ? { ...registration, checkInTime } : registration,
+        ),
       );
     } catch (error: any) {
       setError(error.message);
@@ -156,6 +164,10 @@ export default function Registrations() {
       setSelectedRegistration(null);
     }
   };
+
+  const canExport =
+    user?.role === 'Admin' ||
+    (user?.objectId != null && event?.ACL?.[user.objectId]?.read === true);
 
   const exportRegistrations = () => {
     if (registrations.length === 0) {
@@ -218,12 +230,14 @@ export default function Registrations() {
             <p className="text-lg mt-0 text-primary/75">{t('registrations.description')}</p>
           </div>
 
-          <Button onClick={() => exportRegistrations()} disabled={registrations.length === 0}>
-            <span className="flex flex-row items-center gap-2 text-lg">
-              <Icon icon={LuDownload} />
-              <span>{t('registrations.export')}</span>
-            </span>
-          </Button>
+          {canExport && (
+            <Button onClick={() => exportRegistrations()} disabled={registrations.length === 0}>
+        <span className="flex flex-row items-center gap-2 text-lg">
+            <Icon icon={LuDownload} />
+            <span>{t('registrations.export')}</span>
+        </span>
+            </Button>
+          )}
         </div>
 
         {/* FILTERS */}
@@ -282,18 +296,18 @@ export default function Registrations() {
                 name: 'actions',
                 title: t('registrations.actions'),
                 formatter: (value: string) => {
-                  const { objectId, status, isCheckedIn} = JSON.parse(value);
+                  const { objectId, status, isCheckedIn } = JSON.parse(value);
 
                   return (
                     <div className="relative flex gap-2 justify-center">
                       <button
-                          className={`w-8 h-8 flex items-center justify-center rounded-lg border p-2 transition active:scale-95 ${
-                              isCheckedIn
-                                  ? 'border-primary/10 bg-white text-primary hover:bg-background'
-                                  : 'border-red-200 bg-red-50 text-red-600 cursor-not-allowed'
-                          }`}
-                          onClick={() => updateCheckInTime(objectId, {__type: 'Date', iso: new Date().toISOString()})}
-                          disabled={!isCheckedIn}
+                        className={`w-8 h-8 flex items-center justify-center rounded-lg border p-2 transition active:scale-95 ${
+                          isCheckedIn
+                            ? 'border-primary/10 bg-white text-primary hover:bg-background'
+                            : 'border-red-200 bg-red-50 text-red-600 cursor-not-allowed'
+                        }`}
+                        onClick={() => updateCheckInTime(objectId, { __type: 'Date', iso: new Date().toISOString() })}
+                        disabled={!isCheckedIn}
                       >
                         <Icon icon={LuUserCheck} size={14} />
                       </button>
@@ -361,10 +375,11 @@ export default function Registrations() {
                   column === 'status' ? registration.status : getCellValue(registration, column),
                 ),
                 JSON.stringify(
-                    { objectId: registration.objectId,
-                      status: registration.status,
-                      isCheckedIn: registration.checkInTime == null
-                    }),
+                  {
+                    objectId: registration.objectId,
+                    status: registration.status,
+                    isCheckedIn: registration.checkInTime == null,
+                  }),
               ],
             }))}
           />
