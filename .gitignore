@@ -28,6 +28,7 @@ pids
 *.pid
 *.seed
 *.lock-wscript
+build.zip
 
 # ==============================================================================
 # 4. LOGS & TESTING
@@ -71,3 +72,4 @@ Thumbs.db
 parse-backend/.env
 src/.env
 .env
+
