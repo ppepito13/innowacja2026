@@ -27,7 +27,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="flex flex-col bg-white px-8 py-4 rounded-2xl w-[512px]">
+    <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full max-w-lg">
       {/* HEADER */}
       <div className="flex flex-col mb-4">
         <h1 className="text-3xl mb-0">{t('login.title')}</h1>

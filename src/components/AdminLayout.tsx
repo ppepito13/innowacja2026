@@ -14,6 +14,9 @@ import { ReactComponent as LogoutIcon } from '../assets/logout-icon.svg';
 import { ReactComponent as ChevronLeftIcon } from '../assets/chevron-left-icon.svg';
 import { ReactComponent as ChevronRightIcon } from '../assets/chevron-right-icon.svg';
 import { ReactComponent as HomeIcon } from '../assets/home-icon.svg';
+import { ReactComponent as MenuIcon } from '../assets/menu-icon.svg';
+import { ReactComponent as CloseIcon } from '../assets/close-icon.svg';
+
 
 interface NavItem {
   icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
@@ -39,6 +42,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const location = useLocation();
   const history = useHistory();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const isActive = (item: NavItem): boolean => {
     const p = location.pathname;
@@ -59,6 +63,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const handleGoHome = () => {
     history.push('/');
+    setMobileOpen(false);
+  };
+
+  const handleNavClick = (path: string) => {
+    history.push(path);
+    setMobileOpen(false);
   };
 
   const displayName = user?.fullName || user?.username || '';
@@ -66,8 +76,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="admin-layout-container">
+      {/* ── MOBILE OVERLAY ── */}
+      {mobileOpen && (
+        <div
+          className="admin-mobile-overlay"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
       {/* ── SIDEBAR ── */}
-      <aside className={`admin-sidebar admin-sidebar-${collapsedClass}`}>
+      <aside className={`admin-sidebar admin-sidebar-${collapsedClass} ${mobileOpen ? 'admin-sidebar-mobile-open' : ''}`}>
         
         {/* Brand */}
         <div className={`admin-brand-section ${collapsedClass}`}>
@@ -91,7 +109,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             return (
               <button
                 key={item.path}
-                onClick={() => history.push(item.path)}
+                onClick={() => handleNavClick(item.path)}
                 title={collapsed ? t(item.labelKey) : undefined}
                 className={`admin-nav-item ${collapsedClass} ${activeClass}`}
               >
@@ -109,7 +127,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <div className="admin-action-buttons">
             <button
               onClick={() => setCollapsed((c) => !c)}
-              className={`admin-action-item admin-minimize-item ${collapsedClass}`}
+              className={`admin-action-item admin-minimize-item ${collapsedClass} admin-desktop-only`}
             >
               <div className="admin-icon-container">
                 {collapsed ? <ChevronRightIcon width="16" height="16" /> : <ChevronLeftIcon width="16" height="16" />}
@@ -125,6 +143,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         
         {/* TOP BAR */}
         <header className="admin-topbar">
+          {/* Mobile hamburger */}
+          <button
+            className="admin-hamburger"
+            onClick={() => setMobileOpen((o) => !o)}
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <CloseIcon width="20" height="20" /> : <MenuIcon width="20" height="20" />}
+          </button>
+
           <div className="admin-topbar-content">
             <div className="admin-welcome-text">
               <span className="admin-welcome-prefix">Welcome,</span> <span className="admin-welcome-name">{displayName}!</span>
@@ -132,11 +159,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <div className="admin-topbar-buttons">
               <button onClick={handleGoHome} className="admin-topbar-btn">
                 <HomeIcon width="16" height="16" />
-                Homepage
+                <span className="admin-topbar-btn-label">Homepage</span>
               </button>
               <button onClick={handleLogout} className="admin-topbar-btn">
                 <LogoutIcon width="16" height="16" />
-                Log out
+                <span className="admin-topbar-btn-label">Log out</span>
               </button>
             </div>
           </div>
