@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { parseService } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
-import Icon from '../../components/Icon';
-import { LuDownload, LuChevronDown, LuZap, LuZapOff } from 'react-icons/lu';
+import { ReactComponent as DownloadIcon } from '../../assets/download-icon.svg';
+import { ReactComponent as ChevronDownIcon } from '../../assets/chevron-down-icon.svg';
+import { ReactComponent as ZapIcon } from '../../assets/zap-icon.svg';
+import { ReactComponent as ZapOffIcon } from '../../assets/zap-off-icon.svg';
 
 import { useScanner } from '../../hooks/useScanner';
 
@@ -23,7 +25,7 @@ export default function CheckIn() {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'qr' | 'manual'>('qr');
-  
+
   // Scanner state
   const [scanStatus, setScanStatus] = useState<'idle' | 'success' | 'warning' | 'error'>('idle');
   const [scanMessage, setScanMessage] = useState<{
@@ -45,19 +47,19 @@ export default function CheckIn() {
 
     try {
       const registration = await parseService.getById<Registration>('Registration', decodedText);
-      
+
       if (!registration || registration.status !== 'approved') {
-        const errorMsg = registration 
+        const errorMsg = registration
           ? t('checkIn.scanner.error', { name: 'User', message: 'Registration not found or not approved.' })
           : t('checkIn.scanner.error', { name: '', message: 'Registration not found.' });
-        
+
         const cleanMsg = errorMsg.replace(/^:\s*/, '');
-        
+
         setScanStatus('error');
         setScanMessage({
-          toastTitle: t('checkIn.scanner.warningTitle'), // "Scan Result"
+          toastTitle: t('checkIn.scanner.warningTitle'),
           toastBody: cleanMsg,
-          inlineTitle: t('checkIn.scanner.errorTitle'), // "Scan Failed"
+          inlineTitle: t('checkIn.scanner.errorTitle'),
           inlineBody: cleanMsg,
         });
 
@@ -80,12 +82,12 @@ export default function CheckIn() {
             : new Date(registration.checkInTime.iso ?? registration.checkInTime.date ?? '');
           const timeStr = checkInDate.toLocaleString();
           const warningMsg = t('checkIn.scanner.warning', { name, time: timeStr });
-          
+
           setScanStatus('warning');
           setScanMessage({
-            toastTitle: t('checkIn.scanner.warningTitle'), // "Scan Result"
+            toastTitle: t('checkIn.scanner.warningTitle'),
             toastBody: warningMsg,
-            inlineTitle: t('checkIn.scanner.errorTitle'), // "Scan Failed"
+            inlineTitle: t('checkIn.scanner.errorTitle'),
             inlineBody: warningMsg,
           });
 
@@ -103,14 +105,14 @@ export default function CheckIn() {
           await parseService.update<Registration>('Registration', registration.objectId, {
             checkInTime: new Date()
           });
-          
+
           const successMsg = t('checkIn.scanner.success', { name });
-          
+
           setScanStatus('success');
           setScanMessage({
-            toastTitle: t('checkIn.scanner.successTitle'), // "Success!"
+            toastTitle: t('checkIn.scanner.successTitle'),
             toastBody: successMsg,
-            inlineTitle: t('checkIn.scanner.successInlineTitle'), // "Check-in Successful!"
+            inlineTitle: t('checkIn.scanner.successInlineTitle'),
             inlineBody: successMsg,
           });
 
@@ -129,12 +131,12 @@ export default function CheckIn() {
     } catch (err: any) {
       const errorMsg = t('checkIn.scanner.error', { name: '', message: 'Registration not found.' });
       const cleanMsg = errorMsg.replace(/^:\s*/, '');
-      
+
       setScanStatus('error');
       setScanMessage({
-        toastTitle: t('checkIn.scanner.warningTitle'), // "Scan Result"
+        toastTitle: t('checkIn.scanner.warningTitle'),
         toastBody: cleanMsg,
-        inlineTitle: t('checkIn.scanner.errorTitle'), // "Scan Failed"
+        inlineTitle: t('checkIn.scanner.errorTitle'),
         inlineBody: cleanMsg,
       });
 
@@ -180,87 +182,105 @@ export default function CheckIn() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[100] bg-[#0c1626] text-white overflow-x-hidden overflow-y-auto flex flex-col items-center">
+    <div className="flex flex-col gap-6 w-full max-w-2xl">
+
       {/* Toast Notification */}
       {scanMessage && (
-        <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 p-4 rounded-xl shadow-2xl border toast-enter flex flex-col justify-center w-[90%] max-w-[400px] min-h-[80px]
-          ${scanStatus === 'success' ? 'bg-[#0f1b2c] border-[#1e324a]' : ''}
-          ${scanStatus === 'warning' || scanStatus === 'error' ? 'bg-[#f05252] border-red-600 text-white' : ''}
+        <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-4 rounded-xl shadow-xl border toast-enter flex flex-col justify-center w-[90%] max-w-[420px] min-h-[72px]
+          ${scanStatus === 'success' ? 'bg-white border-success/30' : ''}
+          ${scanStatus === 'warning' || scanStatus === 'error' ? 'bg-white border-error/30' : ''}
         `}>
-          <h4 className="font-headline font-bold mb-1 text-base">{scanMessage.toastTitle}</h4>
-          <p className="text-sm opacity-90">{scanMessage.toastBody}</p>
+          <div className="flex items-start gap-3">
+            <span className={`mt-0.5 w-2.5 h-2.5 rounded-full flex-shrink-0
+              ${scanStatus === 'success' ? 'bg-success' : 'bg-error'}
+            `} />
+            <div>
+              <h4 className="font-headline font-bold text-sm text-primary mb-0.5">{scanMessage.toastTitle}</h4>
+              <p className="text-xs text-primary/70">{scanMessage.toastBody}</p>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Main Content - Mobile Width Constrained */}
-      <main className="w-full max-w-[480px] p-4 sm:p-6 lg:p-8 flex flex-col min-h-full font-sans">
-        
-        {/* Header Section */}
-        <div className="w-full mb-8 pt-4">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-wide">{t('checkIn.title')}</h1>
-          <p className="text-sm text-gray-400 mt-2">{t('checkIn.subtitle')}</p>
+      {/* HEADER CARD */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-white px-4 sm:px-8 py-4 rounded-2xl gap-4">
+        <div>
+          <h1 className="text-3xl mb-0">{t('checkIn.title')}</h1>
+          <p className="text-lg mt-0 text-primary/75">{t('checkIn.subtitle')}</p>
         </div>
-        
-        {/* Controls Row */}
-        <div className="flex flex-col gap-4 mb-8">
-          <div className="relative w-full">
+
+        {/* Event selector + Export */}
+        <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+          <div className="relative">
             <select
               value={selectedEventId}
               onChange={(e) => setSelectedEventId(e.target.value)}
-              className="w-full bg-[#162436] border border-[#24364b] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none appearance-none font-medium shadow-sm"
+              className="border border-primary/20 rounded-lg px-3 py-2 pr-8 text-sm text-primary focus:outline-none focus:border-primary appearance-none bg-white font-medium w-full sm:w-auto"
             >
               {events.map(ev => (
                 <option key={ev.objectId} value={ev.objectId}>{ev.title}</option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-              <Icon icon={LuChevronDown} size={16} />
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-primary/40">
+              <ChevronDownIcon width="14" height="14" />
             </div>
           </div>
 
-          <button 
-            type="button" 
-            className="flex items-center justify-center gap-2 w-full bg-[#162436] border border-[#24364b] rounded-xl px-4 py-3.5 text-sm text-white hover:bg-[#1e2e40] transition-colors shadow-sm font-medium"
+          <button
+            type="button"
+            className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-primary bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
           >
-            <Icon icon={LuDownload} size={16} />
+            <DownloadIcon width="14" height="14" />
             {t('checkIn.export')}
           </button>
         </div>
+      </div>
 
-        {/* Tabs Container */}
-        <div className="flex bg-[#24364b] rounded-xl mb-6 p-1 shadow-sm shrink-0 font-sans">
-          <button 
+      {/* MAIN CONTENT CARD */}
+      <div className="flex flex-col bg-white px-4 sm:px-8 py-6 rounded-2xl">
+
+        {/* Tabs */}
+        <div className="flex border border-primary/10 rounded-xl mb-6 p-1 bg-background/50">
+          <button
             onClick={() => setActiveTab('qr')}
-            className={`flex-1 py-3 text-sm transition-all font-semibold rounded-lg
-              ${activeTab === 'qr' ? 'bg-[#0b1521] text-white shadow-md' : 'text-gray-400 hover:text-gray-300'}`}
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all
+              ${activeTab === 'qr'
+                ? 'bg-white text-primary shadow-sm border border-primary/10'
+                : 'text-primary/50 hover:text-primary/80'
+              }`}
           >
             {t('checkIn.tabs.qrScanner')}
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('manual')}
-            className={`flex-1 py-3 text-sm transition-all font-semibold rounded-lg
-              ${activeTab === 'manual' ? 'bg-[#0b1521] text-white shadow-md' : 'text-gray-400 hover:text-gray-300'}`}
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all
+              ${activeTab === 'manual'
+                ? 'bg-white text-primary shadow-sm border border-primary/10'
+                : 'text-primary/50 hover:text-primary/80'
+              }`}
           >
             {t('checkIn.tabs.manual')}
           </button>
         </div>
 
-        {/* Scanner Area */}
+        {/* QR Scanner Tab */}
         {activeTab === 'qr' && (
-          <div className="flex-1 bg-[#162436] border border-[#24364b] rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col mb-6">
-            
-            <div className="w-full text-left mb-6">
-              <h2 className="text-xl font-bold mb-1">{t('checkIn.scanner.title')}</h2>
-              <p className="text-sm text-gray-400">{t('checkIn.scanner.description')}</p>
+          <div className="flex flex-col gap-6">
+
+            {/* Scanner section header */}
+            <div>
+              <h2 className="text-xl mb-0">{t('checkIn.scanner.title')}</h2>
+              <p className="text-sm mt-0 text-primary/75">{t('checkIn.scanner.description')}</p>
             </div>
 
-            <div className="flex justify-center mb-6">
+            {/* Start/Stop button */}
+            <div className="flex justify-center">
               <button
                 onClick={toggleScanner}
-                className={`py-3 px-8 rounded-xl font-bold text-sm transition-all shadow-md
-                  ${isScanning 
-                    ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/50' 
-                    : 'bg-[#fbbd23] text-black hover:bg-[#fbbd23]/90'
+                className={`py-2.5 px-10 rounded-lg font-semibold text-sm transition-all cursor-pointer border-none
+                  ${isScanning
+                    ? 'bg-error/10 text-error hover:bg-error/15'
+                    : 'bg-secondary text-primary hover:bg-secondary/90'
                   }
                 `}
               >
@@ -268,83 +288,88 @@ export default function CheckIn() {
               </button>
             </div>
 
-            {/* QR Video Area with Glowing/Pulsing Borders */}
-            <div className={`w-full relative bg-black rounded-xl overflow-hidden flex flex-col items-center justify-center border aspect-square transition-all duration-300
-              ${scanStatus === 'success' ? 'border-[#10b981] shadow-[0_0_20px_rgba(16,185,129,0.35)]' : ''}
-              ${scanStatus === 'warning' || scanStatus === 'error' ? 'border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.35)]' : ''}
-              ${scanStatus === 'idle' && isScanning ? 'border-[#24364b] shadow-[0_0_15px_rgba(36,54,75,0.25)]' : 'border-[#24364b]'}
+            {/* QR Video Area */}
+            <div className={`w-full relative bg-primary/5 rounded-xl overflow-hidden flex flex-col items-center justify-center border aspect-square transition-all duration-300
+              ${scanStatus === 'success' ? 'border-success shadow-[0_0_0_3px_rgba(46,125,50,0.15)]' : ''}
+              ${scanStatus === 'warning' || scanStatus === 'error' ? 'border-error shadow-[0_0_0_3px_rgba(211,47,47,0.15)]' : ''}
+              ${(scanStatus === 'idle') ? 'border-primary/15' : ''}
             `}>
-              <div id="qr-reader" className="w-full h-full flex items-center justify-center"></div>
+              <div id="qr-reader" className="w-full h-full flex items-center justify-center" />
+
               {!isScanning && (
-                <div className="absolute inset-0 flex items-center justify-center text-gray-500">
-                  <p className="text-sm font-medium">Camera is off.</p>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-primary/30 gap-2">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                    <circle cx="12" cy="13" r="4" />
+                  </svg>
+                  <p className="text-xs font-medium">{t('checkIn.scanner.start')}</p>
                 </div>
               )}
 
-              {/* Flashlight/Torch Trigger Button */}
+              {/* Flashlight button */}
               {isScanning && hasFlashlight && (
                 <button
                   type="button"
                   onClick={toggleFlashlight}
-                  className={`absolute top-4 right-4 p-3 rounded-full transition-all shadow-lg backdrop-blur-md border z-10
-                    ${flashlightOn 
-                      ? 'bg-yellow-400 text-black border-yellow-500 scale-110 shadow-yellow-500/20' 
-                      : 'bg-black/60 text-white border-white/20 hover:bg-black/80'
+                  className={`absolute top-3 right-3 p-2.5 rounded-lg transition-all border z-10 cursor-pointer
+                    ${flashlightOn
+                      ? 'bg-secondary text-primary border-secondary/50'
+                      : 'bg-white/80 text-primary/60 border-primary/10 hover:bg-white'
                     }
                   `}
                 >
-                  <Icon icon={flashlightOn ? LuZap : LuZapOff} size={18} />
+                  {flashlightOn ? <ZapIcon width="16" height="16" /> : <ZapOffIcon width="16" height="16" />}
                 </button>
               )}
             </div>
-            
-            {/* Scan Result Box shown below video */}
+
+            {/* Inline scan result */}
             {scanMessage && (
-              <div className={`w-full mt-6 p-4 rounded-xl border transition-all duration-300 scale-in
-                ${scanStatus === 'success' ? 'bg-[#0b1521] border-[#24364b]' : ''}
-                ${scanStatus === 'warning' || scanStatus === 'error' ? 'bg-[#0b1521] border-red-500/70' : ''}
+              <div className={`w-full p-4 rounded-xl border scale-in
+                ${scanStatus === 'success' ? 'bg-success/5 border-success/20' : ''}
+                ${scanStatus === 'warning' || scanStatus === 'error' ? 'bg-error/5 border-error/20' : ''}
               `}>
-                <h4 className={`font-bold mb-1 text-sm
-                  ${scanStatus === 'success' ? 'text-white' : ''}
-                  ${scanStatus === 'warning' || scanStatus === 'error' ? 'text-red-500' : ''}
+                <h4 className={`font-bold text-sm mb-1
+                  ${scanStatus === 'success' ? 'text-success' : 'text-error'}
                 `}>{scanMessage.inlineTitle}</h4>
                 <p className={`text-sm
-                  ${scanStatus === 'success' ? 'text-gray-300' : ''}
-                  ${scanStatus === 'warning' || scanStatus === 'error' ? 'text-red-500' : ''}
+                  ${scanStatus === 'success' ? 'text-success/80' : 'text-error/80'}
                 `}>{scanMessage.inlineBody}</p>
+              </div>
+            )}
+
+            {/* Recent scans log */}
+            {recentScans.length > 0 && (
+              <div>
+                <h3 className="text-xs font-bold text-primary/40 mb-3 tracking-wider uppercase">{t('checkIn.recentScans') ?? 'Recent scans'}</h3>
+                <div className="flex flex-col gap-2">
+                  {recentScans.map((scan, index) => (
+                    <div key={index} className="flex items-center justify-between border border-primary/10 bg-background/40 px-4 py-3 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <span className={`w-2 h-2 rounded-full flex-shrink-0
+                          ${scan.status === 'success' ? 'bg-success' : 'bg-error'}
+                        `} />
+                        <span className="text-sm font-medium text-primary truncate max-w-[200px]">{scan.name}</span>
+                      </div>
+                      <span className="text-xs text-primary/40 font-mono">{scan.time}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
         )}
 
-        {/* Recent Scans Session Log */}
-        {activeTab === 'qr' && recentScans.length > 0 && (
-          <div className="w-full bg-[#162436]/40 border border-[#24364b]/40 rounded-2xl p-5 shadow-lg scale-in mb-8">
-            <h3 className="text-xs font-bold text-gray-400 mb-3 tracking-wider uppercase">Ostatnie skanowania</h3>
-            <div className="flex flex-col gap-2.5">
-              {recentScans.map((scan, index) => (
-                <div key={index} className="flex items-center justify-between bg-[#0b1521]/60 px-4 py-3 rounded-xl border border-[#24364b]/20">
-                  <div className="flex items-center gap-3">
-                    <span className={`w-2.5 h-2.5 rounded-full ${
-                      scan.status === 'success' ? 'bg-[#10b981] shadow-[0_0_8px_#10b981]' : 'bg-[#ef4444] shadow-[0_0_8px_#ef4444]'
-                    }`} />
-                    <span className="text-sm font-medium text-white truncate max-w-[200px]">{scan.name}</span>
-                  </div>
-                  <span className="text-xs text-gray-500 font-mono">{scan.time}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Manual Check-in Placeholder */}
+        {/* Manual Tab */}
         {activeTab === 'manual' && (
-          <div className="flex-1 bg-[#162436] border border-[#24364b] rounded-2xl p-6 shadow-xl text-center py-16 text-gray-400 flex flex-col items-center justify-center mb-8">
-            <p>Manual check-in feature coming soon.</p>
+          <div className="flex flex-col items-center justify-center py-16 text-center text-primary/40 gap-3">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M9 21V9" />
+            </svg>
+            <p className="text-sm">{t('checkIn.manual.comingSoon') ?? 'Manual check-in feature coming soon.'}</p>
           </div>
         )}
-      </main>
-
+      </div>
     </div>
   );
 }

@@ -111,16 +111,16 @@ export default function EventDetails() {
         </div>
       </header>
 
-      <div className="w-full h-[50vh] relative z-0">
+      <div className="w-full h-[35vh] sm:h-[50vh] relative z-0">
         <img src={event.heroImageUrl} alt={event.title} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0b1521]/40 to-[#0b1521]"></div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-40">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-16 sm:-mt-40">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           <section className="w-full lg:w-[60%] bg-[#162436] rounded-xl shadow-2xl overflow-hidden">
-            <div className="p-8 md:p-10">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white tracking-tight">
+            <div className="p-5 md:p-10">
+              <h1 className="text-2xl md:text-4xl font-bold mb-4 text-white tracking-tight">
                 {event.title}
               </h1>
 
@@ -155,7 +155,7 @@ export default function EventDetails() {
             </div>
           </section>
 
-          <section className="w-full lg:w-[40%] bg-[#162436] rounded-xl shadow-2xl p-8 sticky top-8">
+          <section className="w-full lg:w-[40%] bg-[#162436] rounded-xl shadow-2xl p-5 sm:p-8 lg:sticky lg:top-8">
             <h2 className="text-xl font-bold mb-1 text-white">{t('eventDetails.registerNow')}</h2>
             <p className="text-sm text-gray-400 mb-8">{t('eventDetails.fillForm')}</p>
 

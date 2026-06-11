@@ -208,9 +208,9 @@ export default function Registrations() {
 
   return (
     <>
-      <div className="flex flex-col bg-white px-8 py-4 rounded-2xl sm:min-w-[1024px]">
+      <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full">
         {/* HEADER */}
-        <div className="flex flex-row items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex flex-col">
             <h1 className="text-3xl mb-0">
               {t('registrations.title', { title: event?.title ?? eventId })}
@@ -227,7 +227,7 @@ export default function Registrations() {
         </div>
 
         {/* FILTERS */}
-        <div className="flex flex-row gap-4 mt-4">
+        <div className="flex flex-col sm:flex-row gap-4 mt-4">
           <InputTextfieldStateful
             className="flex-1"
             label={t('registrations.filters.search')}
@@ -403,7 +403,7 @@ export default function Registrations() {
             onClick={() => setSelectedRegistration(null)}
           >
             <div
-              className="w-[360px] rounded-2xl bg-white px-6 py-5 pt-2 shadow-xl"
+              className="w-[90vw] max-w-[360px] rounded-2xl bg-white px-6 py-5 pt-2 shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between">
