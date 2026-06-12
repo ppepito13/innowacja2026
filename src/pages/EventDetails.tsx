@@ -7,6 +7,7 @@ import { parseService, createPointer } from '../services/parseService';
 import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle } from 'react-icons/lu';
 import Icon from '../components/Icon';
 import { EMAIL_REGEX, PHONE_REGEX } from '../utils/regex';
+import parseClient from '../services/parseClient';
 
 const LANGUAGES = [
   { code: 'en', label: 'EN' },
@@ -26,7 +27,9 @@ export default function EventDetails() {
 
   useEffect(() => {
     if (!eventId) return;
-    parseService.getById<Event>('TestEvent', eventId).then(setEvent);
+    parseClient.get(`/classes/TestEvent/${eventId}`, {
+      headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY }
+    }).then(({ data }) => setEvent(data));
   }, [eventId]);
 
   const validateField = (value: string, field: any) => {
@@ -69,6 +72,7 @@ export default function EventDetails() {
         formData,
         status: 'pending',
         consent: true,
+        ACL: event.ACL,
       });
 
       setFormData({});
