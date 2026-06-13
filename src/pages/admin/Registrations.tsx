@@ -116,11 +116,23 @@ export default function Registrations() {
   const renderStatus = (status: Registration['status']) => {
     switch (status) {
       case 'approved':
-        return <Icon icon={LuCircleCheck} size={14} />;
+        return (
+          <span className="text-success">
+            <Icon icon={LuCircleCheck} size={14} />
+          </span>
+        );
       case 'pending':
-        return <Icon icon={LuClock} size={14} />;
+        return (
+          <span className="text-secondary">
+            <Icon icon={LuClock} size={14} />
+          </span>
+        );
       case 'rejected':
-        return <Icon icon={LuCircleX} size={14} />;
+        return (
+          <span className="text-error">
+            <Icon icon={LuCircleX} size={14} />
+          </span>
+        );
       default:
         return null;
     }
