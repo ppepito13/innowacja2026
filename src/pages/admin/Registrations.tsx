@@ -346,12 +346,10 @@ export default function Registrations() {
                       </button>
 
                       <button
-                        className={`w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95 ${status !== 'pending' ? 'opacity-75 cursor-not-allowed' : ''}`}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
                         onClick={() =>
-                          status === 'pending' &&
                           setOpenedActionId((id) => (id === objectId ? null : objectId))
                         }
-                        disabled={status !== 'pending'}
                       >
                         <Icon icon={LuEllipsis} size={14} />
                       </button>
@@ -359,15 +357,17 @@ export default function Registrations() {
                       {openedActionId === objectId && (
                         <div className="absolute right-0 top-10 z-50 w-48 rounded-xl border shadow-lg">
                           <button
-                            className="flex w-full items-center gap-2 px-3 py-2 text-xs border border-b-0 rounded-t-xl bg-white hover:bg-background"
+                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border border-b-0 rounded-t-xl bg-white hover:bg-background ${status === 'approved' ? 'cursor-not-allowed' : ''}`}
                             onClick={() => updateStatus(objectId, 'approved')}
+                            disabled={status === 'approved'}
                           >
                             <Icon icon={LuCircleCheck} size={14} />
                             <span>{t('registrations.approve')}</span>
                           </button>
                           <button
-                            className="flex w-full items-center gap-2 px-3 py-2 text-xs border rounded-b-xl bg-white hover:bg-background"
+                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border rounded-b-xl bg-white hover:bg-background ${status === 'rejected' ? 'cursor-not-allowed' : ''}`}
                             onClick={() => updateStatus(objectId, 'rejected')}
+                            disabled={status === 'rejected'}
                           >
                             <Icon icon={LuCircleX} size={14} />
                             <span>{t('registrations.reject')}</span>
