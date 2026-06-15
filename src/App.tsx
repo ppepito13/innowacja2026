@@ -64,7 +64,7 @@ function App() {
                   exact
                   path="/admin/registrations/:eventId"
                   component={Registrations}
-                  requiredRole="Admin"
+                  requiredRole={['Admin', 'Organizer']}
                 />
                 <ProtectedRoute
                   exact
