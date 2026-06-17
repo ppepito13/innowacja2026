@@ -142,10 +142,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col bg-white px-8 py-4 rounded-2xl w-full max-w-4xl">
+    <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full max-w-4xl">
 
       {/* HEADER */}
-      <div className="flex items-start justify-between mb-1">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-1">
         <div>
           <h1 className="text-3xl mb-0">{t('dashboard.title')}</h1>
           <p className="text-lg mt-0 text-primary/75">
@@ -170,13 +170,13 @@ export default function Dashboard() {
       </div>
 
       {/* FILTERS */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex flex-wrap items-center gap-3 mb-4">
         <input
           type="text"
           placeholder={t('dashboard.search')}
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="border border-primary/20 rounded-lg px-3 py-2 text-sm w-64 focus:outline-none focus:border-primary"
+          className="border border-primary/20 rounded-lg px-3 py-2 text-sm w-full sm:w-64 focus:outline-none focus:border-primary"
         />
         <select
           value={statusFilter}
@@ -199,7 +199,8 @@ export default function Dashboard() {
       {loading ? (
         <p className="text-primary/50 text-sm">{t('dashboard.loading')}</p>
       ) : (
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto w-full -mx-0">
+          <table className="w-full text-sm min-w-[560px]">
           <thead>
           <tr className="border-b border-primary/10 text-left">
             <th className="pb-3 font-medium text-primary/50 w-28 cursor-pointer select-none" onClick={() => handleSort('isActive')}>
@@ -272,11 +273,12 @@ export default function Dashboard() {
           )}
           </tbody>
         </table>
+        </div>
       )}
 
       {/* PAGINATION */}
       {!loading && !error && sorted.length > 0 && (
-        <div className="flex items-center justify-between mt-4 pt-3 border-t border-primary/10">
+        <div className="flex flex-wrap items-center justify-between gap-2 mt-4 pt-3 border-t border-primary/10">
           <div className="flex items-center gap-2 text-sm text-primary/60">
             <span>{t('dashboard.rowsPerPage')}</span>
             <select

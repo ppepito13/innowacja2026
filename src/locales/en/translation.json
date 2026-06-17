@@ -9,6 +9,16 @@
     "projectName": "Innovation Project",
     "account": "Account"
   },
+  "nav": {
+    "brand": "Admin Panel",
+    "brandSub": "Commerzbank Events",
+    "events": "Events",
+    "checkIn": "Check-In",
+    "users": "Users",
+    "account": "Account Settings",
+    "minimize": "Minimize Menu",
+    "logout": "Log out"
+  },
   "login": {
     "title": "Login",
     "description": "Login to access protected routes",

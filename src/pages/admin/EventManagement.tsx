@@ -169,7 +169,7 @@ export default function EventManagement({ mode }: Props) {
   }
 
   return (
-    <div className="flex flex-col bg-white px-8 py-4 rounded-2xl w-[640px]">
+    <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full max-w-2xl">
       <div className="flex flex-row items-center justify-between mb-2">
         <div className="flex flex-col">
           <h1 className="text-3xl mb-0">{ttm('title')}</h1>
@@ -214,7 +214,7 @@ export default function EventManagement({ mode }: Props) {
             { value: 'multi', label: tt('fields.dateTypeMulti') },
           ]}
         />
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <InputDatepicker
               label={tt('fields.startDate')}
@@ -260,7 +260,7 @@ export default function EventManagement({ mode }: Props) {
           onChange={(v) => handleFieldChange('location', String(v))}
         />
         <p className="text-sm font-semibold text-primary mt-3">{tt('sections.colors')}</p>
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           <ColorField
             label={tt('fields.primaryColor')}
             value={event?.primaryColor ?? DEFAULT_PRIMARY_COLOR}

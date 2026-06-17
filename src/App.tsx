@@ -4,6 +4,7 @@ import { AuthProvider } from './auth/AuthProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
 
 import Layout from './components/Layout';
+import AdminLayout from './components/AdminLayout';
 
 // Public pages
 import Home from './pages/Home';
@@ -36,9 +37,9 @@ function App() {
           {/* Public Fullscreen Routes */}
           <Route exact path="/events/:eventId" component={EventDetails} />
 
-          {/* Routes with Layout */}
-          <Route>
-            <Layout>
+          {/* Admin routes — sidebar layout */}
+          <Route path="/admin">
+            <AdminLayout>
               <Switch>
                 {/* Admin Routes */}
                 <ProtectedRoute
@@ -63,7 +64,7 @@ function App() {
                   exact
                   path="/admin/registrations/:eventId"
                   component={Registrations}
-                  requiredRole="Admin"
+                  requiredRole={['Admin', 'Organizer']}
                 />
                 <ProtectedRoute
                   exact
@@ -96,8 +97,14 @@ function App() {
                   component={Account}
                   requiredRole={['Admin', 'Organizer']}
                 />
+              </Switch>
+            </AdminLayout>
+          </Route>
 
-                {/* Other Public Routes */}
+          {/* Public routes — original Layout */}
+          <Route>
+            <Layout>
+              <Switch>
                 <Route exact path="/login" component={AdminLogin} />
                 <Route exact path="/test" component={Test} />
                 <Route exact path="/formconfig" component={FormConfig} />

@@ -14,12 +14,14 @@ import {
   LuUserCheck,
 } from 'react-icons/lu';
 import { Button, InputDatepicker, InputTextfieldStateful, ComplexTable } from '@lsg/components';
+import { useAuth } from '../../auth/AuthProvider';
 import { parseService, createPointer } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
 import { formatDate, formatColumnName, formatCellValue } from '../../utils/formatters';
 import { useTranslation } from 'react-i18next';
 
 import Icon from '../../components/Icon';
+import parseClient from '../../services/parseClient';
 
 type RegistrationParams = { eventId: string };
 
@@ -27,6 +29,7 @@ const RowsPerPage = 8;
 
 export default function Registrations() {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   const { eventId } = useParams<RegistrationParams>();
   const history = useHistory();
@@ -49,12 +52,17 @@ export default function Registrations() {
 
     Promise.all([
       parseService.getById<Event>('TestEvent', eventId),
+      parseClient.get(`/classes/TestEvent/${eventId}`, {
+        headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY }
+      }).then(({ data }: { data: { ACL?: Record<string, { read?: boolean; write?: boolean }> } }) => data.ACL),
       parseService.query<Registration>('Registration', {
         event: createPointer('TestEvent', eventId),
       }),
     ])
-      .then(([event, registrations]) => {
-        setEvent(event);
+      .then(([event, acl, registrations]) => {
+        console.log('event ACL:', acl);
+        console.log('user objectId:', user?.objectId);
+        setEvent({ ...event, ACL: acl ?? {} });
         setRegistrations(registrations);
       })
       .catch((error) => setError(error.message))
@@ -177,6 +185,10 @@ export default function Registrations() {
     }
   };
 
+  const canExport =
+    user?.role === 'Admin' ||
+    (user?.objectId != null && event?.ACL?.[user.objectId]?.read === true);
+
   const exportRegistrations = () => {
     if (registrations.length === 0) {
       return;
@@ -228,9 +240,9 @@ export default function Registrations() {
 
   return (
     <>
-      <div className="flex flex-col bg-white px-8 py-4 rounded-2xl sm:min-w-[1024px]">
+      <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full">
         {/* HEADER */}
-        <div className="flex flex-row items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex flex-col">
             <h1 className="text-3xl mb-0">
               {t('registrations.title', { title: event?.title ?? eventId })}
@@ -238,16 +250,18 @@ export default function Registrations() {
             <p className="text-lg mt-0 text-primary/75">{t('registrations.description')}</p>
           </div>
 
-          <Button onClick={() => exportRegistrations()} disabled={registrations.length === 0}>
-            <span className="flex flex-row items-center gap-2 text-lg">
-              <Icon icon={LuDownload} />
-              <span>{t('registrations.export')}</span>
-            </span>
-          </Button>
+          {canExport && (
+            <Button onClick={() => exportRegistrations()} disabled={registrations.length === 0}>
+        <span className="flex flex-row items-center gap-2 text-lg">
+            <Icon icon={LuDownload} />
+            <span>{t('registrations.export')}</span>
+        </span>
+            </Button>
+          )}
         </div>
 
         {/* FILTERS */}
-        <div className="flex flex-row gap-4 mt-4">
+        <div className="flex flex-col sm:flex-row gap-4 mt-4">
           <InputTextfieldStateful
             className="flex-1"
             label={t('registrations.filters.search')}
@@ -428,7 +442,7 @@ export default function Registrations() {
             onClick={() => setSelectedRegistration(null)}
           >
             <div
-              className="w-[360px] rounded-2xl bg-white px-6 py-5 pt-2 shadow-xl"
+              className="w-[90vw] max-w-[360px] rounded-2xl bg-white px-6 py-5 pt-2 shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between">
