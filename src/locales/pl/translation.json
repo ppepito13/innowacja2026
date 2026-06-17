@@ -55,7 +55,8 @@
       "title": "Szczegóły rejestracji",
       "status": {
         "approved": "Zatwierdzona",
-        "pending": "Oczekująca"
+        "pending": "Oczekująca",
+        "rejected": "Odrzucona"
       },
       "date": "Data"
     },

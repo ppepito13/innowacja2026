@@ -55,7 +55,8 @@
       "title": "Registration details",
       "status": {
         "approved": "Approved",
-        "pending": "Pending"
+        "pending": "Pending",
+        "rejected": "Rejected"
       },
       "date": "Date"
     },

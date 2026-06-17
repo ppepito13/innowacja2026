@@ -12,14 +12,14 @@ export interface EventACL {
 // --- FormConfig Types ---
 
 export type FieldType =
-  | "text"
-  | "email"
-  | "phone"
-  | "textarea"
-  | "checkbox"
-  | "radio"
-  | "multiselect"
-  | "dropdown";
+  | 'text'
+  | 'email'
+  | 'phone'
+  | 'textarea'
+  | 'checkbox'
+  | 'radio'
+  | 'multiselect'
+  | 'dropdown';
 
 export interface FieldTypeOption {
   value: FieldType;
@@ -80,7 +80,7 @@ export interface Registration {
   objectId: string;
   event: Event; // Pointer
   formData: Record<string, unknown>; // JSON/Object
-  status: 'pending' | 'approved'; // String: pending/approved
+  status: 'pending' | 'approved' | 'rejected'; // String: pending/approved/rejected
   checkInTime: Date | MongoDate | null; // Date/Nullable
   consent: boolean;
   createdAt: string;
