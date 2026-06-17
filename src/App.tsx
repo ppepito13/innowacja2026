@@ -61,6 +61,12 @@ function App() {
                   requiredRole={['Admin', 'Organizer']}
                 />
                 <ProtectedRoute
+                    exact
+                    path="/admin/events/:id/formconfig"
+                    component={FormConfig}
+                    requiredRole={['Admin', 'Organizer']}
+                />
+                <ProtectedRoute
                   exact
                   path="/admin/registrations/:eventId"
                   component={Registrations}

@@ -116,6 +116,7 @@
     },
     "cancel": "Cancel",
     "loading": "Loading data",
+    "editFormConfig": "Edit form config",
     "error": "Error",
     "sections": {
       "colors": "Color System",

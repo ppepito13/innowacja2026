@@ -176,7 +176,7 @@ export default function EventDetails() {
                       {isRequired && <span className="text-red-500">*</span>}
                     </label>
 
-                    {field.type === 'string' && (
+                    {field.type === 'text' && (
                       <input
                         id={key}
                         type="text"
@@ -244,7 +244,7 @@ export default function EventDetails() {
                       />
                     )}
 
-                    {field.type === 'select' && (
+                    {field.type === 'dropdown' && (
                       <div className="relative w-full box-border">
                         <select
                           id={key}
@@ -262,7 +262,7 @@ export default function EventDetails() {
                           <option value="" disabled hidden>
                             {t('eventDetails.selectOption')}
                           </option>
-                          {field.values?.map((value: string) => (
+                          {field.options?.map((value: string) => (
                             <option key={value} value={value}>
                               {value}
                             </option>

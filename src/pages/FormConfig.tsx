@@ -1,8 +1,11 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import type { FormField, FormConfig as FormConfigType, FormConfigEntry } from "../types/types";
+import type { FormField, FormConfig as FormConfigType, FormConfigEntry, Event, MongoDate} from "../types/types";
 import { FieldCard, TYPES_WITH_OPTIONS } from "../components/formConfig";
-
+import { useParams } from 'react-router';
+import {parseService} from "../services/parseService";
+import {DEFAULT_ACCENT_COLOR, DEFAULT_PRIMARY_COLOR, EVENT_CLASS} from "../constants/eventDefaults";
+type EventEditParams = { id: string };
 const uid = (): string => Math.random().toString(36).slice(2, 9);
 
 const defaultField = (): FormField => ({
@@ -16,12 +19,45 @@ const defaultField = (): FormField => ({
 
 export default function FormConfig() {
   const { t } = useTranslation();
+  const { id } = useParams<EventEditParams>();
 
   const [fields, setFields] = useState<FormField[]>([defaultField()]);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState<boolean>(false);
   const [jsonPreview, setJsonPreview] = useState<boolean>(false);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    parseService
+        .getById<Event>(EVENT_CLASS, id)
+        .then((rawEvent) => {
+          setEvent(rawEvent);
+          if (rawEvent.formConfig) {
+            setFields(configToFields(rawEvent.formConfig));
+          }
+        })
+        .catch((e: any) => setError(e.message));
+  }, []);
+
+// Konwertuje formConfig z bazy → tablicę FormField[] do edycji
+  const configToFields = (config: Record<string, unknown>): FormField[] => {
+    const entries = Object.entries(config);
+    if (entries.length === 0) return [defaultField()];
+
+    return entries.map(([key, raw]) => {
+      const entry = raw as FormConfigEntry;
+      return {
+        id: uid(),
+        label: entry.label ?? key,
+        type: entry.type ?? "text",
+        placeholder: entry.placeholder ?? "",
+        required: entry.required ?? false,
+        options: entry.options ?? [],
+      };
+    });
+  };
 
   const updateField = useCallback((id: string, patch: Partial<FormField>) => {
     setFields((prev) =>
@@ -93,12 +129,19 @@ export default function FormConfig() {
     if (!validate()) return;
     const config = buildFormConfig();
     console.log("formConfig →", JSON.stringify(config, null, 2));
+    parseService
+        .update<Event>(EVENT_CLASS, id, { formConfig: config })
+        .then(() => {
+          setSaved(true);
+          setTimeout(() => setSaved(false), 2500);
+        })
+        .catch((e: any) => setError(e.message));
     setSaved(true);
+
     setTimeout(() => setSaved(false), 2500);
   };
 
   const formConfig = buildFormConfig();
-
   return (
     <div className="font-mono bg-[#0b1120] min-h-screen text-slate-200">
       {/* Header */}
@@ -154,7 +197,7 @@ export default function FormConfig() {
 
         {/* JSON Preview */}
         {jsonPreview && (
-          <div className="flex-[0_0_340px] bg-gray-900 rounded-[10px] border border-slate-800 overflow-hidden sticky top-6 max-h-[80vh]">
+          <div className="flex-[0_0_340px] bg-gray-900 rounded-[10px] border border-slate-800 overflow-auto sticky top-6 max-h-[80vh]">
             <div className="flex justify-between items-center px-4 py-3 border-b border-slate-800">
               <span className="text-xs tracking-wider text-slate-400">
                 formConfig
@@ -179,3 +222,7 @@ export default function FormConfig() {
     </div>
   );
 }
+// TODO: Unifikacja tworzenia pól formularza na podstawie formConfig (string czy text, choice czy dropdown etc)
+// TODO: event.formConfig is null ? event.formConfig : buildFormConfig()
+// TODO: Poprawa tła, ale to drugorzędne
+// TODO: Przewijalny JSON formConfiga

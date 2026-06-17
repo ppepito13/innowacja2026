@@ -343,6 +343,13 @@ export default function EventManagement({ mode }: Props) {
           {t('eventManagement.cancel')}
         </button>
         <button
+            type="button"
+            onClick={() => history.push(`/admin/events/${id}/formconfig`)}
+            className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
+        >
+          {t('eventManagement.editFormConfig')}
+        </button>
+        <button
           type="button"
           onClick={handleSubmit}
           disabled={saving || uploading}
