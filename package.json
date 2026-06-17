@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "proxy": "https://192.168.66.24:1337",
+  "homepage": "/",
   "dependencies": {
     "@lsg/components": "./biblioteki/components-17.10.0.tgz",
     "@lsg/icons": "./biblioteki/icons-0.5.0.tgz",
