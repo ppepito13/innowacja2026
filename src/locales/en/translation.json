@@ -272,6 +272,7 @@
     "title": "Event Check-in",
     "subtitle": "Scan QR codes or manually check in attendees for an event.",
     "export": "Export",
+    "recentScans": "Recent scans",
     "tabs": {
       "qrScanner": "QR Scanner",
       "manual": "Manual Check-in"
@@ -288,6 +289,19 @@
       "warning": "{{name}}: User already checked in at {{time}}.",
       "errorTitle": "Scan Failed",
       "error": "{{name}}: {{message}}"
+    },
+    "manual": {
+      "title": "Manual Attendee List",
+      "description": "Search for an attendee and manually toggle their check-in status.",
+      "search": "Search by name or email...",
+      "attendee": "Attendee",
+      "status": "Status",
+      "action": "Action",
+      "noResults": "No attendees found.",
+      "checkedIn": "Checked-In",
+      "notPresent": "Not Present",
+      "undo": "Undo Check-in",
+      "checkInBtn": "Check-in"
     }
   }
 }
