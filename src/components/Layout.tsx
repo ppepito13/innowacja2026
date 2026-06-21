@@ -29,14 +29,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Link href="/">Commerzbank Events</Link>
 
         <nav className="flex items-center gap-4">
-          <Link href="/">Home</Link>
+          <Link href="#events">{t('layout.events')}</Link>
 
           {user && <Link href="/admin/account">{t('layout.account')}</Link>}
         </nav>
       </header>
-
-      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">{children}</main>
-
+      <main className="flex-1 flex flex-col w-full">{children}</main>
       <footer className="flex flex-col items-center bg-primary text-secondary text-center px-4 sm:px-8 py-4">
         <p>{t('layout.projectName')} 2026</p>
 

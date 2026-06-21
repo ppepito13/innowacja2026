@@ -1,11 +1,15 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Grotesk:wght@300..700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Grotesk:wght@300..700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-    @apply font-body bg-background;
+  @apply font-body bg-background;
 }
 
 h1,
@@ -14,34 +18,45 @@ h3,
 h4,
 h5,
 h6 {
-    @apply font-headline;
+  @apply font-headline;
 }
 
 code {
-    font-family:
-        source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 .toast-enter {
-    animation: slideDown 0.3s ease-out forwards;
+  animation: slideDown 0.3s ease-out forwards;
 }
 @keyframes slideDown {
-    from { transform: translate(-50%, -100%); opacity: 0; }
-    to { transform: translate(-50%, 0); opacity: 1; }
+  from {
+    transform: translate(-50%, -100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
 }
 
 .scale-in {
-    animation: scaleIn 0.2s ease-out forwards;
+  animation: scaleIn 0.2s ease-out forwards;
 }
 @keyframes scaleIn {
-    from { transform: scale(0.95); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Enforce absolute styling on video to match the container */
 #qr-reader video {
-    object-fit: cover !important;
-    border-radius: 0.75rem;
-    width: 100% !important;
-    height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 0.75rem;
+  width: 100% !important;
+  height: 100% !important;
 }
