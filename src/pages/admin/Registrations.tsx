@@ -18,6 +18,7 @@ import { useAuth } from '../../auth/AuthProvider';
 import { parseService, createPointer } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
 import { formatDate, formatColumnName, formatCellValue } from '../../utils/formatters';
+import { exportRegistrationsToCsv, ExportColumn } from '../../utils/export';
 import { useTranslation } from 'react-i18next';
 
 import Icon from '../../components/Icon';
@@ -52,16 +53,19 @@ export default function Registrations() {
 
     Promise.all([
       parseService.getById<Event>('TestEvent', eventId),
-      parseClient.get(`/classes/TestEvent/${eventId}`, {
-        headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY }
-      }).then(({ data }: { data: { ACL?: Record<string, { read?: boolean; write?: boolean }> } }) => data.ACL),
+      parseClient
+        .get(`/classes/TestEvent/${eventId}`, {
+          headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY },
+        })
+        .then(
+          ({ data }: { data: { ACL?: Record<string, { read?: boolean; write?: boolean }> } }) =>
+            data.ACL,
+        ),
       parseService.query<Registration>('Registration', {
         event: createPointer('TestEvent', eventId),
       }),
     ])
       .then(([event, acl, registrations]) => {
-        console.log('event ACL:', acl);
-        console.log('user objectId:', user?.objectId);
         setEvent({ ...event, ACL: acl ?? {} });
         setRegistrations(registrations);
       })
@@ -88,6 +92,25 @@ export default function Registrations() {
 
     return value !== undefined ? String(value) : 'N/A';
   };
+
+  const getExportValue = (registration: Registration, column: string): string => {
+    if (column === 'createdAt') {
+      return formatDate(registration.createdAt);
+    }
+
+    if (column === 'status') {
+      return registration.status;
+    }
+
+    const value = registration.formData?.[column];
+
+    return value !== undefined ? String(value) : '';
+  };
+
+  const exportColumns: ExportColumn<Registration>[] = columns.map((column) => ({
+    header: formatColumnName(column),
+    getValue: (registration) => getExportValue(registration, column),
+  }));
 
   const filtered = useMemo(() => {
     return registrations.filter((registration) => {
@@ -189,41 +212,12 @@ export default function Registrations() {
     user?.role === 'Admin' ||
     (user?.objectId != null && event?.ACL?.[user.objectId]?.read === true);
 
-  const exportRegistrations = () => {
-    if (registrations.length === 0) {
-      return;
-    }
-
-    const rows = registrations.map((registration) =>
-      columns.map((column) => {
-        if (column === 'status') {
-          return registration.status;
-        }
-
-        const value = getCellValue(registration, column);
-
-        if (
-          typeof value === 'string' &&
-          (value.includes(',') || value.includes('') || value.includes('\n'))
-        ) {
-          return `"${value.replace(/"/g, '""')}"`;
-        }
-
-        return value;
-      }),
-    );
-
-    const data = [columns, ...rows].map((row) => row.join(',')).join('\n');
-
-    const blob = new Blob(['\uFEFF' + data], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-
-    link.href = url;
-    link.download = `registrations-${event?.title ?? eventId}-${new Date().toISOString().slice(0, 10)}.csv`;
-    link.click();
-
-    URL.revokeObjectURL(url);
+  const handleExport = () => {
+    exportRegistrationsToCsv<Registration>({
+      eventTitle: event?.title ?? eventId,
+      columns: exportColumns,
+      rows: registrations,
+    });
   };
 
   if (loading) {
@@ -251,11 +245,11 @@ export default function Registrations() {
           </div>
 
           {canExport && (
-            <Button onClick={() => exportRegistrations()} disabled={registrations.length === 0}>
-        <span className="flex flex-row items-center gap-2 text-lg">
-            <Icon icon={LuDownload} />
-            <span>{t('registrations.export')}</span>
-        </span>
+            <Button onClick={handleExport} disabled={registrations.length === 0}>
+              <span className="flex flex-row items-center gap-2 text-lg">
+                <Icon icon={LuDownload} />
+                <span>{t('registrations.export')}</span>
+              </span>
             </Button>
           )}
         </div>
