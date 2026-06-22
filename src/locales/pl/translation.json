@@ -7,7 +7,17 @@
   },
   "layout": {
     "projectName": "Projekt Innowacja",
+    "events": "Wydarzenia",
     "account": "Konto"
+  },
+  "home": {
+    "heroTitle": "Networking. Kodowanie. Świętowanie.",
+    "heroSubtitle": "Rejestracje na wydarzenia Commerzbank Łódź",
+    "activeEvents": "Aktywne Wydarzenia",
+    "loading": "Wczytywanie wydarzeń...",
+    "loadError": "Nie udało się wczytać wydarzeń. Spróbuj ponownie później.",
+    "noEvents": "Obecnie nie ma żadnych aktywnych wydarzeń.",
+    "noImage": "Brak zdjęcia"
   },
   "nav": {
     "brand": "Panel Admina",

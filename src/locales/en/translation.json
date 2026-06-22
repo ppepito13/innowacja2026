@@ -7,7 +7,17 @@
   },
   "layout": {
     "projectName": "Innovation Project",
+    "events": "Events",
     "account": "Account"
+  },
+  "home": {
+    "heroTitle": "Connect. Code. Celebrate.",
+    "heroSubtitle": "Commerzbank Łódź Event Registration",
+    "activeEvents": "Active Events",
+    "loading": "Loading events...",
+    "loadError": "Could not load events. Please try again later.",
+    "noEvents": "There are no active events right now.",
+    "noImage": "No image"
   },
   "nav": {
     "brand": "Admin Panel",
