@@ -272,6 +272,7 @@
     "title": "Zameldowanie na wydarzenie",
     "subtitle": "Zeskanuj kody QR lub ręcznie zamelduj uczestników.",
     "export": "Eksport",
+    "recentScans": "Ostatnie skanowania",
     "tabs": {
       "qrScanner": "Skaner QR",
       "manual": "Ręczne zameldowanie"
@@ -288,6 +289,19 @@
       "warning": "{{name}}: Uczestnik jest już zameldowany z dnia {{time}}.",
       "errorTitle": "Błąd Skanowania",
       "error": "{{name}}: {{message}}"
+    },
+    "manual": {
+      "title": "Ręczna lista uczestników",
+      "description": "Wyszukaj uczestnika i ręcznie zmień jego status zameldowania.",
+      "search": "Szukaj po nazwisku lub e-mailu...",
+      "attendee": "Uczestnik",
+      "status": "Status",
+      "action": "Akcja",
+      "noResults": "Nie znaleziono uczestników.",
+      "checkedIn": "Odznaczony",
+      "notPresent": "Nieobecny",
+      "undo": "Cofnij",
+      "checkInBtn": "Odznacz"
     }
   }
 }
