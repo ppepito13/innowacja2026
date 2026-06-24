@@ -191,12 +191,15 @@ export default function Registrations() {
     checkInTime: Registration['checkInTime'],
   ) => {
     try {
-      await parseService.update<Registration>('Registration', registrationId, { checkInTime });
+      await parseService.update<Registration>('Registration', registrationId, {
+        checkInTime,
+        isCheckedIn: true,
+      });
 
       setRegistrations((previousRegistrations) =>
         previousRegistrations.map((registration) =>
           registration.objectId === registrationId
-            ? { ...registration, checkInTime }
+            ? { ...registration, checkInTime, isCheckedIn: true }
             : registration,
         ),
       );
