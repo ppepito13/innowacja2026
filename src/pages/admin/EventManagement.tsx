@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import ColorField from '../../components/ColorField';
 import RadioGroup from '../../components/RadioGroup';
+import Toggle from '../../components/Toggle';
 import parseClient from '../../services/parseClient';
 import {
   EVENT_CLASS,
@@ -27,6 +28,7 @@ const EMPTY_EVENT: Event = {
   endDate: {},
   eventFormat: 'on-site',
   location: '',
+  requiresApproval: false,
   primaryColor: DEFAULT_PRIMARY_COLOR,
   accentColor: DEFAULT_ACCENT_COLOR,
   heroImageUrl: '',
@@ -73,6 +75,7 @@ export default function EventManagement({ mode }: Props) {
           ...rawEvent,
           dateType: rawEvent.dateType ?? 'single',
           eventFormat: rawEvent.eventFormat ?? 'on-site',
+          requiresApproval: rawEvent.requiresApproval ?? false,
           location: rawEvent.location ?? '',
           primaryColor: rawEvent.primaryColor ?? DEFAULT_PRIMARY_COLOR,
           accentColor: rawEvent.accentColor ?? DEFAULT_ACCENT_COLOR,
@@ -135,6 +138,7 @@ export default function EventManagement({ mode }: Props) {
       dateType: event.dateType,
       eventFormat: event.eventFormat,
       location: event.location,
+      requiresApproval: event.requiresApproval,
       primaryColor: event.primaryColor,
       accentColor: event.accentColor,
       heroImageUrl: event.heroImageUrl,
@@ -259,6 +263,20 @@ export default function EventManagement({ mode }: Props) {
           defaultValue={event?.location ?? ''}
           onChange={(v) => handleFieldChange('location', String(v))}
         />
+        <p className="text-sm font-semibold text-primary mt-3">{tt('sections.registration')}</p>
+        <div className="flex items-start justify-between gap-4 rounded-lg border border-primary/10 p-4">
+          <div className="flex flex-col">
+            <label htmlFor="requiresApproval" className="text-sm font-medium text-primary">
+              {tt('fields.requiresApproval')}
+            </label>
+            <p className="text-xs text-primary/60 mt-1">{tt('fields.requiresApprovalHint')}</p>
+          </div>
+          <Toggle
+            id="requiresApproval"
+            checked={event?.requiresApproval ?? false}
+            onChange={(v) => handleFieldChange('requiresApproval', v)}
+          />
+        </div>
         <p className="text-sm font-semibold text-primary mt-3">{tt('sections.colors')}</p>
         <div className="flex flex-col sm:flex-row gap-4">
           <ColorField

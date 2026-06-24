@@ -130,10 +130,13 @@
     "error": "Błąd",
     "sections": {
       "colors": "System kolorów",
-      "heroImage": "Zdjęcie główne"
+      "heroImage": "Zdjęcie główne",
+      "registration": "Potwierdzanie rejestracji"
     },
     "fields": {
       "title": "Nazwa wydarzenia",
+      "requiresApproval": "Wymagaj potwierdzenia organizatora",
+      "requiresApprovalHint": "Jeśli włączono, rejestracje będą oczekiwać na ręczną akceptację organizatora.",
       "description": "Opis",
       "descriptionPlaceholder": "Opisz swoje wydarzenie...",
       "dateType": "Typ daty",

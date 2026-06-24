@@ -130,10 +130,13 @@
     "error": "Error",
     "sections": {
       "colors": "Color System",
-      "heroImage": "Hero Image"
+      "heroImage": "Hero Image",
+      "registration": "Registration Confirmation"
     },
     "fields": {
       "title": "Event Name",
+      "requiresApproval": "Require Organizer Confirmation",
+      "requiresApprovalHint": "If enabled, registrations will be pending until an organizer approves them manually.",
       "description": "Description",
       "descriptionPlaceholder": "Describe your event...",
       "dateType": "Date Type",

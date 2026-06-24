@@ -70,7 +70,7 @@ export default function EventDetails() {
       await parseService.create('Registration', {
         event: createPointer('TestEvent', event.objectId!),
         formData,
-        status: 'pending',
+        status: event.requiresApproval ? 'pending' : 'approved',
         consent: true,
         ACL: event.ACL,
       });

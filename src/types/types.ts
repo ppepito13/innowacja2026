@@ -64,6 +64,7 @@ export interface Event {
   location?: string;
   dateType: 'single' | 'multi';
   eventFormat: 'virtual' | 'on-site';
+  requiresApproval?: boolean;
   primaryColor: string;
   accentColor?: string;
   heroImageUrl?: string;
