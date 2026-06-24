@@ -80,6 +80,12 @@ export const parseService = {
   async remove(className: string, objectId: string): Promise<void> {
     await parseClient.delete(`/classes/${className}/${objectId}`);
   },
+
+  /** Wywołaj funkcję Parse Cloud Code */
+  async runFunction<T>(name: string, params: Record<string, unknown> = {}): Promise<T> {
+    const { data } = await parseClient.post<{ result: T }>(`/functions/${name}`, params);
+    return data.result;
+  },
 };
 
 //  Auth
