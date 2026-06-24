@@ -81,6 +81,7 @@ export interface Registration {
   event: Event; // Pointer
   formData: Record<string, unknown>; // JSON/Object
   status: 'pending' | 'approved' | 'rejected'; // String: pending/approved/rejected
+  isCheckedIn?: boolean;
   checkInTime: Date | MongoDate | null; // Date/Nullable
   consent: boolean;
   createdAt: string;
