@@ -463,7 +463,7 @@ export default function CheckIn() {
                       (reg.formData?.name as string) ||
                       'Attendee';
                     const email = (reg.formData?.email as string) || '';
-                    const isCheckedIn = !!reg.checkInTime;
+                    const isCheckedIn = reg.isCheckedIn ?? !!reg.checkInTime;
 
                     let timeStr = '';
                     if (isCheckedIn) {
