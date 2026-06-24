@@ -298,7 +298,11 @@
       "warningTitle": "Wynik Skanowania",
       "warning": "{{name}}: Uczestnik jest już zameldowany z dnia {{time}}.",
       "errorTitle": "Błąd Skanowania",
-      "error": "{{name}}: {{message}}"
+      "error": "{{name}}: {{message}}",
+      "invalidCode": "Ten kod QR jest nieprawidłowy lub został zmodyfikowany.",
+      "notApproved": "Rejestracja nie została zatwierdzona.",
+      "notFound": "Nie znaleziono rejestracji.",
+      "wrongEvent": "Ten bilet dotyczy innego wydarzenia."
     },
     "manual": {
       "title": "Ręczna lista uczestników",
