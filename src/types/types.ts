@@ -63,7 +63,8 @@ export interface Event {
   endDate?: MongoDate;
   location?: string;
   dateType: 'single' | 'multi';
-  eventFormat: 'virtual' | 'on-site';
+  eventFormat: 'virtual' | 'on-site' | 'hybrid';
+  meetingLink?: string;
   requiresApproval?: boolean;
   primaryColor: string;
   accentColor?: string;

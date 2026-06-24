@@ -28,6 +28,7 @@ const EMPTY_EVENT: Event = {
   endDate: {},
   eventFormat: 'on-site',
   location: '',
+  meetingLink: '',
   requiresApproval: false,
   primaryColor: DEFAULT_PRIMARY_COLOR,
   accentColor: DEFAULT_ACCENT_COLOR,
@@ -77,6 +78,7 @@ export default function EventManagement({ mode }: Props) {
           eventFormat: rawEvent.eventFormat ?? 'on-site',
           requiresApproval: rawEvent.requiresApproval ?? false,
           location: rawEvent.location ?? '',
+          meetingLink: rawEvent.meetingLink ?? '',
           primaryColor: rawEvent.primaryColor ?? DEFAULT_PRIMARY_COLOR,
           accentColor: rawEvent.accentColor ?? DEFAULT_ACCENT_COLOR,
           heroImageUrl: rawEvent.heroImageUrl ?? '',
@@ -138,6 +140,7 @@ export default function EventManagement({ mode }: Props) {
       dateType: event.dateType,
       eventFormat: event.eventFormat,
       location: event.location,
+      meetingLink: event.meetingLink,
       requiresApproval: event.requiresApproval,
       primaryColor: event.primaryColor,
       accentColor: event.accentColor,
@@ -247,6 +250,7 @@ export default function EventManagement({ mode }: Props) {
           options={[
             { value: 'virtual', label: tt('fields.formatVirtual') },
             { value: 'on-site', label: tt('fields.formatOnSite') },
+            { value: 'hybrid', label: tt('fields.formatHybrid') },
           ]}
         />
         <InputTextfieldStateful
@@ -263,6 +267,14 @@ export default function EventManagement({ mode }: Props) {
           defaultValue={event?.location ?? ''}
           onChange={(v) => handleFieldChange('location', String(v))}
         />
+        {event?.eventFormat === 'hybrid' && (
+          <InputTextfieldStateful
+            label={tt('fields.locationVirtual')}
+            placeholder={tt('fields.locationVirtualPlaceholder')}
+            defaultValue={event?.meetingLink ?? ''}
+            onChange={(v) => handleFieldChange('meetingLink', String(v))}
+          />
+        )}
         <p className="text-sm font-semibold text-primary mt-3">{tt('sections.registration')}</p>
         <div className="flex items-start justify-between gap-4 rounded-lg border border-primary/10 p-4">
           <div className="flex flex-col">

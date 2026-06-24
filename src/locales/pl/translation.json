@@ -147,6 +147,7 @@
       "eventFormat": "Format wydarzenia",
       "formatVirtual": "Wirtualne",
       "formatOnSite": "Stacjonarne",
+      "formatHybrid": "Hybrydowe",
       "locationVirtual": "Link do spotkania",
       "locationVirtualPlaceholder": "https://meet.example.com/...",
       "locationOnSite": "Adres",
@@ -184,7 +185,8 @@
     "readMoreIn": "Dowiedz się więcej w",
     "termsAndConditions": "regulaminie",
     "requiredField": "Pole wymagane.",
-    "register": "Zarejestruj"
+    "register": "Zarejestruj",
+    "joinOnline": "Dołącz online"
   },
   "formConfig": {
     "title": "Kreator formularza",

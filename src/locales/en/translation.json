@@ -147,6 +147,7 @@
       "eventFormat": "Event Format",
       "formatVirtual": "Virtual",
       "formatOnSite": "On-site",
+      "formatHybrid": "Hybrid",
       "locationVirtual": "Meeting Link",
       "locationVirtualPlaceholder": "https://meet.example.com/...",
       "locationOnSite": "Address",
@@ -184,7 +185,8 @@
     "readMoreIn": "Read more in",
     "termsAndConditions": "terms and conditions",
     "requiredField": "Required field.",
-    "register": "Register"
+    "register": "Register",
+    "joinOnline": "Join online"
   },
   "formConfig": {
     "title": "Form Builder",
