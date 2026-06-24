@@ -172,18 +172,27 @@ export default function CheckIn() {
   }, [registrations, searchQuery]);
 
   const handleManualCheckInToggle = async (registration: Registration) => {
-    const isCheckedIn = !!registration.checkInTime;
-    const newCheckInTime = isCheckedIn ? null : { __type: 'Date', iso: new Date().toISOString() };
+    const currentlyCheckedIn = registration.isCheckedIn ?? !!registration.checkInTime;
+    const nextCheckedIn = !currentlyCheckedIn;
+    const nowIso = new Date().toISOString();
+
+    // Keep both attendance fields in sync: set them together on check-in, clear
+    // them together on undo (__op: Delete unsets checkInTime on the server).
+    const payload = nextCheckedIn
+      ? { isCheckedIn: true, checkInTime: { __type: 'Date', iso: nowIso } }
+      : { isCheckedIn: false, checkInTime: { __op: 'Delete' } };
 
     try {
-      await parseService.update<Registration>('Registration', registration.objectId, {
-        checkInTime: newCheckInTime as any,
-      });
+      await parseService.update<Registration>('Registration', registration.objectId, payload as any);
 
       setRegistrations((prev) =>
         prev.map((reg) =>
           reg.objectId === registration.objectId
-            ? { ...reg, checkInTime: newCheckInTime as any }
+            ? {
+                ...reg,
+                isCheckedIn: nextCheckedIn,
+                checkInTime: nextCheckedIn ? ({ __type: 'Date', iso: nowIso } as any) : null,
+              }
             : reg,
         ),
       );
