@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { parseService } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
@@ -8,6 +9,8 @@ import { ReactComponent as ZapIcon } from '../../assets/zap-icon.svg';
 import { ReactComponent as ZapOffIcon } from '../../assets/zap-off-icon.svg';
 
 import { useScanner } from '../../hooks/useScanner';
+
+type CheckInParams = { eventId?: string };
 
 // Device vibration feedback
 const triggerVibration = (type: 'success' | 'error') => {
@@ -22,6 +25,7 @@ const triggerVibration = (type: 'success' | 'error') => {
 
 export default function CheckIn() {
   const { t } = useTranslation();
+  const { eventId: routeEventId } = useParams<CheckInParams>();
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'qr' | 'manual'>('qr');
@@ -195,15 +199,20 @@ export default function CheckIn() {
   useEffect(() => {
     parseService
       .getAll<Event>('TestEvent')
-      .then((data) => {
-        setEvents(data);
-        if (data.length > 0 && data[0].objectId) {
-          setSelectedEventId(data[0].objectId);
-        }
-      })
+      .then(setEvents)
       // eslint-disable-next-line no-console
       .catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (events.length === 0) return;
+
+    if (routeEventId && events.some((e) => e.objectId === routeEventId)) {
+      setSelectedEventId(routeEventId);
+    } else if (!selectedEventId) {
+      setSelectedEventId(events[0].objectId!);
+    }
+  }, [events, routeEventId, selectedEventId]);
 
   useEffect(() => {
     if (!selectedEventId) return;

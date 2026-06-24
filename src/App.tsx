@@ -61,10 +61,10 @@ function App() {
                   requiredRole={['Admin', 'Organizer']}
                 />
                 <ProtectedRoute
-                    exact
-                    path="/admin/events/:id/formconfig"
-                    component={FormConfig}
-                    requiredRole={['Admin', 'Organizer']}
+                  exact
+                  path="/admin/events/:id/formconfig"
+                  component={FormConfig}
+                  requiredRole={['Admin', 'Organizer']}
                 />
                 <ProtectedRoute
                   exact
@@ -80,7 +80,7 @@ function App() {
                 />
                 <ProtectedRoute
                   exact
-                  path="/admin/check-in"
+                  path="/admin/check-in/:eventId?"
                   component={CheckIn}
                   requiredRole="Admin"
                 />
