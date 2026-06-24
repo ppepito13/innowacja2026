@@ -111,29 +111,13 @@ export default function CheckIn() {
         recordScan(name, 'error');
       }
     } catch (err: any) {
-      const errorMsg = t('checkIn.scanner.error', { name: '', message: 'Registration not found.' });
-      const cleanMsg = errorMsg.replace(/^:\s*/, '');
+      const code = err?.response?.data?.code;
+      const message =
+        code === 101 ? t('checkIn.scanner.notFound') : t('checkIn.scanner.invalidCode');
+      const msg = t('checkIn.scanner.error', { name: '', message }).replace(/^:\s*/, '');
 
-      setScanStatus('error');
-      setScanMessage({
-        toastTitle: t('checkIn.scanner.warningTitle'),
-        toastBody: cleanMsg,
-        inlineTitle: t('checkIn.scanner.errorTitle'),
-        inlineBody: cleanMsg,
-      });
-
-      triggerVibration('error');
-
-      setRecentScans((prev) =>
-        [
-          {
-            name: 'Unknown',
-            status: 'error' as const,
-            time: new Date().toLocaleTimeString(),
-          },
-          ...prev,
-        ].slice(0, 3),
-      );
+      showScanResult('error', msg, t('checkIn.scanner.warningTitle'), t('checkIn.scanner.errorTitle'));
+      recordScan('Unknown', 'error');
     }
 
     setTimeout(() => {
