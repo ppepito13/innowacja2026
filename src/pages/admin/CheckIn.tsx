@@ -46,108 +46,69 @@ export default function CheckIn() {
     }>
   >([]);
 
+  const recordScan = (name: string, status: 'success' | 'warning' | 'error') => {
+    setRecentScans((prev) =>
+      [{ name, status, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 3),
+    );
+  };
+
+  const showScanResult = (
+    status: 'success' | 'warning' | 'error',
+    body: string,
+    toastTitle: string,
+    inlineTitle: string,
+  ) => {
+    setScanStatus(status);
+    setScanMessage({ toastTitle, toastBody: body, inlineTitle, inlineBody: body });
+    triggerVibration(status === 'success' ? 'success' : 'error');
+  };
+
   const handleScan = async (decodedText: string) => {
-    pauseScanner();
+    await pauseScanner();
 
     try {
-      const registration = await parseService.getById<Registration>('Registration', decodedText);
+      const res = await parseService.runFunction<{
+        result: 'checked_in' | 'already_checked_in' | 'not_approved' | 'wrong_event';
+        checkInTime?: string;
+        participant: { formData?: Record<string, unknown> };
+      }>('checkInByToken', { token: decodedText, eventId: selectedEventId });
 
-      if (!registration || registration.status !== 'approved') {
-        const errorMsg = registration
-          ? t('checkIn.scanner.error', {
-              name: 'User',
-              message: 'Registration not found or not approved.',
-            })
-          : t('checkIn.scanner.error', { name: '', message: 'Registration not found.' });
+      const name =
+        (res.participant?.formData?.fullName as string) ||
+        (res.participant?.formData?.name as string) ||
+        'Attendee';
 
-        const cleanMsg = errorMsg.replace(/^:\s*/, '');
-
-        setScanStatus('error');
-        setScanMessage({
-          toastTitle: t('checkIn.scanner.warningTitle'),
-          toastBody: cleanMsg,
-          inlineTitle: t('checkIn.scanner.errorTitle'),
-          inlineBody: cleanMsg,
-        });
-
-        triggerVibration('error');
-
-        setRecentScans((prev) =>
-          [
-            {
-              name: registration ? 'User' : 'Unknown',
-              status: 'error' as const,
-              time: new Date().toLocaleTimeString(),
-            },
-            ...prev,
-          ].slice(0, 3),
+      if (res.result === 'checked_in') {
+        showScanResult(
+          'success',
+          t('checkIn.scanner.success', { name }),
+          t('checkIn.scanner.successTitle'),
+          t('checkIn.scanner.successInlineTitle'),
         );
+        recordScan(name, 'success');
+      } else if (res.result === 'already_checked_in') {
+        const timeStr = res.checkInTime ? new Date(res.checkInTime).toLocaleString() : '';
+        showScanResult(
+          'warning',
+          t('checkIn.scanner.warning', { name, time: timeStr }),
+          t('checkIn.scanner.warningTitle'),
+          t('checkIn.scanner.errorTitle'),
+        );
+        recordScan(name, 'warning');
       } else {
-        const name =
-          (registration.formData?.fullName as string) ||
-          (registration.formData?.name as string) ||
-          'Attendee';
-
-        if (registration.checkInTime) {
-          const checkInDate =
-            registration.checkInTime instanceof Date
-              ? registration.checkInTime
-              : new Date(
-                  (registration.checkInTime as any).iso ??
-                    (registration.checkInTime as any).date ??
-                    '',
-                );
-          const timeStr = checkInDate.toLocaleString();
-          const warningMsg = t('checkIn.scanner.warning', { name, time: timeStr });
-
-          setScanStatus('warning');
-          setScanMessage({
-            toastTitle: t('checkIn.scanner.warningTitle'),
-            toastBody: warningMsg,
-            inlineTitle: t('checkIn.scanner.errorTitle'),
-            inlineBody: warningMsg,
-          });
-
-          triggerVibration('error');
-
-          setRecentScans((prev) =>
-            [
-              {
-                name,
-                status: 'warning' as const,
-                time: new Date().toLocaleTimeString(),
-              },
-              ...prev,
-            ].slice(0, 3),
-          );
-        } else {
-          await parseService.update<Registration>('Registration', registration.objectId, {
-            checkInTime: { __type: 'Date', iso: new Date().toISOString() } as any,
-          });
-
-          const successMsg = t('checkIn.scanner.success', { name });
-
-          setScanStatus('success');
-          setScanMessage({
-            toastTitle: t('checkIn.scanner.successTitle'),
-            toastBody: successMsg,
-            inlineTitle: t('checkIn.scanner.successInlineTitle'),
-            inlineBody: successMsg,
-          });
-
-          triggerVibration('success');
-
-          setRecentScans((prev) =>
-            [
-              {
-                name,
-                status: 'success' as const,
-                time: new Date().toLocaleTimeString(),
-              },
-              ...prev,
-            ].slice(0, 3),
-          );
-        }
+        // not_approved or wrong_event — reject without checking in
+        const reason =
+          res.result === 'wrong_event'
+            ? t('checkIn.scanner.wrongEvent')
+            : t('checkIn.scanner.notApproved');
+        const msg = t('checkIn.scanner.error', { name, message: reason }).replace(/^:\s*/, '');
+        showScanResult(
+          'error',
+          msg,
+          t('checkIn.scanner.warningTitle'),
+          t('checkIn.scanner.errorTitle'),
+        );
+        recordScan(name, 'error');
       }
     } catch (err: any) {
       const errorMsg = t('checkIn.scanner.error', { name: '', message: 'Registration not found.' });
