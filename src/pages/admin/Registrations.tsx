@@ -15,6 +15,7 @@ import {
 } from 'react-icons/lu';
 import { Button, InputDatepicker, InputTextfieldStateful, ComplexTable } from '@lsg/components';
 import { useAuth } from '../../auth/AuthProvider';
+import { NotificationService } from '../../services/notificationService';
 import { parseService, createPointer } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
 import { formatDate, formatColumnName, formatCellValue } from '../../utils/formatters';
@@ -178,6 +179,20 @@ export default function Registrations() {
           registration.objectId === registrationId ? { ...registration, status } : registration,
         ),
       );
+
+      if (status === 'approved') {
+        const registration = registrations.find((r) => r.objectId === registrationId);
+
+        const email = registration?.formData?.email || (registration as any)?.email;
+
+        if (email) {
+          await NotificationService.sendEmail(
+            email,
+            'Your registration has been approved!',
+            `<h2>Good news!</h2> <p>Your registration for ${event?.title ? event.title : 'the'} event has been approved. See you there!</p>`,
+          );
+        }
+      }
     } catch (error: any) {
       setError(error.message);
     } finally {
