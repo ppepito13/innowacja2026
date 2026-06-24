@@ -68,7 +68,10 @@
         "pending": "Pending",
         "rejected": "Rejected"
       },
-      "date": "Date"
+      "date": "Date",
+      "qrCode": "Check-in QR code",
+      "qrLoading": "Generating QR code…",
+      "qrError": "Could not generate QR code."
     },
     "actions": "Actions",
     "pagination": {
