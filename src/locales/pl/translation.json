@@ -105,7 +105,12 @@
     "rowsPerPage": "Wierszy na stronę",
     "page": "Strona",
     "of": "z",
-    "deleteConfirm": "Czy na pewno chcesz usunąć \"{{title}}\"?"
+    "deleteConfirm": "Czy na pewno chcesz usunąć \"{{title}}\"?",
+    "editEvent": "Edytuj wydarzenie",
+    "goToRegistrations": "Przejdź do rejestracji",
+    "goToCheckin": "Przejdź do zameldowania",
+    "viewPublicPage": "Zobacz stronę publiczną",
+    "deleteEvent": "Usuń wydarzenie"
   },
   "eventManagement": {
     "new": {

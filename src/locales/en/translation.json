@@ -105,7 +105,12 @@
     "rowsPerPage": "Rows per page",
     "page": "Page",
     "of": "of",
-    "deleteConfirm": "Are you sure you want to delete \"{{title}}\"?"
+    "deleteConfirm": "Are you sure you want to delete \"{{title}}\"?",
+    "editEvent": "Edit event",
+    "goToRegistrations": "Go to registrations",
+    "goToCheckin": "Go to check-in",
+    "viewPublicPage": "View public page",
+    "deleteEvent": "Delete event"
   },
   "eventManagement": {
     "new": {

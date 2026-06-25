@@ -1,6 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import { LuPlus, LuPencil, LuLink, LuTrash2, LuChevronLeft, LuChevronRight, LuChevronsLeft, LuChevronsRight } from 'react-icons/lu';
+import {
+  LuPlus,
+  LuPencil,
+  LuLink,
+  LuTrash2,
+  LuUsers,
+  LuQrCode,
+  LuChevronLeft,
+  LuChevronRight,
+  LuChevronsLeft,
+  LuChevronsRight,
+} from 'react-icons/lu';
 import { parseService } from '../../services/parseService';
 import { useAuth } from '../../auth/AuthProvider';
 import { Event, EventOrganizer } from '../../types/types';
@@ -28,7 +39,9 @@ export default function Dashboard() {
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [sortField, setSortField] = useState<'isActive' | 'title' | 'startDate' | 'location' | null>(null);
+  const [sortField, setSortField] = useState<
+    'isActive' | 'title' | 'startDate' | 'location' | null
+  >(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
@@ -45,8 +58,8 @@ export default function Dashboard() {
 
   const SortIcon = ({ field }: { field: 'isActive' | 'title' | 'startDate' | 'location' }) => (
     <span className="text-xs ml-1">
-            {sortField === field ? (sortDir === 'asc' ? '↑' : '↓') : '↑↓'}
-        </span>
+      {sortField === field ? (sortDir === 'asc' ? '↑' : '↓') : '↑↓'}
+    </span>
   );
 
   useEffect(() => {
@@ -62,12 +75,12 @@ export default function Dashboard() {
     const where = isAdmin
       ? {}
       : {
-        organizer: {
-          __type: 'Pointer',
-          className: '_User',
-          objectId: user.objectId,
-        } as EventOrganizer,
-      };
+          organizer: {
+            __type: 'Pointer',
+            className: '_User',
+            objectId: user.objectId,
+          } as EventOrganizer,
+        };
 
     parseService
       .query<Event>(EVENT_CLASS, where)
@@ -113,7 +126,7 @@ export default function Dashboard() {
   };
 
   const handleDelete = (event: Event) => {
-    if (!window.confirm(t('dashboard.deleteConfirm', {title: event.title}))) return;
+    if (!window.confirm(t('dashboard.deleteConfirm', { title: event.title }))) return;
     parseService
       .remove(EVENT_CLASS, event.objectId!)
       .then(() => setEvents((prev) => prev.filter((e) => e.objectId !== event.objectId)))
@@ -123,9 +136,7 @@ export default function Dashboard() {
   const handleToggleActive = (event: Event) => {
     // Zmień natychmiast w UI
     setEvents((prev) =>
-      prev.map((e) =>
-        e.objectId === event.objectId ? { ...e, isActive: !e.isActive } : e
-      )
+      prev.map((e) => (e.objectId === event.objectId ? { ...e, isActive: !e.isActive } : e)),
     );
 
     // Wyślij do serwera, przy błędzie cofnij
@@ -134,23 +145,18 @@ export default function Dashboard() {
       .catch((e: any) => {
         setError(e.message);
         setEvents((prev) =>
-          prev.map((e) =>
-            e.objectId === event.objectId ? { ...e, isActive: event.isActive } : e
-          )
+          prev.map((e) => (e.objectId === event.objectId ? { ...e, isActive: event.isActive } : e)),
         );
       });
   };
 
   return (
     <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full max-w-4xl">
-
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-1">
         <div>
           <h1 className="text-3xl mb-0">{t('dashboard.title')}</h1>
-          <p className="text-lg mt-0 text-primary/75">
-            {t('dashboard.subtitle')}
-          </p>
+          <p className="text-lg mt-0 text-primary/75">{t('dashboard.subtitle')}</p>
         </div>
         <button
           onClick={() => history.push('/admin/events/new')}
@@ -164,9 +170,7 @@ export default function Dashboard() {
       {/* SUBHEADER */}
       <div>
         <h2 className="text-xl mb-0">{t('dashboard.allEvents')}</h2>
-        <p className="text-sm mt-0 text-primary/75">
-          {t('dashboard.allEventsDescription')}
-        </p>
+        <p className="text-sm mt-0 text-primary/75">{t('dashboard.allEventsDescription')}</p>
       </div>
 
       {/* FILTERS */}
@@ -175,12 +179,18 @@ export default function Dashboard() {
           type="text"
           placeholder={t('dashboard.search')}
           value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
           className="border border-primary/20 rounded-lg px-3 py-2 text-sm w-full sm:w-64 focus:outline-none focus:border-primary"
         />
         <select
           value={statusFilter}
-          onChange={(e) => { setStatusFilter(e.target.value as typeof statusFilter); setPage(1); }}
+          onChange={(e) => {
+            setStatusFilter(e.target.value as typeof statusFilter);
+            setPage(1);
+          }}
           className="border border-primary/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
         >
           <option value="all">{t('dashboard.filter.all')}</option>
@@ -188,8 +198,8 @@ export default function Dashboard() {
           <option value="inactive">{t('dashboard.filter.inactive')}</option>
         </select>
         <span className="ml-auto text-sm text-primary/50">
-                    {t('dashboard.found', { count: sorted.length})}
-                </span>
+          {t('dashboard.found', { count: sorted.length })}
+        </span>
       </div>
 
       {/* ERROR */}
@@ -201,78 +211,107 @@ export default function Dashboard() {
       ) : (
         <div className="overflow-x-auto w-full -mx-0">
           <table className="w-full text-sm min-w-[560px]">
-          <thead>
-          <tr className="border-b border-primary/10 text-left">
-            <th className="pb-3 font-medium text-primary/50 w-28 cursor-pointer select-none" onClick={() => handleSort('isActive')}>
-              {t('dashboard.col.active')} <SortIcon field="isActive" />
-            </th>
-            <th className="pb-3 font-medium text-primary/50 cursor-pointer select-none" onClick={() => handleSort('title')}>
-              {t('dashboard.col.name')} <SortIcon field="title" />
-            </th>
-            <th className="pb-3 font-medium text-primary/50 w-32 cursor-pointer select-none" onClick={() => handleSort('startDate')}>
-              {t('dashboard.col.date')} <SortIcon field="startDate" />
-            </th>
-            <th className="pb-3 font-medium text-primary/50 cursor-pointer select-none" onClick={() => handleSort('location')}>
-              {t('dashboard.col.location')} <SortIcon field="location" />
-            </th>
-            <th className="pb-3 font-medium text-primary/50">
-              {t('dashboard.col.actions')}
-            </th>
-          </tr>
-          </thead>
-          <tbody>
-          {paginated.map((event) => (
-            <tr key={event.objectId} className="border-b border-primary/5 transition-colors">
-              <td className="py-3">
-                <button
-                  onClick={() => handleToggleActive(event)}
-                  className={`w-11 h-6 rounded-full transition-colors flex items-center px-0.5 border-none cursor-pointer flex-shrink-0 ${event.isActive ? 'bg-secondary' : 'bg-primary/20'}`}
+            <thead>
+              <tr className="border-b border-primary/10 text-left">
+                <th
+                  className="pb-3 font-medium text-primary/50 w-28 cursor-pointer select-none"
+                  onClick={() => handleSort('isActive')}
                 >
-                  <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${event.isActive ? 'translate-x-5' : 'translate-x-0'}`} />
-                </button>
-              </td>
-              <td className="py-3">
-                <p className="font-medium text-primary">{event.title ?? '—'}</p>
-              </td>
-              <td className="py-3 text-primary/50">{formatDate(event.startDate)}</td>
-              <td className="py-3 text-primary/50">
-                {event.eventFormat === 'virtual'
-                  ? t('dashboard.virtual')
-                  : event.location || t('dashboard.onSite')}
-              </td>
-              <td className="py-3">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => history.push(`/admin/events/${event.objectId}/edit`)}
-                    className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/40 hover:text-primary cursor-pointer border-none bg-transparent"
-                  >
-                    <Icon icon={LuPencil} />
-                  </button>
-                  <button
-                    onClick={() => history.push(`/events/${event.objectId}`)}
-                    className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/40 hover:text-primary cursor-pointer border-none bg-transparent"
-                  >
-                    <Icon icon={LuLink} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(event)}
-                    className="p-2 rounded-lg hover:bg-red-50 transition-colors text-primary/40 hover:text-red-600 cursor-pointer border-none bg-transparent"
-                  >
-                    <Icon icon={LuTrash2} />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-          {paginated.length === 0 && (
-            <tr>
-              <td colSpan={5} className="py-8 text-center text-primary/40">
-                {t('dashboard.empty')}
-              </td>
-            </tr>
-          )}
-          </tbody>
-        </table>
+                  {t('dashboard.col.active')} <SortIcon field="isActive" />
+                </th>
+                <th
+                  className="pb-3 font-medium text-primary/50 cursor-pointer select-none"
+                  onClick={() => handleSort('title')}
+                >
+                  {t('dashboard.col.name')} <SortIcon field="title" />
+                </th>
+                <th
+                  className="pb-3 font-medium text-primary/50 w-32 cursor-pointer select-none"
+                  onClick={() => handleSort('startDate')}
+                >
+                  {t('dashboard.col.date')} <SortIcon field="startDate" />
+                </th>
+                <th
+                  className="pb-3 font-medium text-primary/50 cursor-pointer select-none"
+                  onClick={() => handleSort('location')}
+                >
+                  {t('dashboard.col.location')} <SortIcon field="location" />
+                </th>
+                <th className="pb-3 font-medium text-primary/50">{t('dashboard.col.actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginated.map((event) => (
+                <tr key={event.objectId} className="border-b border-primary/5 transition-colors">
+                  <td className="py-3">
+                    <button
+                      onClick={() => handleToggleActive(event)}
+                      className={`w-11 h-6 rounded-full transition-colors flex items-center px-0.5 border-none cursor-pointer flex-shrink-0 ${event.isActive ? 'bg-secondary' : 'bg-primary/20'}`}
+                    >
+                      <div
+                        className={`w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${event.isActive ? 'translate-x-5' : 'translate-x-0'}`}
+                      />
+                    </button>
+                  </td>
+                  <td className="py-3">
+                    <p className="font-medium text-primary">{event.title ?? '—'}</p>
+                  </td>
+                  <td className="py-3 text-primary/50">{formatDate(event.startDate)}</td>
+                  <td className="py-3 text-primary/50">
+                    {event.eventFormat === 'virtual'
+                      ? t('dashboard.virtual')
+                      : event.location || t('dashboard.onSite')}
+                  </td>
+                  <td className="py-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => history.push(`/admin/events/${event.objectId}/edit`)}
+                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/40 hover:text-primary cursor-pointer border-none bg-transparent"
+                        title={t('dashboard.editEvent')}
+                      >
+                        <Icon icon={LuPencil} />
+                      </button>
+                      <button
+                        onClick={() => history.push(`/admin/registrations/${event.objectId}`)}
+                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/40 hover:text-primary cursor-pointer border-none bg-transparent"
+                        title={t('dashboard.goToRegistrations')}
+                      >
+                        <Icon icon={LuUsers} />
+                      </button>
+                      <button
+                        onClick={() => history.push(`/admin/check-in/${event.objectId}`)}
+                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/40 hover:text-primary cursor-pointer border-none bg-transparent"
+                        title={t('dashboard.goToCheckin')}
+                      >
+                        <Icon icon={LuQrCode} />
+                      </button>
+                      <button
+                        onClick={() => history.push(`/events/${event.objectId}`)}
+                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/40 hover:text-primary cursor-pointer border-none bg-transparent"
+                        title={t('dashboard.viewPublicPage')}
+                      >
+                        <Icon icon={LuLink} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(event)}
+                        className="p-2 rounded-lg hover:bg-red-50 transition-colors text-primary/40 hover:text-red-600 cursor-pointer border-none bg-transparent"
+                        title={t('dashboard.deleteEvent')}
+                      >
+                        <Icon icon={LuTrash2} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {paginated.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-primary/40">
+                    {t('dashboard.empty')}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       )}
 
@@ -283,24 +322,49 @@ export default function Dashboard() {
             <span>{t('dashboard.rowsPerPage')}</span>
             <select
               value={rowsPerPage}
-              onChange={(e) => { setRowsPerPage(Number(e.target.value)); setPage(1); }}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setPage(1);
+              }}
               className="border border-primary/20 rounded-lg px-2 py-1 text-sm text-primary bg-white focus:outline-none"
             >
-              {ROWS_OPTIONS.map((n) => <option key={n} value={n}>{n}</option>)}
+              {ROWS_OPTIONS.map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex items-center gap-1 text-sm text-primary/60">
-            <span>{t('dashboard.page')} {page} {t('dashboard.of')} {totalPages}</span>
-            <button onClick={() => handlePageChange(1)} disabled={page === 1} className="w-7 h-7 flex items-center justify-center rounded hover:bg-primary/10 disabled:opacity-30">
+            <span>
+              {t('dashboard.page')} {page} {t('dashboard.of')} {totalPages}
+            </span>
+            <button
+              onClick={() => handlePageChange(1)}
+              disabled={page === 1}
+              className="w-7 h-7 flex items-center justify-center rounded hover:bg-primary/10 disabled:opacity-30"
+            >
               <Icon icon={LuChevronsLeft} size={14} />
             </button>
-            <button onClick={() => handlePageChange(page - 1)} disabled={page === 1} className="w-7 h-7 flex items-center justify-center rounded hover:bg-primary/10 disabled:opacity-30">
+            <button
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1}
+              className="w-7 h-7 flex items-center justify-center rounded hover:bg-primary/10 disabled:opacity-30"
+            >
               <Icon icon={LuChevronLeft} size={14} />
             </button>
-            <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages} className="w-7 h-7 flex items-center justify-center rounded hover:bg-primary/10 disabled:opacity-30">
+            <button
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === totalPages}
+              className="w-7 h-7 flex items-center justify-center rounded hover:bg-primary/10 disabled:opacity-30"
+            >
               <Icon icon={LuChevronRight} size={14} />
             </button>
-            <button onClick={() => handlePageChange(totalPages)} disabled={page === totalPages} className="w-7 h-7 flex items-center justify-center rounded hover:bg-primary/10 disabled:opacity-30">
+            <button
+              onClick={() => handlePageChange(totalPages)}
+              disabled={page === totalPages}
+              className="w-7 h-7 flex items-center justify-center rounded hover:bg-primary/10 disabled:opacity-30"
+            >
               <Icon icon={LuChevronsRight} size={14} />
             </button>
           </div>
