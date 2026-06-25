@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Event } from '../types/types';
 import { formatColumnName, formatDate } from '../utils/formatters';
 import { parseService, createPointer } from '../services/parseService';
-import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle } from 'react-icons/lu';
+import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle, LuLink } from 'react-icons/lu';
 import Icon from '../components/Icon';
 import { EMAIL_REGEX, PHONE_REGEX } from '../utils/regex';
 import parseClient from '../services/parseClient';
@@ -70,7 +70,7 @@ export default function EventDetails() {
       await parseService.create('Registration', {
         event: createPointer('TestEvent', event.objectId!),
         formData,
-        status: 'pending',
+        status: event.requiresApproval ? 'pending' : 'approved',
         consent: true,
         ACL: event.ACL,
       });
@@ -149,6 +149,18 @@ export default function EventDetails() {
                     <Icon icon={LuMapPin} size={16} />
                     <span>{event.location}</span>
                   </div>
+                )}
+
+                {event.eventFormat === 'hybrid' && event.meetingLink && (
+                  <a
+                    href={event.meetingLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                  >
+                    <Icon icon={LuLink} size={16} />
+                    <span>{t('eventDetails.joinOnline')}</span>
+                  </a>
                 )}
               </div>
 
