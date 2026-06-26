@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from '@lsg/components';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../auth/AuthProvider';
+import ThemeToggle from './ThemeToggle';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -49,6 +50,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </Link>
           ))}
         </div>
+        <ThemeToggle className="absolute bottom-4 right-4 sm:right-8" />
       </footer>
     </div>
   );
