@@ -450,13 +450,13 @@ export default function CheckIn() {
               placeholder={t('checkIn.manual.search') ?? 'Search by name or email...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full border border-primary/20 rounded-lg px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary bg-background/50 mb-2"
+              className="w-full box-border border border-primary/20 rounded-lg px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary bg-background/50 mb-2"
             />
 
             <div className="flex flex-col border border-primary/10 rounded-xl overflow-hidden">
-              <div className="flex items-center justify-between bg-background/50 px-4 py-3 border-b border-primary/10 text-xs font-semibold text-primary/60">
+              <div className="flex items-center justify-between gap-3 bg-background/50 px-4 py-3 border-b border-primary/10 text-xs font-semibold text-primary/60">
                 <div className="flex-1">{t('checkIn.manual.attendee') ?? 'Attendee'}</div>
-                <div className="w-32 text-center">{t('checkIn.manual.status') ?? 'Status'}</div>
+                <div className="w-40 text-center">{t('checkIn.manual.status') ?? 'Status'}</div>
                 <div className="w-32 text-right">{t('checkIn.manual.action') ?? 'Action'}</div>
               </div>
 
@@ -491,7 +491,7 @@ export default function CheckIn() {
                     return (
                       <div
                         key={reg.objectId}
-                        className="flex items-center justify-between px-4 py-3 bg-surface hover:bg-background/30 transition-colors"
+                        className="flex items-center justify-between gap-3 px-4 py-3 bg-surface hover:bg-background/30 transition-colors"
                       >
                         <div className="flex-1 flex flex-col truncate pr-4">
                           <span className="font-semibold text-sm text-primary truncate">
@@ -500,9 +500,9 @@ export default function CheckIn() {
                           <span className="text-sm text-primary/60 truncate">{email}</span>
                         </div>
 
-                        <div className="w-32 flex justify-center">
+                        <div className="w-40 flex justify-center">
                           {isCheckedIn ? (
-                            <span className="px-2.5 py-1 rounded-full bg-success text-black text-xs font-medium whitespace-nowrap">
+                            <span className="px-2.5 py-1 rounded-full bg-green-200 text-black text-xs font-bold whitespace-nowrap">
                               {t('checkIn.manual.checkedIn') ?? 'Checked-In'} ({timeStr})
                             </span>
                           ) : (
