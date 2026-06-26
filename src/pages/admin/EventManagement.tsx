@@ -9,6 +9,8 @@ import Icon from '../../components/Icon';
 import ColorField from '../../components/ColorField';
 import RadioGroup from '../../components/RadioGroup';
 import Toggle from '../../components/Toggle';
+import RichTextEditor from '../../components/RichTextEditor';
+import DOMPurify from 'dompurify';
 import parseClient from '../../services/parseClient';
 import {
   EVENT_CLASS,
@@ -121,6 +123,13 @@ export default function EventManagement({ mode }: Props) {
     }
   };
 
+  const uploadImage = async (file: File): Promise<string> => {
+    const { data } = await parseClient.post(`/files/${encodeURIComponent(file.name)}`, file, {
+      headers: { 'Content-Type': file.type },
+    });
+    return data.url as string;
+  };
+
   const handleSubmit = () => {
     if (!event) return;
     setSaving(true);
@@ -205,13 +214,15 @@ export default function EventManagement({ mode }: Props) {
           defaultValue={event?.title ?? ''}
           onChange={(v) => handleFieldChange('title', String(v))}
         />
-        <InputTextfieldStateful
-          label={tt('fields.description')}
-          placeholder={tt('fields.descriptionPlaceholder')}
-          defaultValue={event?.description ?? ''}
-          textArea={true}
-          onChange={(v) => handleFieldChange('description', String(v))}
-        />
+        <div className="flex flex-col gap-1 mt-1">
+          <label className="text-sm font-medium text-primary">{tt('fields.description')}</label>
+          <RichTextEditor
+            value={event?.description ?? ''}
+            placeholder={tt('fields.descriptionPlaceholder')}
+            onChange={(html) => handleFieldChange('description', html)}
+            uploadImage={uploadImage}
+          />
+        </div>
         <RadioGroup
           label={tt('fields.dateType')}
           value={event?.dateType ?? 'single'}
