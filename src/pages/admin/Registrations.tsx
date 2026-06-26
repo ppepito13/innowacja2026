@@ -22,6 +22,8 @@ import { formatDate, formatColumnName, formatCellValue } from '../../utils/forma
 import { exportRegistrationsToCsv, ExportColumn } from '../../utils/export';
 import { useTranslation } from 'react-i18next';
 
+import { QRCodeSVG } from 'qrcode.react';
+
 import Icon from '../../components/Icon';
 import parseClient from '../../services/parseClient';
 
@@ -47,6 +49,8 @@ export default function Registrations() {
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
   const [openedActionId, setOpenedActionId] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
+  const [qrToken, setQrToken] = useState<string | null>(null);
+  const [qrError, setQrError] = useState<boolean>(false);
 
   useEffect(() => {
     setLoading(true);
@@ -73,6 +77,30 @@ export default function Registrations() {
       .catch((error) => setError(error.message))
       .finally(() => setLoading(false));
   }, [eventId]);
+
+  useEffect(() => {
+    if (!selectedRegistration) {
+      setQrToken(null);
+      setQrError(false);
+      return;
+    }
+    let cancelled = false;
+    setQrToken(null);
+    setQrError(false);
+    parseService
+      .runFunction<{ token: string }>('generateQrToken', {
+        registrationId: selectedRegistration.objectId,
+      })
+      .then((res) => {
+        if (!cancelled) setQrToken(res.token);
+      })
+      .catch(() => {
+        if (!cancelled) setQrError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedRegistration]);
 
   const columns = useMemo(() => {
     const formConfigKeys = Object.keys(event?.formConfig ?? {});
@@ -206,12 +234,15 @@ export default function Registrations() {
     checkInTime: Registration['checkInTime'],
   ) => {
     try {
-      await parseService.update<Registration>('Registration', registrationId, { checkInTime });
+      await parseService.update<Registration>('Registration', registrationId, {
+        checkInTime,
+        isCheckedIn: true,
+      });
 
       setRegistrations((previousRegistrations) =>
         previousRegistrations.map((registration) =>
           registration.objectId === registrationId
-            ? { ...registration, checkInTime }
+            ? { ...registration, checkInTime, isCheckedIn: true }
             : registration,
         ),
       );
@@ -482,6 +513,23 @@ export default function Registrations() {
                     {formatCellValue(String(value), t)}
                   </div>
                 ))}
+
+                <div className="flex flex-col items-center gap-2 border-t border-primary/10 pt-3">
+                  <span className="self-start font-semibold">
+                    {t('registrations.details.qrCode')}:
+                  </span>
+                  {qrToken ? (
+                    <div className="rounded-lg border border-primary/10 bg-white p-3">
+                      <QRCodeSVG value={qrToken} size={180} level="M" />
+                    </div>
+                  ) : (
+                    <span className="text-xs text-primary/50">
+                      {qrError
+                        ? t('registrations.details.qrError')
+                        : t('registrations.details.qrLoading')}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>

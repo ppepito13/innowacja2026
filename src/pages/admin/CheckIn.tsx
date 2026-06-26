@@ -50,133 +50,78 @@ export default function CheckIn() {
     }>
   >([]);
 
+  const recordScan = (name: string, status: 'success' | 'warning' | 'error') => {
+    setRecentScans((prev) =>
+      [{ name, status, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 3),
+    );
+  };
+
+  const showScanResult = (
+    status: 'success' | 'warning' | 'error',
+    body: string,
+    toastTitle: string,
+    inlineTitle: string,
+  ) => {
+    setScanStatus(status);
+    setScanMessage({ toastTitle, toastBody: body, inlineTitle, inlineBody: body });
+    triggerVibration(status === 'success' ? 'success' : 'error');
+  };
+
   const handleScan = async (decodedText: string) => {
-    pauseScanner();
+    await pauseScanner();
 
     try {
-      const registration = await parseService.getById<Registration>('Registration', decodedText);
+      const res = await parseService.runFunction<{
+        result: 'checked_in' | 'already_checked_in' | 'not_approved' | 'wrong_event';
+        checkInTime?: string;
+        participant: { formData?: Record<string, unknown> };
+      }>('checkInByToken', { token: decodedText, eventId: selectedEventId });
 
-      if (!registration || registration.status !== 'approved') {
-        const errorMsg = registration
-          ? t('checkIn.scanner.error', {
-              name: 'User',
-              message: 'Registration not found or not approved.',
-            })
-          : t('checkIn.scanner.error', { name: '', message: 'Registration not found.' });
+      const name =
+        (res.participant?.formData?.fullName as string) ||
+        (res.participant?.formData?.name as string) ||
+        'Attendee';
 
-        const cleanMsg = errorMsg.replace(/^:\s*/, '');
-
-        setScanStatus('error');
-        setScanMessage({
-          toastTitle: t('checkIn.scanner.warningTitle'),
-          toastBody: cleanMsg,
-          inlineTitle: t('checkIn.scanner.errorTitle'),
-          inlineBody: cleanMsg,
-        });
-
-        triggerVibration('error');
-
-        setRecentScans((prev) =>
-          [
-            {
-              name: registration ? 'User' : 'Unknown',
-              status: 'error' as const,
-              time: new Date().toLocaleTimeString(),
-            },
-            ...prev,
-          ].slice(0, 3),
+      if (res.result === 'checked_in') {
+        showScanResult(
+          'success',
+          t('checkIn.scanner.success', { name }),
+          t('checkIn.scanner.successTitle'),
+          t('checkIn.scanner.successInlineTitle'),
         );
+        recordScan(name, 'success');
+      } else if (res.result === 'already_checked_in') {
+        const timeStr = res.checkInTime ? new Date(res.checkInTime).toLocaleString() : '';
+        showScanResult(
+          'warning',
+          t('checkIn.scanner.warning', { name, time: timeStr }),
+          t('checkIn.scanner.warningTitle'),
+          t('checkIn.scanner.errorTitle'),
+        );
+        recordScan(name, 'warning');
       } else {
-        const name =
-          (registration.formData?.fullName as string) ||
-          (registration.formData?.name as string) ||
-          'Attendee';
-
-        if (registration.checkInTime) {
-          const checkInDate =
-            registration.checkInTime instanceof Date
-              ? registration.checkInTime
-              : new Date(
-                  (registration.checkInTime as any).iso ??
-                    (registration.checkInTime as any).date ??
-                    '',
-                );
-          const timeStr = checkInDate.toLocaleString();
-          const warningMsg = t('checkIn.scanner.warning', { name, time: timeStr });
-
-          setScanStatus('warning');
-          setScanMessage({
-            toastTitle: t('checkIn.scanner.warningTitle'),
-            toastBody: warningMsg,
-            inlineTitle: t('checkIn.scanner.errorTitle'),
-            inlineBody: warningMsg,
-          });
-
-          triggerVibration('error');
-
-          setRecentScans((prev) =>
-            [
-              {
-                name,
-                status: 'warning' as const,
-                time: new Date().toLocaleTimeString(),
-              },
-              ...prev,
-            ].slice(0, 3),
-          );
-        } else {
-          await parseService.update<Registration>('Registration', registration.objectId, {
-            checkInTime: { __type: 'Date', iso: new Date().toISOString() } as any,
-          });
-
-          const successMsg = t('checkIn.scanner.success', { name });
-
-          setScanStatus('success');
-          setScanMessage({
-            toastTitle: t('checkIn.scanner.successTitle'),
-            toastBody: successMsg,
-            inlineTitle: t('checkIn.scanner.successInlineTitle'),
-            inlineBody: successMsg,
-          });
-
-          triggerVibration('success');
-
-          setRecentScans((prev) =>
-            [
-              {
-                name,
-                status: 'success' as const,
-                time: new Date().toLocaleTimeString(),
-              },
-              ...prev,
-            ].slice(0, 3),
-          );
-        }
+        // not_approved or wrong_event — reject without checking in
+        const reason =
+          res.result === 'wrong_event'
+            ? t('checkIn.scanner.wrongEvent')
+            : t('checkIn.scanner.notApproved');
+        const msg = t('checkIn.scanner.error', { name, message: reason }).replace(/^:\s*/, '');
+        showScanResult(
+          'error',
+          msg,
+          t('checkIn.scanner.warningTitle'),
+          t('checkIn.scanner.errorTitle'),
+        );
+        recordScan(name, 'error');
       }
     } catch (err: any) {
-      const errorMsg = t('checkIn.scanner.error', { name: '', message: 'Registration not found.' });
-      const cleanMsg = errorMsg.replace(/^:\s*/, '');
+      const code = err?.response?.data?.code;
+      const message =
+        code === 101 ? t('checkIn.scanner.notFound') : t('checkIn.scanner.invalidCode');
+      const msg = t('checkIn.scanner.error', { name: '', message }).replace(/^:\s*/, '');
 
-      setScanStatus('error');
-      setScanMessage({
-        toastTitle: t('checkIn.scanner.warningTitle'),
-        toastBody: cleanMsg,
-        inlineTitle: t('checkIn.scanner.errorTitle'),
-        inlineBody: cleanMsg,
-      });
-
-      triggerVibration('error');
-
-      setRecentScans((prev) =>
-        [
-          {
-            name: 'Unknown',
-            status: 'error' as const,
-            time: new Date().toLocaleTimeString(),
-          },
-          ...prev,
-        ].slice(0, 3),
-      );
+      showScanResult('error', msg, t('checkIn.scanner.warningTitle'), t('checkIn.scanner.errorTitle'));
+      recordScan('Unknown', 'error');
     }
 
     setTimeout(() => {
@@ -236,18 +181,27 @@ export default function CheckIn() {
   }, [registrations, searchQuery]);
 
   const handleManualCheckInToggle = async (registration: Registration) => {
-    const isCheckedIn = !!registration.checkInTime;
-    const newCheckInTime = isCheckedIn ? null : { __type: 'Date', iso: new Date().toISOString() };
+    const currentlyCheckedIn = registration.isCheckedIn ?? !!registration.checkInTime;
+    const nextCheckedIn = !currentlyCheckedIn;
+    const nowIso = new Date().toISOString();
+
+    // Keep both attendance fields in sync: set them together on check-in, clear
+    // them together on undo (__op: Delete unsets checkInTime on the server).
+    const payload = nextCheckedIn
+      ? { isCheckedIn: true, checkInTime: { __type: 'Date', iso: nowIso } }
+      : { isCheckedIn: false, checkInTime: { __op: 'Delete' } };
 
     try {
-      await parseService.update<Registration>('Registration', registration.objectId, {
-        checkInTime: newCheckInTime as any,
-      });
+      await parseService.update<Registration>('Registration', registration.objectId, payload as any);
 
       setRegistrations((prev) =>
         prev.map((reg) =>
           reg.objectId === registration.objectId
-            ? { ...reg, checkInTime: newCheckInTime as any }
+            ? {
+                ...reg,
+                isCheckedIn: nextCheckedIn,
+                checkInTime: nextCheckedIn ? ({ __type: 'Date', iso: nowIso } as any) : null,
+              }
             : reg,
         ),
       );
@@ -518,7 +472,7 @@ export default function CheckIn() {
                       (reg.formData?.name as string) ||
                       'Attendee';
                     const email = (reg.formData?.email as string) || '';
-                    const isCheckedIn = !!reg.checkInTime;
+                    const isCheckedIn = reg.isCheckedIn ?? !!reg.checkInTime;
 
                     let timeStr = '';
                     if (isCheckedIn) {
