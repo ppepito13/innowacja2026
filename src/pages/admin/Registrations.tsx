@@ -364,7 +364,7 @@ export default function Registrations() {
                         className={`w-8 h-8 flex items-center justify-center rounded-lg border p-2 transition active:scale-95 ${
                           isCheckedIn
                             ? 'border-primary/10 bg-surface text-primary hover:bg-background'
-                            : 'border-red-200 bg-red-50 text-red-600 cursor-not-allowed'
+                            : 'border-primary/10 bg-transparent text-error cursor-not-allowed'
                         }`}
                         onClick={() =>
                           updateCheckInTime(objectId, {
