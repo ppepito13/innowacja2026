@@ -16,8 +16,8 @@ export default function OptionsList({
   const { t } = useTranslation();
 
   return (
-    <div className="mt-1 p-3 bg-[#0b1120] rounded-lg border border-slate-800">
-      <div className="text-xs text-slate-400 mb-1.5 tracking-wider uppercase">
+    <div className="mt-1 p-3 bg-background rounded-lg border border-primary/10">
+      <div className="text-xs text-primary/60 mb-1.5 tracking-wider uppercase">
         {t("formConfig.options")}
       </div>
 
@@ -31,7 +31,7 @@ export default function OptionsList({
               onChange(next);
             }}
             placeholder={`${t("formConfig.option")} ${i + 1}`}
-            className="flex-1 bg-gray-900 border border-slate-700 rounded-[5px] px-2.5 py-[7px] text-slate-200 text-sm font-mono outline-none focus:border-slate-500"
+            className="flex-1 bg-surface border border-primary/20 rounded-[5px] px-2.5 py-[7px] text-primary text-sm font-mono outline-none focus:border-primary/40"
           />
           <button
             onClick={() => onRemove(i)}
@@ -53,7 +53,7 @@ export default function OptionsList({
 
       <button
         onClick={onAdd}
-        className="flex items-center mt-1 bg-transparent border border-dashed border-slate-700 rounded-[5px] text-slate-500 px-3 py-1.5 text-xs font-mono cursor-pointer hover:border-slate-500 hover:text-slate-400 transition-colors"
+        className="flex items-center mt-1 bg-transparent border border-dashed border-primary/20 rounded-[5px] text-primary/50 px-3 py-1.5 text-xs font-mono cursor-pointer hover:border-primary/40 hover:text-primary/60 transition-colors"
       >
         <span className="text-base mr-1.5">⊕</span>
         {t("formConfig.addOption")}

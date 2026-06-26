@@ -176,7 +176,7 @@ export default function EventManagement({ mode }: Props) {
   }
 
   return (
-    <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full max-w-2xl">
+    <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-2xl">
       <div className="flex flex-row items-center justify-between mb-2">
         <div className="flex flex-col">
           <h1 className="text-3xl mb-0">{ttm('title')}</h1>
@@ -189,7 +189,7 @@ export default function EventManagement({ mode }: Props) {
           </p>
         </div>
         <button
-          className="w-9 h-9 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
+          className="w-9 h-9 flex items-center justify-center rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95"
           onClick={() => history.goBack()}
         >
           <Icon icon={LuArrowLeft} />

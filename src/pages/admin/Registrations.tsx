@@ -280,7 +280,7 @@ export default function Registrations() {
 
   return (
     <>
-      <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full">
+      <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full">
         {/* HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex flex-col">
@@ -363,7 +363,7 @@ export default function Registrations() {
                       <button
                         className={`w-8 h-8 flex items-center justify-center rounded-lg border p-2 transition active:scale-95 ${
                           isCheckedIn
-                            ? 'border-primary/10 bg-white text-primary hover:bg-background'
+                            ? 'border-primary/10 bg-surface text-primary hover:bg-background'
                             : 'border-red-200 bg-red-50 text-red-600 cursor-not-allowed'
                         }`}
                         onClick={() =>
@@ -377,7 +377,7 @@ export default function Registrations() {
                         <Icon icon={LuUserCheck} size={14} />
                       </button>
                       <button
-                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95"
                         onClick={() => {
                           const registration = registrations.find(
                             (registration) => registration.objectId === objectId,
@@ -391,7 +391,7 @@ export default function Registrations() {
                       </button>
 
                       <button
-                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95"
                         onClick={() =>
                           history.push(`/admin/registrations/${eventId}/${objectId}/edit`)
                         }
@@ -400,7 +400,7 @@ export default function Registrations() {
                       </button>
 
                       <button
-                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95"
                         onClick={() =>
                           setOpenedActionId((id) => (id === objectId ? null : objectId))
                         }
@@ -411,7 +411,7 @@ export default function Registrations() {
                       {openedActionId === objectId && (
                         <div className="absolute right-0 top-10 z-50 w-48 rounded-xl border shadow-lg">
                           <button
-                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border border-b-0 rounded-t-xl bg-white hover:bg-background ${status === 'approved' ? 'cursor-not-allowed' : ''}`}
+                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border border-b-0 rounded-t-xl bg-surface hover:bg-background ${status === 'approved' ? 'cursor-not-allowed' : ''}`}
                             onClick={() => updateStatus(objectId, 'approved')}
                             disabled={status === 'approved'}
                           >
@@ -419,7 +419,7 @@ export default function Registrations() {
                             <span>{t('registrations.approve')}</span>
                           </button>
                           <button
-                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border rounded-b-xl bg-white hover:bg-background ${status === 'rejected' ? 'cursor-not-allowed' : ''}`}
+                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border rounded-b-xl bg-surface hover:bg-background ${status === 'rejected' ? 'cursor-not-allowed' : ''}`}
                             onClick={() => updateStatus(objectId, 'rejected')}
                             disabled={status === 'rejected'}
                           >
@@ -458,7 +458,7 @@ export default function Registrations() {
 
           <div className="flex gap-2">
             <button
-              className={`rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95 ${totalPages === 1 ? 'opacity-75 cursor-not-allowed' : ''}`}
+              className={`rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95 ${totalPages === 1 ? 'opacity-75 cursor-not-allowed' : ''}`}
               onClick={() => setPage((page) => Math.max(1, page - 1))}
               disabled={totalPages === 1}
             >
@@ -466,7 +466,7 @@ export default function Registrations() {
             </button>
 
             <button
-              className={`rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95 ${totalPages === 1 ? 'opacity-75 cursor-not-allowed' : ''}`}
+              className={`rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95 ${totalPages === 1 ? 'opacity-75 cursor-not-allowed' : ''}`}
               onClick={() => setPage((page) => Math.min(totalPages, page + 1))}
               disabled={totalPages === 1}
             >
@@ -482,14 +482,14 @@ export default function Registrations() {
             onClick={() => setSelectedRegistration(null)}
           >
             <div
-              className="w-[90vw] max-w-[360px] rounded-2xl bg-white px-6 py-5 pt-2 shadow-xl"
+              className="w-[90vw] max-w-[360px] rounded-2xl bg-surface px-6 py-5 pt-2 shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">{t('registrations.details.title')}</h2>
 
                 <button
-                  className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white hover:bg-background"
+                  className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface hover:bg-background"
                   onClick={() => setSelectedRegistration(null)}
                 >
                   <Icon icon={LuX} size={14} />
@@ -519,7 +519,7 @@ export default function Registrations() {
                     {t('registrations.details.qrCode')}:
                   </span>
                   {qrToken ? (
-                    <div className="rounded-lg border border-primary/10 bg-white p-3">
+                    <div className="rounded-lg border border-primary/10 bg-surface p-3">
                       <QRCodeSVG value={qrToken} size={180} level="M" />
                     </div>
                   ) : (

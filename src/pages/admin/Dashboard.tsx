@@ -151,7 +151,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full max-w-4xl">
+    <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-4xl">
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-1">
         <div>
@@ -326,7 +326,7 @@ export default function Dashboard() {
                 setRowsPerPage(Number(e.target.value));
                 setPage(1);
               }}
-              className="border border-primary/20 rounded-lg px-2 py-1 text-sm text-primary bg-white focus:outline-none"
+              className="border border-primary/20 rounded-lg px-2 py-1 text-sm text-primary bg-surface focus:outline-none"
             >
               {ROWS_OPTIONS.map((n) => (
                 <option key={n} value={n}>

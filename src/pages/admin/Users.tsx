@@ -68,7 +68,7 @@ export default function Users() {
   );
 
   return (
-    <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full max-w-4xl">
+    <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-4xl">
 
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-1">

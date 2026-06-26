@@ -217,8 +217,8 @@ export default function CheckIn() {
       {scanMessage && (
         <div
           className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-4 rounded-xl shadow-xl border toast-enter flex flex-col justify-center w-[90%] max-w-[420px] min-h-[72px]
-          ${scanStatus === 'success' ? 'bg-white border-success/30' : ''}
-          ${scanStatus === 'warning' || scanStatus === 'error' ? 'bg-white border-error/30' : ''}
+          ${scanStatus === 'success' ? 'bg-surface border-success/30' : ''}
+          ${scanStatus === 'warning' || scanStatus === 'error' ? 'bg-surface border-error/30' : ''}
         `}
         >
           <div className="flex items-start gap-3">
@@ -238,7 +238,7 @@ export default function CheckIn() {
       )}
 
       {/* HEADER CARD */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-white px-4 sm:px-8 py-4 rounded-2xl gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-surface px-4 sm:px-8 py-4 rounded-2xl gap-4">
         <div>
           <h1 className="text-3xl mb-0">{t('checkIn.title')}</h1>
           <p className="text-lg mt-0 text-primary/75">{t('checkIn.subtitle')}</p>
@@ -250,7 +250,7 @@ export default function CheckIn() {
             <select
               value={selectedEventId}
               onChange={(e) => setSelectedEventId(e.target.value)}
-              className="border border-primary/20 rounded-lg px-3 py-2 pr-8 text-sm text-primary focus:outline-none focus:border-primary appearance-none bg-white font-medium w-full sm:w-auto"
+              className="border border-primary/20 rounded-lg px-3 py-2 pr-8 text-sm text-primary focus:outline-none focus:border-primary appearance-none bg-surface font-medium w-full sm:w-auto"
             >
               {events.map((ev) => (
                 <option key={ev.objectId} value={ev.objectId}>
@@ -274,7 +274,7 @@ export default function CheckIn() {
       </div>
 
       {/* MAIN CONTENT CARD */}
-      <div className="flex flex-col bg-white px-4 sm:px-8 py-6 rounded-2xl">
+      <div className="flex flex-col bg-surface px-4 sm:px-8 py-6 rounded-2xl">
         {/* Tabs */}
         <div className="flex border border-primary/10 rounded-xl mb-6 p-1 bg-background/50">
           <button
@@ -282,7 +282,7 @@ export default function CheckIn() {
             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all
               ${
                 activeTab === 'qr'
-                  ? 'bg-white text-primary shadow-sm border border-primary/10'
+                  ? 'bg-surface text-primary shadow-sm border border-primary/10'
                   : 'text-primary/50 hover:text-primary/80'
               }`}
           >
@@ -293,7 +293,7 @@ export default function CheckIn() {
             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all
               ${
                 activeTab === 'manual'
-                  ? 'bg-white text-primary shadow-sm border border-primary/10'
+                  ? 'bg-surface text-primary shadow-sm border border-primary/10'
                   : 'text-primary/50 hover:text-primary/80'
               }`}
           >
@@ -363,7 +363,7 @@ export default function CheckIn() {
                     ${
                       flashlightOn
                         ? 'bg-secondary text-primary border-secondary/50'
-                        : 'bg-white/80 text-primary/60 border-primary/10 hover:bg-white'
+                        : 'bg-surface/80 text-primary/60 border-primary/10 hover:bg-surface'
                     }
                   `}
                 >
@@ -491,7 +491,7 @@ export default function CheckIn() {
                     return (
                       <div
                         key={reg.objectId}
-                        className="flex items-center justify-between px-4 py-3 bg-white hover:bg-background/30 transition-colors"
+                        className="flex items-center justify-between px-4 py-3 bg-surface hover:bg-background/30 transition-colors"
                       >
                         <div className="flex-1 flex flex-col truncate pr-4">
                           <span className="font-semibold text-sm text-primary truncate">

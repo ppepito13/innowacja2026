@@ -24,7 +24,7 @@ export default function ColorField({ label, value, onChange }: ColorFieldProps) 
                     type="color"
                     value={safeHex}
                     onChange={(e) => onChange(e.target.value)}
-                    className="w-10 h-10 rounded-lg cursor-pointer border border-primary/20 p-0.5 bg-white"
+                    className="w-10 h-10 rounded-lg cursor-pointer border border-primary/20 p-0.5 bg-surface"
                 />
                 <input
                     type="text"

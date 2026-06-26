@@ -143,27 +143,27 @@ export default function FormConfig() {
 
   const formConfig = buildFormConfig();
   return (
-    <div className="font-mono bg-[#0b1120] min-h-screen text-slate-200">
+    <div className="font-mono bg-background min-h-screen text-primary">
       {/* Header */}
-      <div className="flex justify-between items-center px-8 pt-7 pb-5 border-b border-slate-800 bg-gradient-to-b from-[#0f1729] to-[#0b1120] flex-wrap gap-4">
+      <div className="flex justify-between items-center px-8 pt-7 pb-5 border-b border-primary/10 bg-gradient-to-b from-surface to-background flex-wrap gap-4">
         <div>
-          <h1 className="m-0 text-[22px] font-bold -tracking-wide text-slate-50">
+          <h1 className="m-0 text-[22px] font-bold -tracking-wide text-primary">
             {t("formConfig.title")}
           </h1>
-          <p className="mt-1 mb-0 text-[13px] text-slate-500 tracking-wide">
+          <p className="mt-1 mb-0 text-[13px] text-primary/50 tracking-wide">
             {t("formConfig.subtitle")}
           </p>
         </div>
         <div className="flex gap-2.5 items-center">
           <button
             onClick={() => setJsonPreview(!jsonPreview)}
-            className="bg-slate-800 text-slate-400 border border-slate-700 rounded-md px-4 py-2 text-[13px] font-mono cursor-pointer hover:bg-slate-700 transition-colors"
+            className="bg-surface-2 text-primary/60 border border-primary/20 rounded-md px-4 py-2 text-[13px] font-mono cursor-pointer hover:bg-surface-2 transition-colors"
           >
             {jsonPreview ? t("formConfig.hideJson") : t("formConfig.showJson")}
           </button>
           <button
             onClick={handleSave}
-            className="bg-amber-400 text-slate-900 border-none rounded-md px-5 py-2 text-[13px] font-bold font-mono cursor-pointer tracking-wide hover:bg-amber-300 transition-colors"
+            className="bg-secondary text-brand border-none rounded-md px-5 py-2 text-[13px] font-bold font-mono cursor-pointer tracking-wide hover:bg-secondary transition-colors"
           >
             {saved ? `✓ ${t("formConfig.saved")}` : t("formConfig.save")}
           </button>
@@ -188,7 +188,7 @@ export default function FormConfig() {
 
           <button
             onClick={addField}
-            className="bg-gray-900 border-2 border-dashed border-slate-800 rounded-[10px] text-amber-400 px-5 py-4 text-sm font-semibold font-mono cursor-pointer flex items-center justify-center hover:border-slate-600 hover:bg-gray-800 transition-colors"
+            className="bg-surface border-2 border-dashed border-primary/10 rounded-[10px] text-secondary px-5 py-4 text-sm font-semibold font-mono cursor-pointer flex items-center justify-center hover:border-primary/40 hover:bg-surface-2 transition-colors"
           >
             <span className="text-xl mr-2">＋</span>
             {t("formConfig.addField")}
@@ -197,16 +197,16 @@ export default function FormConfig() {
 
         {/* JSON Preview */}
         {jsonPreview && (
-          <div className="flex-[0_0_340px] bg-gray-900 rounded-[10px] border border-slate-800 overflow-auto sticky top-6 max-h-[80vh]">
-            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-800">
-              <span className="text-xs tracking-wider text-slate-400">
+          <div className="flex-[0_0_340px] bg-surface rounded-[10px] border border-primary/10 overflow-auto sticky top-6 max-h-[80vh]">
+            <div className="flex justify-between items-center px-4 py-3 border-b border-primary/10">
+              <span className="text-xs tracking-wider text-primary/60">
                 formConfig
               </span>
-              <span className="bg-amber-400/10 text-amber-400 rounded px-2 py-0.5 text-[10px] font-bold tracking-wider">
+              <span className="bg-secondary/10 text-secondary rounded px-2 py-0.5 text-[10px] font-bold tracking-wider">
                 JSON
               </span>
             </div>
-            <pre className="m-0 p-4 text-xs leading-relaxed text-slate-400 overflow-x-auto whitespace-pre-wrap break-words">
+            <pre className="m-0 p-4 text-xs leading-relaxed text-primary/60 overflow-x-auto whitespace-pre-wrap break-words">
               {JSON.stringify(formConfig, null, 2)}
             </pre>
           </div>
