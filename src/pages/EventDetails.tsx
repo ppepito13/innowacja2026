@@ -297,7 +297,7 @@ export default function EventDetails() {
                   );
                 })}
 
-                <div className="bg-surface-2 border border-primary/15 rounded-md p-4 mt-2 w-full min-w-0">
+                <div className="bg-surface-2 border border-primary/15 rounded-md p-4 mt-2 w-full box-border min-w-0">
                   <div className="flex items-start gap-3">
                     <div className="flex items-center mt-1 shrink-0">
                       <input
@@ -340,7 +340,7 @@ export default function EventDetails() {
 
                 <button
                   type="button"
-                  className="w-full mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="w-full box-border mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                   style={{ backgroundColor: event.accentColor }}
                   onClick={handleSubmit}
                   disabled={loading || !isFormValid}
