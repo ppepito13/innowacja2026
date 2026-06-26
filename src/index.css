@@ -20,6 +20,31 @@
   --admin-hover: 255 255 255 / 0.05;
 }
 
+.dark {
+  --lsg-color-col-text-primary: #e2e8f0;
+  --lsg-color-col-text-highlight: #ffffff;
+  --lsg-color-col-action-inactive: #94a3b8;
+  --lsg-color-col-action-secondary-light: #e2e8f0;
+  --lsg-color-col-action-secondary-dark: #dce6e6;
+  --lsg-color-col-action-secondary-hover: #ffffff;
+  --lsg-color-col-action-tertiary-dark: #91afb4;
+  --lsg-color-col-fine-line-dark: #64748b;
+  --lsg-color-col-text-primary-light: #e2e8f0;
+  --lsg-color-col-text-primary-elevated-light: #e2e8f0;
+  --lsg-color-col-text-primary-contrast-light: #e2e8f0;
+  --lsg-color-col-text-highlight-light: #ffffff;
+  --lsg-color-col-text-highlight-elevated-light: #ffffff;
+  --lsg-color-col-text-highlight-contrast-light: #ffffff;
+  --lsg-color-col-action-tertiary-light: #cbd5e1;
+  --lsg-color-col-action-tertiary-elevated-light: #cbd5e1;
+  --lsg-color-col-action-tertiary-contrast-light: #cbd5e1;
+  --lsg-color-col-action-inactive-light: #94a3b8;
+  --lsg-color-col-action-inactive-elevated-light: #94a3b8;
+  --lsg-color-col-action-inactive-contrast-light: #94a3b8;
+  --lsg-color-col-fine-line-light: #64748b;
+  --lsg-color-col-fine-line-elevated-light: #64748b;
+}
+
 .light {
   color-scheme: light;
   --color-primary: 0 46 60;
