@@ -4,12 +4,43 @@
 @tailwind components;
 @tailwind utilities;
 
+:root,
+.dark {
+  color-scheme: dark;
+  --color-primary: 226 232 240;
+  --color-background: 11 21 33;
+  --color-surface: 22 36 54;
+  --color-surface-2: 36 54 75;
+
+  --admin-chrome: 15 23 42;
+  --admin-bg: 11 21 33;
+  --admin-border: 255 255 255 / 0.05;
+  --admin-text: 226 232 240;
+  --admin-muted: 148 163 184;
+  --admin-hover: 255 255 255 / 0.05;
+}
+
+.light {
+  color-scheme: light;
+  --color-primary: 0 46 60;
+  --color-background: 224 244 247;
+  --color-surface: 255 255 255;
+  --color-surface-2: 241 245 249;
+
+  --admin-chrome: 255 255 255;
+  --admin-bg: 241 245 249;
+  --admin-border: 0 46 60 / 0.08;
+  --admin-text: 15 23 42;
+  --admin-muted: 100 116 139;
+  --admin-hover: 0 46 60 / 0.04;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  @apply font-body bg-background;
+  @apply font-body bg-background text-primary;
 }
 
 h1,
