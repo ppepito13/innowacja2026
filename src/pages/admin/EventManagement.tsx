@@ -128,7 +128,7 @@ export default function EventManagement({ mode }: Props) {
 
     const payload: Event = {
       title: event.title,
-      description: event.description,
+      description: DOMPurify.sanitize(event.description),
       ...(event.startDate && {
         startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() },
       }),
