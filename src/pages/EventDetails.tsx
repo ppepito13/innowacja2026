@@ -340,7 +340,7 @@ export default function EventDetails() {
 
                 <button
                   type="button"
-                  className="w-full mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                  className="w-full mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                   style={{ backgroundColor: event.accentColor }}
                   onClick={handleSubmit}
                   disabled={loading || !isFormValid}
