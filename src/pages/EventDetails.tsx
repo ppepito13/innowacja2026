@@ -305,8 +305,7 @@ export default function EventDetails() {
                         type="checkbox"
                         checked={consent}
                         onChange={(e) => setConsent(e.target.checked)}
-                        className="w-4 h-4 rounded-full border border-primary/30 bg-surface focus:ring-0 cursor-pointer appearance-none checked:bg-current"
-                        style={{ color: event.primaryColor, borderColor: event.accentColor }}
+                        className="w-4 h-4 rounded-full border border-secondary bg-surface focus:ring-0 cursor-pointer appearance-none checked:bg-secondary"
                       />
                     </div>
                     <div>
@@ -340,8 +339,7 @@ export default function EventDetails() {
 
                 <button
                   type="button"
-                  className="w-full box-border mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
-                  style={{ backgroundColor: event.accentColor }}
+                  className="w-full box-border mt-2 py-3 px-4 rounded-md bg-secondary text-brand font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                   onClick={handleSubmit}
                   disabled={loading || !isFormValid}
                 >
