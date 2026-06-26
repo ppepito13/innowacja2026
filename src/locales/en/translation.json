@@ -10,6 +10,10 @@
     "events": "Events",
     "account": "Account"
   },
+  "theme": {
+    "toggleToDark": "Switch to dark mode",
+    "toggleToLight": "Switch to light mode"
+  },
   "home": {
     "heroTitle": "Connect. Code. Celebrate.",
     "heroSubtitle": "Commerzbank Łódź Event Registration",
@@ -44,6 +48,12 @@
     "username": "Username",
     "email": "Email",
     "role": "Role",
+    "appearance": {
+      "title": "Appearance",
+      "description": "Choose between light and dark mode.",
+      "light": "Light",
+      "dark": "Dark"
+    },
     "logout": {
       "idle": "Logout",
       "pending": "Logging out"

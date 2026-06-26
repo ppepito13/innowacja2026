@@ -10,6 +10,10 @@
     "events": "Wydarzenia",
     "account": "Konto"
   },
+  "theme": {
+    "toggleToDark": "Przełącz na tryb ciemny",
+    "toggleToLight": "Przełącz na tryb jasny"
+  },
   "home": {
     "heroTitle": "Networking. Kodowanie. Świętowanie.",
     "heroSubtitle": "Rejestracje na wydarzenia Commerzbank Łódź",
@@ -44,6 +48,12 @@
     "username": "Nazwa użytkownika",
     "email": "Email",
     "role": "Rola",
+    "appearance": {
+      "title": "Wygląd",
+      "description": "Wybierz między trybem jasnym a ciemnym.",
+      "light": "Jasny",
+      "dark": "Ciemny"
+    },
     "logout": {
       "idle": "Wyloguj się",
       "pending": "Wylogowywanie"
