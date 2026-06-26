@@ -383,7 +383,7 @@ export default function EventManagement({ mode }: Props) {
           type="button"
           onClick={handleSubmit}
           disabled={saving || uploading}
-          className="flex items-center gap-2 px-8 py-3 rounded-full bg-secondary text-primary text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+          className="flex items-center gap-2 px-8 py-3 rounded-full bg-secondary text-brand text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
         >
           <Icon icon={isEdit ? LuSave : LuPlus} size={16} />
           <span>{saving ? `${ttm('submit.pending')}...` : ttm('submit.idle')}</span>

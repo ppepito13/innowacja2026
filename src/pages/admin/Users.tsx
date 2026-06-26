@@ -78,7 +78,7 @@ export default function Users() {
         </div>
         <button
           onClick={() => history.push('/admin/users/new')}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-primary bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
         >
           <Icon icon={LuUserPlus} />
           <span>{t('users.addUser')}</span>
@@ -109,7 +109,7 @@ export default function Users() {
           <option value="Admin">{t('users.roles.Admin')}</option>
           <option value="Organizer">{t('users.roles.Organizer')}</option>
         </select>
-        <span className="ml-auto text-sm text-primary/50">{t('users.found', { count: filtered.length })}</span>
+        <span className="ml-auto text-sm text-primary/70">{t('users.found', { count: filtered.length })}</span>
       </div>
 
       {/* ERROR */}
@@ -117,26 +117,26 @@ export default function Users() {
 
       {/* TABLE */}
       {loading ? (
-        <p className="text-primary/50 text-sm">Loading...</p>
+        <p className="text-primary/70 text-sm">Loading...</p>
       ) : (
         <div className="overflow-x-auto w-full">
           <table className="w-full text-sm min-w-[480px]">
           <thead>
           <tr className="border-b border-primary/10 text-left">
             <th
-              className="pb-3 font-medium text-primary/50 cursor-pointer select-none"
+              className="pb-3 font-medium text-primary/70 cursor-pointer select-none"
               onClick={() => handleSort('username')}
             >
               {t('users.columns.user')} <SortIcon field="username" />
             </th>
             <th
-              className="pb-3 font-medium text-primary/50 cursor-pointer select-none"
+              className="pb-3 font-medium text-primary/70 cursor-pointer select-none"
               onClick={() => handleSort('role')}
             >
               {t('users.columns.role')} <SortIcon field="role" />
             </th>
-            <th className="pb-3 font-medium text-primary/50">{t('users.columns.lastLogin')}</th>
-            <th className="pb-3 font-medium text-primary/50">{t('users.columns.actions')}</th>
+            <th className="pb-3 font-medium text-primary/70">{t('users.columns.lastLogin')}</th>
+            <th className="pb-3 font-medium text-primary/70">{t('users.columns.actions')}</th>
           </tr>
           </thead>
           <tbody>
@@ -144,29 +144,29 @@ export default function Users() {
             <tr key={user.objectId} className="border-b border-primary/5 transition-colors">
               <td className="py-3">
                 <p className="font-medium text-primary">{user.fullName || user.username}</p>
-                <p className="text-primary/50 text-xs">{user.email}</p>
+                <p className="text-primary/70 text-xs">{user.email}</p>
               </td>
               <td className="py-3">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    user.role === 'Admin' ? 'bg-secondary text-primary' : 'bg-primary/10 text-primary'
+                    user.role === 'Admin' ? 'bg-secondary text-brand' : 'bg-primary/10 text-primary'
                   }`}>
                     {t(`users.roles.${user.role}`)}
                   </span>
               </td>
-              <td className="py-3 text-sm text-primary/50">
+              <td className="py-3 text-sm text-primary/70">
                 {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : '—'}
               </td>
               <td className="py-3">
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => history.push(`/admin/users/${user.objectId}/edit`)}
-                    className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/40 hover:text-primary cursor-pointer border-none bg-transparent"
+                    className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/60 hover:text-primary cursor-pointer border-none bg-transparent"
                   >
                     <Icon icon={LuPencil} />
                   </button>
                   <button
                     onClick={() => handleDelete(user.objectId)}
-                    className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/40 hover:text-error cursor-pointer border-none bg-transparent"
+                    className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/60 hover:text-error cursor-pointer border-none bg-transparent"
                   >
                     <Icon icon={LuTrash2} />
                   </button>
@@ -176,7 +176,7 @@ export default function Users() {
           ))}
           {sorted.length === 0 && (
             <tr>
-              <td colSpan={4} className="py-8 text-center text-primary/40">{t('users.noUsers')}</td>
+              <td colSpan={4} className="py-8 text-center text-primary/60">{t('users.noUsers')}</td>
             </tr>
           )}
           </tbody>

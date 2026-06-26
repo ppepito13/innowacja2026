@@ -334,7 +334,7 @@ export default function Registrations() {
 
         {/* TABLE */}
         {paginated.length === 0 ? (
-          <div className="w-full rounded-xl border mt-4 py-10 text-center text-sm text-primary/50">
+          <div className="w-full rounded-xl border mt-4 py-10 text-center text-sm text-primary/70">
             {t('registrations.noRegistrations')}
           </div>
         ) : (
@@ -458,7 +458,7 @@ export default function Registrations() {
 
           <div className="flex gap-2">
             <button
-              className={`rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95 ${totalPages === 1 ? 'opacity-75 cursor-not-allowed' : ''}`}
+              className="rounded-lg border border-primary/15 bg-surface-2 p-2 text-primary transition-colors hover:bg-primary/10 active:scale-95 disabled:text-primary/35 disabled:cursor-not-allowed"
               onClick={() => setPage((page) => Math.max(1, page - 1))}
               disabled={totalPages === 1}
             >
@@ -466,7 +466,7 @@ export default function Registrations() {
             </button>
 
             <button
-              className={`rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95 ${totalPages === 1 ? 'opacity-75 cursor-not-allowed' : ''}`}
+              className="rounded-lg border border-primary/15 bg-surface-2 p-2 text-primary transition-colors hover:bg-primary/10 active:scale-95 disabled:text-primary/35 disabled:cursor-not-allowed"
               onClick={() => setPage((page) => Math.min(totalPages, page + 1))}
               disabled={totalPages === 1}
             >
@@ -523,7 +523,7 @@ export default function Registrations() {
                       <QRCodeSVG value={qrToken} size={180} level="M" />
                     </div>
                   ) : (
-                    <span className="text-xs text-primary/50">
+                    <span className="text-xs text-primary/70">
                       {qrError
                         ? t('registrations.details.qrError')
                         : t('registrations.details.qrLoading')}

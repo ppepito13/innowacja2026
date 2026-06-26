@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useHistory } from 'react-router';
 import { LuLogOut, LuSun, LuMoon } from 'react-icons/lu';
-import { Button } from '@lsg/components';
 import { useAuth } from '../../auth/AuthProvider';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
@@ -77,20 +76,18 @@ export default function Account() {
 
       {/* ACTIONS */}
       <div className="flex items-center justify-end mt-4 pb-4">
-        <Button
-          look="secondary"
-          className="scale-75"
+        <button
+          type="button"
           onClick={handleLogout}
           disabled={loggingOut}
           data-testid="logout-button"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/20 text-primary text-sm font-semibold transition-colors cursor-pointer hover:bg-primary/5 disabled:opacity-50"
         >
-          <span className="flex flex-row items-center gap-2">
-            <Icon icon={LuLogOut} />
-            <span>
-              {loggingOut ? `${t('account.logout.pending')}...` : t('account.logout.idle')}
-            </span>
+          <Icon icon={LuLogOut} size={16} />
+          <span>
+            {loggingOut ? `${t('account.logout.pending')}...` : t('account.logout.idle')}
           </span>
-        </Button>
+        </button>
       </div>
     </div>
   );

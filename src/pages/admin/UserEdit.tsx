@@ -70,7 +70,7 @@ export default function UserEdit() {
       .finally(() => setSaving(false));
   };
 
-  if (loading) return <p className="text-primary/50 text-sm">Loading...</p>;
+  if (loading) return <p className="text-primary/70 text-sm">Loading...</p>;
 
   return (
     <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-lg">
@@ -95,7 +95,7 @@ export default function UserEdit() {
             defaultValue={user.email}
             onChange={(value) => handleChange('email', String(value))}
           />
-          <p className="text-xs text-primary/50 mt-1">{t('users.edit.emailHint')}</p>
+          <p className="text-xs text-primary/70 mt-1">{t('users.edit.emailHint')}</p>
         </div>
 
         <div>
@@ -106,7 +106,7 @@ export default function UserEdit() {
             defaultValue={newPassword}
             onChange={(value) => setNewPassword(String(value))}
           />
-          <p className="text-xs text-primary/50 mt-1">{t('users.edit.passwordHint')}</p>
+          <p className="text-xs text-primary/70 mt-1">{t('users.edit.passwordHint')}</p>
         </div>
 
         <div className="flex flex-col gap-1">
@@ -117,7 +117,7 @@ export default function UserEdit() {
         <div className="flex items-center justify-between px-3 py-3 border border-primary/20 rounded-lg mt-1">
           <div>
             <p className="text-sm font-medium text-primary">{t('users.edit.lockAccount')}</p>
-            <p className="text-xs text-primary/50">{t('users.edit.lockAccountHint')}</p>
+            <p className="text-xs text-primary/70">{t('users.edit.lockAccountHint')}</p>
           </div>
           <button
             onClick={() => handleChange('isLocked', !user.isLocked)}
@@ -142,7 +142,7 @@ export default function UserEdit() {
         <button
           onClick={handleSubmit}
           disabled={saving}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-primary bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none disabled:opacity-50"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none disabled:opacity-50"
         >
           <Icon icon={LuSave} />
           <span>{saving ? `${t('users.edit.pending')}...` : t('users.edit.submit')}</span>

@@ -258,14 +258,14 @@ export default function CheckIn() {
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-primary/40">
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-primary/60">
               <ChevronDownIcon width="14" height="14" />
             </div>
           </div>
 
           <button
             type="button"
-            className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-primary bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
+            className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
           >
             <DownloadIcon width="14" height="14" />
             {t('checkIn.export')}
@@ -283,7 +283,7 @@ export default function CheckIn() {
               ${
                 activeTab === 'qr'
                   ? 'bg-surface text-primary shadow-sm border border-primary/10'
-                  : 'text-primary/50 hover:text-primary/80'
+                  : 'text-primary/70 hover:text-primary/80'
               }`}
           >
             {t('checkIn.tabs.qrScanner')}
@@ -294,7 +294,7 @@ export default function CheckIn() {
               ${
                 activeTab === 'manual'
                   ? 'bg-surface text-primary shadow-sm border border-primary/10'
-                  : 'text-primary/50 hover:text-primary/80'
+                  : 'text-primary/70 hover:text-primary/80'
               }`}
           >
             {t('checkIn.tabs.manual')}
@@ -318,7 +318,7 @@ export default function CheckIn() {
                   ${
                     isScanning
                       ? 'bg-error/10 text-error hover:bg-error/15'
-                      : 'bg-secondary text-primary hover:bg-secondary/90'
+                      : 'bg-secondary text-brand hover:bg-secondary/90'
                   }
                 `}
               >
@@ -362,7 +362,7 @@ export default function CheckIn() {
                   className={`absolute top-3 right-3 p-2.5 rounded-lg transition-all border z-10 cursor-pointer
                     ${
                       flashlightOn
-                        ? 'bg-secondary text-primary border-secondary/50'
+                        ? 'bg-secondary text-brand border-secondary/50'
                         : 'bg-surface/80 text-primary/60 border-primary/10 hover:bg-surface'
                     }
                   `}
@@ -404,7 +404,7 @@ export default function CheckIn() {
             {/* Recent scans log */}
             {recentScans.length > 0 && (
               <div>
-                <h3 className="text-xs font-bold text-primary/40 mb-3 tracking-wider uppercase">
+                <h3 className="text-xs font-bold text-primary/60 mb-3 tracking-wider uppercase">
                   {t('checkIn.recentScans') ?? 'Recent scans'}
                 </h3>
                 <div className="flex flex-col gap-2">
@@ -423,7 +423,7 @@ export default function CheckIn() {
                           {scan.name}
                         </span>
                       </div>
-                      <span className="text-xs text-primary/40 font-mono">{scan.time}</span>
+                      <span className="text-xs text-primary/60 font-mono">{scan.time}</span>
                     </div>
                   ))}
                 </div>
@@ -462,7 +462,7 @@ export default function CheckIn() {
 
               <div className="flex flex-col divide-y divide-primary/10 max-h-[400px] overflow-y-auto">
                 {filteredRegistrations.length === 0 ? (
-                  <div className="py-8 text-center text-sm text-primary/50">
+                  <div className="py-8 text-center text-sm text-primary/70">
                     {t('checkIn.manual.noResults') ?? 'No attendees found.'}
                   </div>
                 ) : (
