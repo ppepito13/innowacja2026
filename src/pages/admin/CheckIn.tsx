@@ -282,8 +282,8 @@ export default function CheckIn() {
             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all
               ${
                 activeTab === 'qr'
-                  ? 'bg-surface text-primary shadow-sm border border-primary/10'
-                  : 'text-primary/70 hover:text-primary/80'
+                  ? 'bg-secondary text-brand shadow-sm border border-primary/10'
+                  : 'bg-surface text-primary shadow-sm border border-primary/10'
               }`}
           >
             {t('checkIn.tabs.qrScanner')}
@@ -293,8 +293,8 @@ export default function CheckIn() {
             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all
               ${
                 activeTab === 'manual'
-                  ? 'bg-surface text-primary shadow-sm border border-primary/10'
-                  : 'text-primary/70 hover:text-primary/80'
+                  ? 'bg-secondary text-brand shadow-sm border border-primary/10'
+                  : 'bg-surface text-primary shadow-sm border border-primary/10'
               }`}
           >
             {t('checkIn.tabs.manual')}
