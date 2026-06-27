@@ -1,5 +1,7 @@
 {
   "common": {
+    "brand": "Commerzbank Wydarzenia",
+    "loading": "Wczytywanie...",
     "boolean": {
       "true": "Tak",
       "false": "Nie"

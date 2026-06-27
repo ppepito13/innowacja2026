@@ -97,7 +97,7 @@ export default function EventDetails() {
   return (
     <div className="min-h-screen bg-background text-primary font-sans relative pb-16 overflow-x-hidden">
       <header className="bg-surface p-4 flex items-center justify-between shadow-md relative z-20">
-        <div className="text-xl font-bold text-primary">Commerzbank Events</div>
+        <div className="text-xl font-bold text-primary">{t('common.brand')}</div>
 
         <div className="flex items-center gap-3 text-sm">
           <div className="flex gap-2">

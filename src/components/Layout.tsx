@@ -27,7 +27,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="flex flex-wrap items-center justify-between bg-brand text-secondary px-4 sm:px-8 py-3 sm:py-4 gap-3">
-        <Link href="/">Commerzbank Events</Link>
+        <Link href="/">{t('common.brand')}</Link>
 
         <nav className="flex items-center gap-4">
           <Link href="#events">{t('layout.events')}</Link>

@@ -70,7 +70,7 @@ export default function UserEdit() {
       .finally(() => setSaving(false));
   };
 
-  if (loading) return <p className="text-primary/70 text-sm">Loading...</p>;
+  if (loading) return <p className="text-primary/70 text-sm">{t('common.loading')}</p>;
 
   return (
     <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-lg">

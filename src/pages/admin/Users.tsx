@@ -117,7 +117,7 @@ export default function Users() {
 
       {/* TABLE */}
       {loading ? (
-        <p className="text-primary/70 text-sm">Loading...</p>
+        <p className="text-primary/70 text-sm">{t('common.loading')}</p>
       ) : (
         <div className="overflow-x-auto w-full">
           <table className="w-full text-sm min-w-[480px]">

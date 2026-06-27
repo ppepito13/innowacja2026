@@ -1,5 +1,7 @@
 {
   "common": {
+    "brand": "Commerzbank Events",
+    "loading": "Loading...",
     "boolean": {
       "true": "Yes",
       "false": "No"
