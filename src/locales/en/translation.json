@@ -14,6 +14,7 @@
     "brandSub": "Commerzbank Events",
     "events": "Events",
     "checkIn": "Check-In",
+    "registrations": "Registrations",
     "users": "Users",
     "account": "Account Settings",
     "minimize": "Minimize Menu",
@@ -286,6 +287,41 @@
       "warning": "{{name}}: User already checked in at {{time}}.",
       "errorTitle": "Scan Failed",
       "error": "{{name}}: {{message}}"
+    }
+  },
+  "registrationsList": {
+    "title": "Registrations",
+    "description": "View and manage event registrations.",
+    "noEvents": "No events available",
+    "selectEvent": "Select an event to view registrations",
+    "noRegistrations": "No registrations found",
+    "loading": "Loading registrations",
+    "found": "Found {{count}} registrations",
+    "approve": "Approve",
+    "reject": "Reject",
+    "filters": {
+      "search": "Search attendees...",
+      "allStatuses": "All Approval",
+      "pending": "Pending",
+      "approved": "Approved"
+    },
+    "columns": {
+      "date": "Registration Date",
+      "status": "Approved",
+      "actions": "Actions"
+    },
+    "status": {
+      "approved": "Approved",
+      "pending": "Pending"
+    },
+    "pagination": {
+      "current": "Page",
+      "total": "of"
+    },
+    "details": {
+      "title": "Registration details",
+      "status": "Status",
+      "date": "Date"
     }
   }
 }

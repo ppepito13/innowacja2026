@@ -14,6 +14,7 @@
     "brandSub": "Commerzbank Events",
     "events": "Wydarzenia",
     "checkIn": "Zameldowanie",
+    "registrations": "Rejestracje",
     "users": "Użytkownicy",
     "account": "Ustawienia konta",
     "minimize": "Zwiń menu",
@@ -286,6 +287,41 @@
       "warning": "{{name}}: Uczestnik jest już zameldowany z dnia {{time}}.",
       "errorTitle": "Błąd Skanowania",
       "error": "{{name}}: {{message}}"
+    }
+  },
+  "registrationsList": {
+    "title": "Rejestracje",
+    "description": "Przeglądaj i zarządzaj rejestracjami na wydarzenia.",
+    "noEvents": "Brak dostępnych wydarzeń",
+    "selectEvent": "Wybierz wydarzenie, aby zobaczyć rejestracje",
+    "noRegistrations": "Nie znaleziono rejestracji",
+    "loading": "Ładowanie rejestracji",
+    "found": "Znaleziono {{count}} rejestracji",
+    "approve": "Zatwierdź",
+    "reject": "Odrzuć",
+    "filters": {
+      "search": "Szukaj uczestników...",
+      "allStatuses": "Wszystkie statusy",
+      "pending": "Oczekujące",
+      "approved": "Zatwierdzone"
+    },
+    "columns": {
+      "date": "Data rejestracji",
+      "status": "Status",
+      "actions": "Akcje"
+    },
+    "status": {
+      "approved": "Zatwierdzona",
+      "pending": "Oczekująca"
+    },
+    "pagination": {
+      "current": "Strona",
+      "total": "z"
+    },
+    "details": {
+      "title": "Szczegóły rejestracji",
+      "status": "Status",
+      "date": "Data"
     }
   }
 }
