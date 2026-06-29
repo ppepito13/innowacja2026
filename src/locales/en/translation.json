@@ -1,5 +1,7 @@
 {
   "common": {
+    "brand": "Commerzbank Events",
+    "loading": "Loading...",
     "boolean": {
       "true": "Yes",
       "false": "No"
@@ -9,6 +11,10 @@
     "projectName": "Innovation Project",
     "events": "Events",
     "account": "Account"
+  },
+  "theme": {
+    "toggleToDark": "Switch to dark mode",
+    "toggleToLight": "Switch to light mode"
   },
   "home": {
     "heroTitle": "Connect. Code. Celebrate.",
@@ -44,6 +50,12 @@
     "username": "Username",
     "email": "Email",
     "role": "Role",
+    "appearance": {
+      "title": "Appearance",
+      "description": "Choose between light and dark mode.",
+      "light": "Light",
+      "dark": "Dark"
+    },
     "logout": {
       "idle": "Logout",
       "pending": "Logging out"

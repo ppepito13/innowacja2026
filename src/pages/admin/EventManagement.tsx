@@ -176,7 +176,7 @@ export default function EventManagement({ mode }: Props) {
   }
 
   return (
-    <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full max-w-2xl">
+    <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-2xl">
       <div className="flex flex-row items-center justify-between mb-2">
         <div className="flex flex-col">
           <h1 className="text-3xl mb-0">{ttm('title')}</h1>
@@ -189,7 +189,7 @@ export default function EventManagement({ mode }: Props) {
           </p>
         </div>
         <button
-          className="w-9 h-9 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
+          className="w-9 h-9 flex items-center justify-center rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95"
           onClick={() => history.goBack()}
         >
           <Icon icon={LuArrowLeft} />
@@ -383,7 +383,7 @@ export default function EventManagement({ mode }: Props) {
           type="button"
           onClick={handleSubmit}
           disabled={saving || uploading}
-          className="flex items-center gap-2 px-8 py-3 rounded-full bg-secondary text-primary text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+          className="flex items-center gap-2 px-8 py-3 rounded-full bg-secondary text-brand text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
         >
           <Icon icon={isEdit ? LuSave : LuPlus} size={16} />
           <span>{saving ? `${ttm('submit.pending')}...` : ttm('submit.idle')}</span>

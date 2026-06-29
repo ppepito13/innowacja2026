@@ -28,18 +28,18 @@ export default function FieldCard({
 
   return (
     <div
-      className={`bg-gray-900 rounded-[10px] p-5 border border-slate-800 relative transition-colors duration-200 ${
-        error ? "border-l-[3px] border-l-red-500" : "border-l-[3px] border-l-amber-400/25"
+      className={`bg-surface rounded-[10px] p-5 border border-primary/10 relative transition-colors duration-200 ${
+        error ? "border-l-[3px] border-l-red-500" : "border-l-[3px] border-l-secondary/25"
       }`}
     >
       {/* Header: index badge + delete */}
       <div className="flex justify-between items-center mb-3.5">
-        <span className="bg-slate-800 text-amber-400 rounded-md px-2.5 py-0.5 text-xs font-bold tracking-wider">
+        <span className="bg-surface-2 text-secondary rounded-md px-2.5 py-0.5 text-xs font-bold tracking-wider">
           {index + 1}
         </span>
         <button
           onClick={onRemove}
-          className="bg-slate-800 border border-slate-700 rounded-md w-[30px] h-[30px] flex items-center justify-center cursor-pointer hover:bg-slate-700 transition-colors"
+          className="bg-surface-2 border border-primary/20 rounded-md w-[30px] h-[30px] flex items-center justify-center cursor-pointer hover:bg-surface-2 transition-colors"
           title={t("formConfig.removeField")}
         >
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -57,28 +57,28 @@ export default function FieldCard({
       {/* Label + Placeholder */}
       <div className="flex gap-4 mb-3 flex-wrap items-end">
         <div className="flex-1">
-          <label className="block text-[11px] text-slate-500 tracking-wider uppercase mb-1">
+          <label className="block text-[11px] text-primary/50 tracking-wider uppercase mb-1">
             {t("formConfig.label")}
           </label>
           <input
             value={field.label}
             onChange={(e) => onUpdate({ label: e.target.value })}
             placeholder={t("formConfig.labelPlaceholder")}
-            className={`w-full bg-[#0b1120] border rounded-md px-3 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500 ${
-              error ? "border-red-500" : "border-slate-700"
+            className={`w-full bg-background border rounded-md px-3 py-2 text-primary text-sm font-mono outline-none transition-colors focus:border-primary/40 ${
+              error ? "border-red-500" : "border-primary/20"
             }`}
           />
           {error && <div className="text-red-500 text-[11px] mt-0.5">{error}</div>}
         </div>
         <div className="flex-1">
-          <label className="block text-[11px] text-slate-500 tracking-wider uppercase mb-1">
+          <label className="block text-[11px] text-primary/50 tracking-wider uppercase mb-1">
             {t("formConfig.placeholder")}
           </label>
           <input
             value={field.placeholder}
             onChange={(e) => onUpdate({ placeholder: e.target.value })}
             placeholder={t("formConfig.placeholderPlaceholder")}
-            className="w-full bg-[#0b1120] border border-slate-700 rounded-md px-3 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500"
+            className="w-full bg-background border border-primary/20 rounded-md px-3 py-2 text-primary text-sm font-mono outline-none transition-colors focus:border-primary/40"
           />
         </div>
       </div>
@@ -86,7 +86,7 @@ export default function FieldCard({
       {/* Type + Required */}
       <div className="flex gap-4 mb-3 flex-wrap items-end">
         <div>
-          <label className="block text-[11px] text-slate-500 tracking-wider uppercase mb-1">
+          <label className="block text-[11px] text-primary/50 tracking-wider uppercase mb-1">
             {t("formConfig.type")}
           </label>
           <TypeDropdown
@@ -109,13 +109,13 @@ export default function FieldCard({
         </div>
 
         <label className="flex flex-col items-start gap-1 cursor-pointer">
-          <span className="block text-[11px] text-slate-500 tracking-wider uppercase">
+          <span className="block text-[11px] text-primary/50 tracking-wider uppercase">
             {t("formConfig.required")}
           </span>
           <div
             onClick={() => onUpdate({ required: !field.required })}
-            className={`w-10 h-[22px] rounded-full border border-slate-700 relative cursor-pointer transition-colors duration-200 ${
-              field.required ? "bg-amber-400" : "bg-slate-800"
+            className={`w-10 h-[22px] rounded-full border border-primary/20 relative cursor-pointer transition-colors duration-200 ${
+              field.required ? "bg-secondary" : "bg-surface-2"
             }`}
           >
             <div

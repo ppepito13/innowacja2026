@@ -98,6 +98,7 @@ export interface User {
   role: 'Admin' | 'Organizer'; // String: Admin/Organizer
   lastLoginAt?: string;
   fullName?: string;
+  themePreference?: 'light' | 'dark';
   isLocked?: boolean;
   createdAt: string;
   updatedAt: string;

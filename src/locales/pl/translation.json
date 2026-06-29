@@ -1,5 +1,7 @@
 {
   "common": {
+    "brand": "Commerzbank Wydarzenia",
+    "loading": "Wczytywanie...",
     "boolean": {
       "true": "Tak",
       "false": "Nie"
@@ -9,6 +11,10 @@
     "projectName": "Projekt Innowacja",
     "events": "Wydarzenia",
     "account": "Konto"
+  },
+  "theme": {
+    "toggleToDark": "Przełącz na tryb ciemny",
+    "toggleToLight": "Przełącz na tryb jasny"
   },
   "home": {
     "heroTitle": "Networking. Kodowanie. Świętowanie.",
@@ -44,6 +50,12 @@
     "username": "Nazwa użytkownika",
     "email": "Email",
     "role": "Rola",
+    "appearance": {
+      "title": "Wygląd",
+      "description": "Wybierz między trybem jasnym a ciemnym.",
+      "light": "Jasny",
+      "dark": "Ciemny"
+    },
     "logout": {
       "idle": "Wyloguj się",
       "pending": "Wylogowywanie"

@@ -55,7 +55,7 @@ export default function UserNew() {
   };
 
   return (
-    <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full max-w-lg">
+    <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-lg">
 
       <div className="flex flex-col mb-4">
         <h1 className="text-3xl mb-0">{t('users.new.title')}</h1>
@@ -77,7 +77,7 @@ export default function UserNew() {
             defaultValue={user.email}
             onChange={(value) => handleChange('email', String(value))}
           />
-          <p className="text-xs text-primary/50 mt-1">{t('users.new.emailHint')}</p>
+          <p className="text-xs text-primary/70 mt-1">{t('users.new.emailHint')}</p>
         </div>
 
         <div>
@@ -88,13 +88,13 @@ export default function UserNew() {
             defaultValue={password}
             onChange={(value) => setPassword(String(value))}
           />
-          <p className="text-xs text-primary/50 mt-1">{t('users.new.passwordHint')}</p>
+          <p className="text-xs text-primary/70 mt-1">{t('users.new.passwordHint')}</p>
         </div>
 
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-primary">{t('users.new.role')}</label>
           <p className="text-sm text-primary px-3 py-2 border border-primary/20 rounded-lg bg-primary/5">{t('users.roles.Organizer')}</p>
-          <p className="text-xs text-primary/50">{t('users.new.roleHint')}</p>
+          <p className="text-xs text-primary/70">{t('users.new.roleHint')}</p>
         </div>
       </div>
 
@@ -112,7 +112,7 @@ export default function UserNew() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-primary bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none disabled:opacity-50"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none disabled:opacity-50"
         >
           <Icon icon={LuUserPlus} />
           <span>{loading ? `${t('users.new.pending')}...` : t('users.new.submit')}</span>

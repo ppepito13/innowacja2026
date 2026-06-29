@@ -217,8 +217,8 @@ export default function CheckIn() {
       {scanMessage && (
         <div
           className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-4 rounded-xl shadow-xl border toast-enter flex flex-col justify-center w-[90%] max-w-[420px] min-h-[72px]
-          ${scanStatus === 'success' ? 'bg-white border-success/30' : ''}
-          ${scanStatus === 'warning' || scanStatus === 'error' ? 'bg-white border-error/30' : ''}
+          ${scanStatus === 'success' ? 'bg-surface border-success/30' : ''}
+          ${scanStatus === 'warning' || scanStatus === 'error' ? 'bg-surface border-error/30' : ''}
         `}
         >
           <div className="flex items-start gap-3">
@@ -238,7 +238,7 @@ export default function CheckIn() {
       )}
 
       {/* HEADER CARD */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-white px-4 sm:px-8 py-4 rounded-2xl gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-surface px-4 sm:px-8 py-4 rounded-2xl gap-4">
         <div>
           <h1 className="text-3xl mb-0">{t('checkIn.title')}</h1>
           <p className="text-lg mt-0 text-primary/75">{t('checkIn.subtitle')}</p>
@@ -250,7 +250,7 @@ export default function CheckIn() {
             <select
               value={selectedEventId}
               onChange={(e) => setSelectedEventId(e.target.value)}
-              className="border border-primary/20 rounded-lg px-3 py-2 pr-8 text-sm text-primary focus:outline-none focus:border-primary appearance-none bg-white font-medium w-full sm:w-auto"
+              className="border border-primary/20 rounded-lg px-3 py-2 pr-8 text-sm text-primary focus:outline-none focus:border-primary appearance-none bg-surface font-medium w-full sm:w-auto"
             >
               {events.map((ev) => (
                 <option key={ev.objectId} value={ev.objectId}>
@@ -258,14 +258,14 @@ export default function CheckIn() {
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-primary/40">
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-primary/60">
               <ChevronDownIcon width="14" height="14" />
             </div>
           </div>
 
           <button
             type="button"
-            className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-primary bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
+            className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
           >
             <DownloadIcon width="14" height="14" />
             {t('checkIn.export')}
@@ -274,7 +274,7 @@ export default function CheckIn() {
       </div>
 
       {/* MAIN CONTENT CARD */}
-      <div className="flex flex-col bg-white px-4 sm:px-8 py-6 rounded-2xl">
+      <div className="flex flex-col bg-surface px-4 sm:px-8 py-6 rounded-2xl">
         {/* Tabs */}
         <div className="flex border border-primary/10 rounded-xl mb-6 p-1 bg-background/50">
           <button
@@ -282,8 +282,8 @@ export default function CheckIn() {
             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all
               ${
                 activeTab === 'qr'
-                  ? 'bg-white text-primary shadow-sm border border-primary/10'
-                  : 'text-primary/50 hover:text-primary/80'
+                  ? 'bg-secondary text-brand shadow-sm border border-primary/10'
+                  : 'bg-surface text-primary shadow-sm border border-primary/10'
               }`}
           >
             {t('checkIn.tabs.qrScanner')}
@@ -293,8 +293,8 @@ export default function CheckIn() {
             className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all
               ${
                 activeTab === 'manual'
-                  ? 'bg-white text-primary shadow-sm border border-primary/10'
-                  : 'text-primary/50 hover:text-primary/80'
+                  ? 'bg-secondary text-brand shadow-sm border border-primary/10'
+                  : 'bg-surface text-primary shadow-sm border border-primary/10'
               }`}
           >
             {t('checkIn.tabs.manual')}
@@ -318,7 +318,7 @@ export default function CheckIn() {
                   ${
                     isScanning
                       ? 'bg-error/10 text-error hover:bg-error/15'
-                      : 'bg-secondary text-primary hover:bg-secondary/90'
+                      : 'bg-secondary text-brand hover:bg-secondary/90'
                   }
                 `}
               >
@@ -362,8 +362,8 @@ export default function CheckIn() {
                   className={`absolute top-3 right-3 p-2.5 rounded-lg transition-all border z-10 cursor-pointer
                     ${
                       flashlightOn
-                        ? 'bg-secondary text-primary border-secondary/50'
-                        : 'bg-white/80 text-primary/60 border-primary/10 hover:bg-white'
+                        ? 'bg-secondary text-brand border-secondary/50'
+                        : 'bg-surface/80 text-primary/60 border-primary/10 hover:bg-surface'
                     }
                   `}
                 >
@@ -404,7 +404,7 @@ export default function CheckIn() {
             {/* Recent scans log */}
             {recentScans.length > 0 && (
               <div>
-                <h3 className="text-xs font-bold text-primary/40 mb-3 tracking-wider uppercase">
+                <h3 className="text-xs font-bold text-primary/60 mb-3 tracking-wider uppercase">
                   {t('checkIn.recentScans') ?? 'Recent scans'}
                 </h3>
                 <div className="flex flex-col gap-2">
@@ -423,7 +423,7 @@ export default function CheckIn() {
                           {scan.name}
                         </span>
                       </div>
-                      <span className="text-xs text-primary/40 font-mono">{scan.time}</span>
+                      <span className="text-xs text-primary/60 font-mono">{scan.time}</span>
                     </div>
                   ))}
                 </div>
@@ -450,19 +450,19 @@ export default function CheckIn() {
               placeholder={t('checkIn.manual.search') ?? 'Search by name or email...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full border border-primary/20 rounded-lg px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary bg-background/50 mb-2"
+              className="w-full box-border border border-primary/20 rounded-lg px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary bg-background/50 mb-2"
             />
 
             <div className="flex flex-col border border-primary/10 rounded-xl overflow-hidden">
-              <div className="flex items-center justify-between bg-background/50 px-4 py-3 border-b border-primary/10 text-xs font-semibold text-primary/60">
+              <div className="flex items-center justify-between gap-3 bg-background/50 px-4 py-3 border-b border-primary/10 text-xs font-semibold text-primary/60">
                 <div className="flex-1">{t('checkIn.manual.attendee') ?? 'Attendee'}</div>
-                <div className="w-32 text-center">{t('checkIn.manual.status') ?? 'Status'}</div>
+                <div className="w-40 text-center">{t('checkIn.manual.status') ?? 'Status'}</div>
                 <div className="w-32 text-right">{t('checkIn.manual.action') ?? 'Action'}</div>
               </div>
 
               <div className="flex flex-col divide-y divide-primary/10 max-h-[400px] overflow-y-auto">
                 {filteredRegistrations.length === 0 ? (
-                  <div className="py-8 text-center text-sm text-primary/50">
+                  <div className="py-8 text-center text-sm text-primary/70">
                     {t('checkIn.manual.noResults') ?? 'No attendees found.'}
                   </div>
                 ) : (
@@ -491,7 +491,7 @@ export default function CheckIn() {
                     return (
                       <div
                         key={reg.objectId}
-                        className="flex items-center justify-between px-4 py-3 bg-white hover:bg-background/30 transition-colors"
+                        className="flex items-center justify-between gap-3 px-4 py-3 bg-surface hover:bg-background/30 transition-colors"
                       >
                         <div className="flex-1 flex flex-col truncate pr-4">
                           <span className="font-semibold text-sm text-primary truncate">
@@ -500,9 +500,9 @@ export default function CheckIn() {
                           <span className="text-sm text-primary/60 truncate">{email}</span>
                         </div>
 
-                        <div className="w-32 flex justify-center">
+                        <div className="w-40 flex justify-center">
                           {isCheckedIn ? (
-                            <span className="px-2.5 py-1 rounded-full bg-success text-black text-xs font-medium whitespace-nowrap">
+                            <span className="px-2.5 py-1 rounded-full bg-green-200 text-black text-xs font-bold whitespace-nowrap">
                               {t('checkIn.manual.checkedIn') ?? 'Checked-In'} ({timeStr})
                             </span>
                           ) : (

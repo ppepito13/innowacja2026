@@ -22,15 +22,15 @@ export default function TypeDropdown({
     <div className="relative min-w-[220px]">
       <button
         onClick={onToggle}
-        className="flex items-center gap-1 w-full min-w-[220px] bg-[#0b1120] border border-slate-700 rounded-md px-3 py-2 text-slate-200 text-sm font-mono cursor-pointer text-left"
+        className="flex items-center gap-1 w-full min-w-[220px] bg-background border border-primary/20 rounded-md px-3 py-2 text-primary text-sm font-mono cursor-pointer text-left"
       >
-        <span className="text-amber-400 mr-1.5 text-[13px]">{current?.icon}</span>
+        <span className="text-secondary mr-1.5 text-[13px]">{current?.icon}</span>
         {current ? t(current.labelKey) : ""}
         <span className="ml-auto opacity-50">▾</span>
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg overflow-hidden z-50 min-w-[240px] shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
+        <div className="absolute top-full left-0 mt-1 bg-surface-2 border border-primary/20 rounded-lg overflow-hidden z-50 min-w-[240px] shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
           {FIELD_TYPES.map((ft) => {
             const isSelected = ft.value === value;
             return (
@@ -42,8 +42,8 @@ export default function TypeDropdown({
                 }}
                 className={`flex items-center w-full px-3.5 py-2.5 border-none cursor-pointer text-sm font-mono text-left transition-colors duration-100 ${
                   isSelected
-                    ? "bg-amber-400 text-slate-900"
-                    : "bg-transparent text-slate-300 hover:bg-slate-700"
+                    ? "bg-secondary text-brand"
+                    : "bg-transparent text-primary hover:bg-surface-2"
                 }`}
               >
                 {isSelected && <span className="mr-1.5">✓</span>}

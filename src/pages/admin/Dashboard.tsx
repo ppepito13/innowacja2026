@@ -151,7 +151,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full max-w-4xl">
+    <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-4xl">
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-1">
         <div>
@@ -160,7 +160,7 @@ export default function Dashboard() {
         </div>
         <button
           onClick={() => history.push('/admin/events/new')}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-primary bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
         >
           <Icon icon={LuPlus} />
           <span>{t('dashboard.addEvent')}</span>
@@ -197,7 +197,7 @@ export default function Dashboard() {
           <option value="active">{t('dashboard.filter.active')}</option>
           <option value="inactive">{t('dashboard.filter.inactive')}</option>
         </select>
-        <span className="ml-auto text-sm text-primary/50">
+        <span className="ml-auto text-sm text-primary/70">
           {t('dashboard.found', { count: sorted.length })}
         </span>
       </div>
@@ -207,37 +207,37 @@ export default function Dashboard() {
 
       {/* TABLE */}
       {loading ? (
-        <p className="text-primary/50 text-sm">{t('dashboard.loading')}</p>
+        <p className="text-primary/70 text-sm">{t('dashboard.loading')}</p>
       ) : (
         <div className="overflow-x-auto w-full -mx-0">
           <table className="w-full text-sm min-w-[560px]">
             <thead>
               <tr className="border-b border-primary/10 text-left">
                 <th
-                  className="pb-3 font-medium text-primary/50 w-28 cursor-pointer select-none"
+                  className="pb-3 font-medium text-primary/70 w-28 cursor-pointer select-none"
                   onClick={() => handleSort('isActive')}
                 >
                   {t('dashboard.col.active')} <SortIcon field="isActive" />
                 </th>
                 <th
-                  className="pb-3 font-medium text-primary/50 cursor-pointer select-none"
+                  className="pb-3 font-medium text-primary/70 cursor-pointer select-none"
                   onClick={() => handleSort('title')}
                 >
                   {t('dashboard.col.name')} <SortIcon field="title" />
                 </th>
                 <th
-                  className="pb-3 font-medium text-primary/50 w-32 cursor-pointer select-none"
+                  className="pb-3 font-medium text-primary/70 w-32 cursor-pointer select-none"
                   onClick={() => handleSort('startDate')}
                 >
                   {t('dashboard.col.date')} <SortIcon field="startDate" />
                 </th>
                 <th
-                  className="pb-3 font-medium text-primary/50 cursor-pointer select-none"
+                  className="pb-3 font-medium text-primary/70 cursor-pointer select-none"
                   onClick={() => handleSort('location')}
                 >
                   {t('dashboard.col.location')} <SortIcon field="location" />
                 </th>
-                <th className="pb-3 font-medium text-primary/50">{t('dashboard.col.actions')}</th>
+                <th className="pb-3 font-medium text-primary/70">{t('dashboard.col.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -256,8 +256,8 @@ export default function Dashboard() {
                   <td className="py-3">
                     <p className="font-medium text-primary">{event.title ?? '—'}</p>
                   </td>
-                  <td className="py-3 text-primary/50">{formatDate(event.startDate)}</td>
-                  <td className="py-3 text-primary/50">
+                  <td className="py-3 text-primary/70">{formatDate(event.startDate)}</td>
+                  <td className="py-3 text-primary/70">
                     {event.eventFormat === 'virtual'
                       ? t('dashboard.virtual')
                       : event.location || t('dashboard.onSite')}
@@ -266,35 +266,35 @@ export default function Dashboard() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => history.push(`/admin/events/${event.objectId}/edit`)}
-                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/40 hover:text-primary cursor-pointer border-none bg-transparent"
+                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/60 hover:text-primary cursor-pointer border-none bg-transparent"
                         title={t('dashboard.editEvent')}
                       >
                         <Icon icon={LuPencil} />
                       </button>
                       <button
                         onClick={() => history.push(`/admin/registrations/${event.objectId}`)}
-                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/40 hover:text-primary cursor-pointer border-none bg-transparent"
+                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/60 hover:text-primary cursor-pointer border-none bg-transparent"
                         title={t('dashboard.goToRegistrations')}
                       >
                         <Icon icon={LuUsers} />
                       </button>
                       <button
                         onClick={() => history.push(`/admin/check-in/${event.objectId}`)}
-                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/40 hover:text-primary cursor-pointer border-none bg-transparent"
+                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/60 hover:text-primary cursor-pointer border-none bg-transparent"
                         title={t('dashboard.goToCheckin')}
                       >
                         <Icon icon={LuQrCode} />
                       </button>
                       <button
                         onClick={() => history.push(`/events/${event.objectId}`)}
-                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/40 hover:text-primary cursor-pointer border-none bg-transparent"
+                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/60 hover:text-primary cursor-pointer border-none bg-transparent"
                         title={t('dashboard.viewPublicPage')}
                       >
                         <Icon icon={LuLink} />
                       </button>
                       <button
                         onClick={() => handleDelete(event)}
-                        className="p-2 rounded-lg hover:bg-red-50 transition-colors text-primary/40 hover:text-red-600 cursor-pointer border-none bg-transparent"
+                        className="p-2 rounded-lg hover:bg-red-50 transition-colors text-primary/60 hover:text-red-600 cursor-pointer border-none bg-transparent"
                         title={t('dashboard.deleteEvent')}
                       >
                         <Icon icon={LuTrash2} />
@@ -305,7 +305,7 @@ export default function Dashboard() {
               ))}
               {paginated.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-primary/40">
+                  <td colSpan={5} className="py-8 text-center text-primary/60">
                     {t('dashboard.empty')}
                   </td>
                 </tr>
@@ -326,7 +326,7 @@ export default function Dashboard() {
                 setRowsPerPage(Number(e.target.value));
                 setPage(1);
               }}
-              className="border border-primary/20 rounded-lg px-2 py-1 text-sm text-primary bg-white focus:outline-none"
+              className="border border-primary/20 rounded-lg px-2 py-1 text-sm text-primary bg-surface focus:outline-none"
             >
               {ROWS_OPTIONS.map((n) => (
                 <option key={n} value={n}>
@@ -342,28 +342,28 @@ export default function Dashboard() {
             <button
               onClick={() => handlePageChange(1)}
               disabled={page === 1}
-              className="w-7 h-7 flex items-center justify-center rounded hover:bg-primary/10 disabled:opacity-30"
+              className="w-7 h-7 flex items-center justify-center rounded-lg border border-primary/15 bg-surface-2 text-primary transition-colors hover:bg-primary/10 disabled:text-primary/35 disabled:cursor-not-allowed"
             >
               <Icon icon={LuChevronsLeft} size={14} />
             </button>
             <button
               onClick={() => handlePageChange(page - 1)}
               disabled={page === 1}
-              className="w-7 h-7 flex items-center justify-center rounded hover:bg-primary/10 disabled:opacity-30"
+              className="w-7 h-7 flex items-center justify-center rounded-lg border border-primary/15 bg-surface-2 text-primary transition-colors hover:bg-primary/10 disabled:text-primary/35 disabled:cursor-not-allowed"
             >
               <Icon icon={LuChevronLeft} size={14} />
             </button>
             <button
               onClick={() => handlePageChange(page + 1)}
               disabled={page === totalPages}
-              className="w-7 h-7 flex items-center justify-center rounded hover:bg-primary/10 disabled:opacity-30"
+              className="w-7 h-7 flex items-center justify-center rounded-lg border border-primary/15 bg-surface-2 text-primary transition-colors hover:bg-primary/10 disabled:text-primary/35 disabled:cursor-not-allowed"
             >
               <Icon icon={LuChevronRight} size={14} />
             </button>
             <button
               onClick={() => handlePageChange(totalPages)}
               disabled={page === totalPages}
-              className="w-7 h-7 flex items-center justify-center rounded hover:bg-primary/10 disabled:opacity-30"
+              className="w-7 h-7 flex items-center justify-center rounded-lg border border-primary/15 bg-surface-2 text-primary transition-colors hover:bg-primary/10 disabled:text-primary/35 disabled:cursor-not-allowed"
             >
               <Icon icon={LuChevronsRight} size={14} />
             </button>

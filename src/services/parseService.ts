@@ -113,6 +113,10 @@ export const authService = {
     localStorage.removeItem(SESSION_TOKEN_KEY);
   },
 
+  async updateThemePreference(objectId: string, theme: 'light' | 'dark'): Promise<void> {
+    await parseClient.put(`/users/${objectId}`, { themePreference: theme });
+  },
+
   async getCurrentUser(): Promise<ParseObject | null> {
     const token = localStorage.getItem(SESSION_TOKEN_KEY);
     if (!token) return null;

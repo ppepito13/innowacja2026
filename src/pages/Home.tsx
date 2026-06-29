@@ -26,7 +26,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center w-full bg-background min-h-screen">
-      <section className="relative w-full overflow-hidden bg-primary px-6 py-28 flex flex-col items-center text-center">
+      <section className="relative w-full overflow-hidden bg-brand px-6 py-28 flex flex-col items-center text-center">
         <div className="absolute -top-24 -left-20 w-96 h-96 rounded-full bg-secondary/20 blur-3xl" />
         <div className="absolute -bottom-32 -right-16 w-[28rem] h-[28rem] rounded-full bg-secondary/15 blur-3xl" />
         <div className="absolute top-1/4 right-1/3 w-56 h-56 rounded-full bg-white/5 blur-2xl" />
@@ -76,7 +76,7 @@ export default function Home() {
                 <Link
                   key={event.objectId}
                   href={`/events/${event.objectId}`}
-                  className="group overflow-hidden rounded-3xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
+                  className="group overflow-hidden rounded-3xl bg-surface shadow-lg transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
                 >
                   <div className="relative h-48 overflow-hidden bg-primary/5">
                     {event.heroImageUrl ? (

@@ -88,47 +88,49 @@ export default function EventDetails() {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-[#111111] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-primary flex items-center justify-center">
         <Icon icon={LuLoaderCircle} size={32} className="animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0b1521] text-white font-sans relative pb-16 overflow-x-hidden">
-      <header className="bg-[#1f2937] p-4 flex items-center justify-between shadow-md relative z-20">
-        <div className="text-xl font-bold text-white">Commerzbank Events</div>
+    <div className="min-h-screen bg-background text-primary font-sans relative pb-16 overflow-x-hidden">
+      <header className="bg-surface p-4 flex items-center justify-between shadow-md relative z-20">
+        <div className="text-xl font-bold text-primary">{t('common.brand')}</div>
 
-        <div className="flex gap-2 text-sm">
-          {LANGUAGES.map(({ code, label }) => (
-            <button
-              key={code}
-              type="button"
-              onClick={() => i18n.changeLanguage(code)}
-              className={`cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide ${
-                i18n.language === code ? 'text-white' : 'text-gray-500 hover:text-gray-300'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+        <div className="flex items-center gap-3 text-sm">
+          <div className="flex gap-2">
+            {LANGUAGES.map(({ code, label }) => (
+              <button
+                key={code}
+                type="button"
+                onClick={() => i18n.changeLanguage(code)}
+                className={`cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide ${
+                  i18n.language === code ? 'text-primary' : 'text-primary/50 hover:text-primary/70'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
       <div className="w-full h-[35vh] sm:h-[50vh] relative z-0">
         <img src={event.heroImageUrl} alt={event.title} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0b1521]/40 to-[#0b1521]"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background"></div>
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-16 sm:-mt-40">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full min-w-0">
-          <section className="col-span-1 lg:col-span-7 bg-[#162436] rounded-xl shadow-2xl overflow-hidden min-w-0">
+          <section className="col-span-1 lg:col-span-7 bg-surface rounded-xl shadow-2xl overflow-hidden min-w-0">
             <div className="p-5 md:p-10">
-              <h1 className="text-2xl md:text-4xl font-bold mb-4 text-white tracking-tight">
+              <h1 className="text-2xl md:text-4xl font-bold mb-4 text-primary tracking-tight">
                 {event.title}
               </h1>
 
-              <div className="flex flex-wrap gap-6 text-sm text-gray-400 mb-8 pb-6 border-b border-gray-700/50">
+              <div className="flex flex-wrap gap-6 text-sm text-primary/60 mb-8 pb-6 border-b border-primary/10">
                 <div className="flex items-center gap-2">
                   <Icon icon={LuCalendarDays} size={16} />
                   <span>
@@ -156,7 +158,7 @@ export default function EventDetails() {
                     href={event.meetingLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                    className="flex items-center gap-2 text-primary/60 hover:text-primary transition-colors"
                   >
                     <Icon icon={LuLink} size={16} />
                     <span>{t('eventDetails.joinOnline')}</span>
@@ -165,16 +167,16 @@ export default function EventDetails() {
               </div>
 
               <div
-                className="prose prose-invert max-w-none text-gray-300 leading-relaxed text-sm md:text-base break-words overflow-x-auto w-full"
+                className="prose prose-invert max-w-none text-primary/70 leading-relaxed text-sm md:text-base break-words overflow-x-auto w-full"
                 dangerouslySetInnerHTML={{ __html: event.description || '' }}
               />
             </div>
           </section>
 
-          <section className="col-span-1 lg:col-span-5 bg-[#162436] rounded-xl shadow-2xl lg:sticky lg:top-8 overflow-hidden min-w-0">
+          <section className="col-span-1 lg:col-span-5 bg-surface rounded-xl shadow-2xl lg:sticky lg:top-8 overflow-hidden min-w-0">
             <div className="p-5 sm:p-8">
-              <h2 className="text-xl font-bold mb-1 text-white">{t('eventDetails.registerNow')}</h2>
-              <p className="text-sm text-gray-400 mb-8">{t('eventDetails.fillForm')}</p>
+              <h2 className="text-xl font-bold mb-1 text-primary">{t('eventDetails.registerNow')}</h2>
+              <p className="text-sm text-primary/60 mb-8">{t('eventDetails.fillForm')}</p>
 
               <form className="flex flex-col gap-6 w-full min-w-0">
                 {Object.entries(event.formConfig ?? {}).map(([key, config]) => {
@@ -184,7 +186,7 @@ export default function EventDetails() {
 
                   return (
                     <div key={key} className="w-full min-w-0 flex flex-col">
-                      <label htmlFor={key} className="block text-xs font-bold text-white mb-2 truncate">
+                      <label htmlFor={key} className="block text-xs font-bold text-primary mb-2 truncate">
                         {formatColumnName(key)}{' '}
                         {isRequired && <span className="text-red-500">*</span>}
                       </label>
@@ -202,7 +204,7 @@ export default function EventDetails() {
                               [key]: validateField(val, field),
                             }));
                           }}
-                          className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
+                          className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
                         />
                       )}
 
@@ -219,7 +221,7 @@ export default function EventDetails() {
                               [key]: validateField(val, field),
                             }));
                           }}
-                          className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
+                          className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
                         />
                       )}
 
@@ -236,7 +238,7 @@ export default function EventDetails() {
                               [key]: validateField(val, field),
                             }));
                           }}
-                          className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
+                          className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
                         />
                       )}
 
@@ -253,7 +255,7 @@ export default function EventDetails() {
                               [key]: validateField(val, field),
                             }));
                           }}
-                          className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
+                          className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
                         />
                       )}
 
@@ -270,7 +272,7 @@ export default function EventDetails() {
                                 [key]: validateField(val, field),
                               }));
                             }}
-                            className="w-full box-border bg-[#24364b] border border-transparent rounded-md pl-4 pr-10 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors appearance-none truncate"
+                            className="w-full box-border bg-surface-2 border border-transparent rounded-md pl-4 pr-10 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors appearance-none truncate"
                           >
                             <option value="" disabled hidden>
                               {t('eventDetails.selectOption')}
@@ -282,7 +284,7 @@ export default function EventDetails() {
                             ))}
                           </select>
 
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-primary/60">
                             <Icon icon={LuChevronDown} size={16} />
                           </div>
                         </div>
@@ -295,7 +297,7 @@ export default function EventDetails() {
                   );
                 })}
 
-                <div className="bg-[#1e2e40] border border-gray-600/50 rounded-md p-4 mt-2 w-full min-w-0">
+                <div className="bg-surface-2 border border-primary/15 rounded-md p-4 mt-2 w-full box-border min-w-0">
                   <div className="flex items-start gap-3">
                     <div className="flex items-center mt-1 shrink-0">
                       <input
@@ -303,18 +305,17 @@ export default function EventDetails() {
                         type="checkbox"
                         checked={consent}
                         onChange={(e) => setConsent(e.target.checked)}
-                        className="w-4 h-4 rounded-full border border-gray-500 bg-[#162436] focus:ring-0 cursor-pointer appearance-none checked:bg-current"
-                        style={{ color: event.primaryColor, borderColor: event.accentColor }}
+                        className="w-4 h-4 rounded-full border border-secondary bg-surface focus:ring-0 cursor-pointer appearance-none checked:bg-secondary"
                       />
                     </div>
                     <div>
                       <label
                         htmlFor="consent"
-                        className="text-sm font-medium text-white cursor-pointer block mb-1 break-words"
+                        className="text-sm font-medium text-primary cursor-pointer block mb-1 break-words"
                       >
                         {t('eventDetails.dataConsent')} <span className="text-red-500">*</span>
                       </label>
-                      <p className="text-xs text-gray-300">
+                      <p className="text-xs text-primary/70">
                         {t('eventDetails.readMoreIn')}{' '}
                         <a
                           href={
@@ -324,7 +325,7 @@ export default function EventDetails() {
                           }
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="underline text-gray-200 hover:text-white"
+                          className="underline text-primary/80 hover:text-primary"
                         >
                           {t('eventDetails.termsAndConditions')}
                         </a>
@@ -334,12 +335,11 @@ export default function EventDetails() {
                   </div>
                 </div>
 
-                <p className="text-[11px] text-gray-400 -mt-2">* {t('eventDetails.requiredField')}</p>
+                <p className="text-[11px] text-primary/60 -mt-2">* {t('eventDetails.requiredField')}</p>
 
                 <button
                   type="button"
-                  className="w-full mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                  style={{ backgroundColor: event.accentColor }}
+                  className="w-full box-border mt-2 py-3 px-4 rounded-md bg-secondary text-brand font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                   onClick={handleSubmit}
                   disabled={loading || !isFormValid}
                 >
