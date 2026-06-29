@@ -1,20 +1,129 @@
-import React from 'react';
-import './App.css';
-import {
-    Spinner
-} from "@lsg/components";
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
+import { AuthProvider } from './auth/AuthProvider';
+import { ThemeProvider } from './theme/ThemeProvider';
+import ProtectedRoute from './auth/ProtectedRoute';
+
+import Layout from './components/Layout';
+import AdminLayout from './components/AdminLayout';
+
+// Public pages
+import Home from './pages/Home';
+import EventDetails from './pages/EventDetails';
+import AdminLogin from './pages/AdminLogin';
+
+// Admin pages
+import Dashboard from './pages/admin/Dashboard';
+import EventManagement from './pages/admin/EventManagement';
+import Registrations from './pages/admin/Registrations';
+import RegistrationEdit from './pages/admin/RegistrationEdit';
+import CheckIn from './pages/admin/CheckIn';
+import Users from './pages/admin/Users';
+import UserNew from './pages/admin/UserNew';
+import UserEdit from './pages/admin/UserEdit';
+import Account from './pages/admin/Account';
+
+// Test page
+import Test from './pages/Test';
+import FormConfig from './pages/FormConfig';
+
+const EventManagementNew = () => <EventManagement mode="new" />;
+const EventManagementEdit = () => <EventManagement mode="edit" />;
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <Spinner />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-      </header>
-    </div>
+    <AuthProvider>
+      <ThemeProvider>
+        <Router>
+        <Switch>
+          {/* Public Fullscreen Routes */}
+          <Route exact path="/events/:eventId" component={EventDetails} />
+
+          {/* Admin routes — sidebar layout */}
+          <Route path="/admin">
+            <AdminLayout>
+              <Switch>
+                {/* Admin Routes */}
+                <ProtectedRoute
+                  exact
+                  path="/admin"
+                  component={Dashboard}
+                  requiredRole={['Admin', 'Organizer']}
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/events/new"
+                  component={EventManagementNew}
+                  requiredRole={['Admin', 'Organizer']}
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/events/:id/edit"
+                  component={EventManagementEdit}
+                  requiredRole={['Admin', 'Organizer']}
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/events/:id/formconfig"
+                  component={FormConfig}
+                  requiredRole={['Admin', 'Organizer']}
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/registrations/:eventId"
+                  component={Registrations}
+                  requiredRole={['Admin', 'Organizer']}
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/registrations/:eventId/:registrationId/edit"
+                  component={RegistrationEdit}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/check-in/:eventId?"
+                  component={CheckIn}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute exact path="/admin/users" component={Users} requiredRole="Admin" />
+                <ProtectedRoute
+                  exact
+                  path="/admin/users/new"
+                  component={UserNew}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/users/:id/edit"
+                  component={UserEdit}
+                  requiredRole="Admin"
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/account"
+                  component={Account}
+                  requiredRole={['Admin', 'Organizer']}
+                />
+              </Switch>
+            </AdminLayout>
+          </Route>
+
+          {/* Public routes — original Layout */}
+          <Route>
+            <Layout>
+              <Switch>
+                <Route exact path="/login" component={AdminLogin} />
+                <Route exact path="/test" component={Test} />
+                <Route exact path="/formconfig" component={FormConfig} />
+                <Route exact path="/" component={Home} />
+              </Switch>
+            </Layout>
+            </Route>
+          </Switch>
+        </Router>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 

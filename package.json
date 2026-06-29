@@ -2,7 +2,8 @@
   "name": "innowacje2026",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://192.168.66.24",
+  "proxy": "https://192.168.66.24:1337",
+  "homepage": "/",
   "dependencies": {
     "@lsg/components": "./biblioteki/components-17.10.0.tgz",
     "@lsg/icons": "./biblioteki/icons-0.5.0.tgz",
@@ -19,10 +20,22 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.126",
+    "@types/parse": "^3.0.9",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "axios": "^1.16.0",
+    "bcryptjs": "^3.0.3",
+    "html5-qrcode": "^2.3.8",
+    "i18next": "^26.2.0",
+    "i18next-browser-languagedetector": "^8.2.1",
+    "parse": "^8.6.0",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-i18next": "^17.0.8",
+    "react-icons": "^5.6.0",
+    "react-router": "^5.3.4",
+    "react-router-dom": "^5.3.4",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
@@ -54,5 +67,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/react-router-dom": "^5.3.3",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.14",
+    "tailwindcss": "^3.4.19"
   }
 }

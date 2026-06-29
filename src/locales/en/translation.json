@@ -1,0 +1,346 @@
+{
+  "common": {
+    "brand": "Commerzbank Events",
+    "loading": "Loading...",
+    "boolean": {
+      "true": "Yes",
+      "false": "No"
+    }
+  },
+  "layout": {
+    "projectName": "Innovation Project",
+    "events": "Events",
+    "account": "Account"
+  },
+  "theme": {
+    "toggleToDark": "Switch to dark mode",
+    "toggleToLight": "Switch to light mode"
+  },
+  "home": {
+    "heroTitle": "Connect. Code. Celebrate.",
+    "heroSubtitle": "Commerzbank Łódź Event Registration",
+    "activeEvents": "Active Events",
+    "loading": "Loading events...",
+    "loadError": "Could not load events. Please try again later.",
+    "noEvents": "There are no active events right now.",
+    "noImage": "No image"
+  },
+  "nav": {
+    "brand": "Admin Panel",
+    "brandSub": "Commerzbank Events",
+    "events": "Events",
+    "checkIn": "Check-In",
+    "users": "Users",
+    "account": "Account Settings",
+    "minimize": "Minimize Menu",
+    "logout": "Log out"
+  },
+  "login": {
+    "title": "Login",
+    "description": "Login to access protected routes",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Login",
+    "pending": "Logging in",
+    "error": "Invalid credentials. Please try again."
+  },
+  "account": {
+    "title": "Account",
+    "description": "View your account details",
+    "username": "Username",
+    "email": "Email",
+    "role": "Role",
+    "appearance": {
+      "title": "Appearance",
+      "description": "Choose between light and dark mode.",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "logout": {
+      "idle": "Logout",
+      "pending": "Logging out"
+    }
+  },
+  "registrations": {
+    "title": "Registrations - {{title}}",
+    "description": "View and manage event registrations",
+    "export": "Export",
+    "filters": {
+      "search": "Search",
+      "from": "From",
+      "to": "To"
+    },
+    "noRegistrations": "No registrations found",
+    "approve": "Approve registration",
+    "reject": "Reject registration",
+    "details": {
+      "title": "Registration details",
+      "status": {
+        "approved": "Approved",
+        "pending": "Pending",
+        "rejected": "Rejected"
+      },
+      "date": "Date",
+      "qrCode": "Check-in QR code",
+      "qrLoading": "Generating QR code…",
+      "qrError": "Could not generate QR code."
+    },
+    "actions": "Actions",
+    "pagination": {
+      "current": "Page",
+      "total": "of"
+    },
+    "loading": "Loading data",
+    "error": "Error"
+  },
+  "dashboard": {
+    "title": "Events",
+    "subtitle": "Manage your events and view their status.",
+    "addEvent": "New Event",
+    "allEvents": "All Events",
+    "allEventsDescription": "Below is a list of events you have access to.",
+    "search": "Search events...",
+    "filter": {
+      "all": "All Statuses",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "found": "Found {{count}} events",
+    "loading": "Loading...",
+    "empty": "No events found.",
+    "col": {
+      "active": "Active",
+      "name": "Event Name",
+      "date": "Date",
+      "location": "Location",
+      "actions": "Actions"
+    },
+    "virtual": "Virtual",
+    "onSite": "On-site",
+    "rowsPerPage": "Rows per page",
+    "page": "Page",
+    "of": "of",
+    "deleteConfirm": "Are you sure you want to delete \"{{title}}\"?",
+    "editEvent": "Edit event",
+    "goToRegistrations": "Go to registrations",
+    "goToCheckin": "Go to check-in",
+    "viewPublicPage": "View public page",
+    "deleteEvent": "Delete event"
+  },
+  "eventManagement": {
+    "new": {
+      "title": "New Event",
+      "subtitle": "Fill in the details to create a new event",
+      "submit": {
+        "idle": "Create Event",
+        "pending": "Creating"
+      }
+    },
+    "edit": {
+      "title": "Edit Event",
+      "subtitle": "Update the details for \"{{title}}\"",
+      "submit": {
+        "idle": "Save",
+        "pending": "Saving"
+      }
+    },
+    "cancel": "Cancel",
+    "loading": "Loading data",
+    "editFormConfig": "Edit form config",
+    "error": "Error",
+    "sections": {
+      "colors": "Color System",
+      "heroImage": "Hero Image",
+      "registration": "Registration Confirmation"
+    },
+    "fields": {
+      "title": "Event Name",
+      "requiresApproval": "Require Organizer Confirmation",
+      "requiresApprovalHint": "If enabled, registrations will be pending until an organizer approves them manually.",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe your event...",
+      "dateType": "Date Type",
+      "dateTypeSingle": "Single-day event",
+      "dateTypeMulti": "Multi-day event",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "eventFormat": "Event Format",
+      "formatVirtual": "Virtual",
+      "formatOnSite": "On-site",
+      "formatHybrid": "Hybrid",
+      "locationVirtual": "Meeting Link",
+      "locationVirtualPlaceholder": "https://meet.example.com/...",
+      "locationOnSite": "Address",
+      "locationOnSitePlaceholder": "Street address Postal code, City",
+      "primaryColor": "Primary Color",
+      "accentColor": "Accent Color",
+      "heroImageUrl": "Image URL",
+      "heroImagePreview": "Hero image preview",
+      "dataProcessingAgreement": "Data Processing Agreement URL",
+      "upload": "Upload",
+      "uploading": "Uploading..."
+    }
+  },
+  "registrationEdit": {
+    "title": "Edit Registration",
+    "cancel": "Cancel",
+    "save": {
+      "idle": "Save",
+      "pending": "Saving"
+    },
+    "loading": "Loading data",
+    "error": "Error"
+  },
+  "eventDetails": {
+    "registerNow": "Register Now",
+    "fillForm": "Fill out the form below to secure your spot.",
+    "fullName": "Full Name",
+    "email": "Email Address",
+    "dropdown": "Dropdown",
+    "selectOption": "Select option",
+    "option1": "Option 1",
+    "option2": "Option 2",
+    "option3": "Option 3",
+    "dataConsent": "Data Processing Consent",
+    "readMoreIn": "Read more in",
+    "termsAndConditions": "terms and conditions",
+    "requiredField": "Required field.",
+    "register": "Register",
+    "joinOnline": "Join online"
+  },
+  "formConfig": {
+    "title": "Form Builder",
+    "subtitle": "Define custom registration fields for your event",
+    "showJson": "Show JSON",
+    "hideJson": "Hide JSON",
+    "save": "Save formConfig",
+    "saved": "Saved",
+    "addField": "Add Field",
+    "removeField": "Remove field",
+    "label": "Label",
+    "labelPlaceholder": "e.g. Full Name",
+    "placeholder": "Placeholder",
+    "placeholderPlaceholder": "e.g. John Doe",
+    "type": "Type",
+    "required": "Required",
+    "options": "Options",
+    "option": "Option",
+    "addOption": "Add Option",
+    "removeOption": "Remove option",
+    "fieldType": {
+      "text": "Text",
+      "email": "Email",
+      "phone": "Phone",
+      "textarea": "Textarea",
+      "checkbox": "Checkbox (agreement)",
+      "radio": "Single Choice (Radio)",
+      "multiselect": "Multiple Choice (Checkbox)",
+      "dropdown": "Dropdown (Single Choice)"
+    },
+    "errors": {
+      "labelRequired": "Label is required",
+      "duplicateLabel": "Duplicate label",
+      "optionRequired": "At least one option is required",
+      "validationFailed": "Schema validation failed — fix highlighted fields before saving."
+    },
+    "register": "Register",
+    "validation": {
+      "required": "This field is required",
+      "email": "Invalid email address",
+      "phone": "Invalid phone number",
+      "number": "Must be a number"
+    },
+    "success": "You have been registered successfully"
+  },
+  "users": {
+    "title": "Users",
+    "description": "Manage users and their permissions.",
+    "addUser": "Add User",
+    "allUsers": "All Users",
+    "allUsersDescription": "View, edit, and delete system users.",
+    "search": "Search users...",
+    "allRoles": "All Roles",
+    "found": "Found {{count}} users",
+    "columns": {
+      "user": "User",
+      "role": "Role",
+      "lastLogin": "Last Login",
+      "actions": "Actions"
+    },
+    "roles": {
+      "Admin": "Administrator",
+      "Organizer": "Organizer"
+    },
+    "noUsers": "No users found.",
+    "deleteConfirm": "Are you sure you want to delete this user?",
+    "new": {
+      "title": "Add New User",
+      "description": "Enter the details to create a new account.",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "emailHint": "This will be the user's login.",
+      "password": "Password",
+      "passwordHint": "Default password is \"password\". User can change it after first login.",
+      "role": "Role",
+      "roleHint": "Access only to assigned events.",
+      "cancel": "Cancel",
+      "submit": "Add User",
+      "pending": "Creating"
+    },
+    "edit": {
+      "title": "Edit User",
+      "description": "Modify user details for \"{{name}}\".",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "emailHint": "This will be the user's login.",
+      "newPassword": "New Password",
+      "passwordHint": "Leave empty to keep current password.",
+      "role": "Role",
+      "lockAccount": "Lock account",
+      "lockAccountHint": "User will not be able to log in.",
+      "cancel": "Cancel",
+      "submit": "Save Changes",
+      "pending": "Saving"
+    }
+  },
+  "checkIn": {
+    "title": "Event Check-in",
+    "subtitle": "Scan QR codes or manually check in attendees for an event.",
+    "export": "Export",
+    "recentScans": "Recent scans",
+    "tabs": {
+      "qrScanner": "QR Scanner",
+      "manual": "Manual Check-in"
+    },
+    "scanner": {
+      "title": "QR Code Scanner",
+      "description": "Point the camera at an attendee's QR code to check them in.",
+      "start": "Start Scanner",
+      "stop": "Stop Scanner",
+      "successTitle": "Success!",
+      "successInlineTitle": "Check-in Successful!",
+      "success": "{{name}}: Check-in successful!",
+      "warningTitle": "Scan Result",
+      "warning": "{{name}}: User already checked in at {{time}}.",
+      "errorTitle": "Scan Failed",
+      "error": "{{name}}: {{message}}",
+      "invalidCode": "This QR code is invalid or has been tampered with.",
+      "notApproved": "Registration is not approved.",
+      "notFound": "Registration not found.",
+      "wrongEvent": "This ticket is for a different event."
+    },
+    "manual": {
+      "title": "Manual Attendee List",
+      "description": "Search for an attendee and manually toggle their check-in status.",
+      "search": "Search by name or email...",
+      "attendee": "Attendee",
+      "status": "Status",
+      "action": "Action",
+      "noResults": "No attendees found.",
+      "checkedIn": "Checked-In",
+      "notPresent": "Not Present",
+      "undo": "Undo Check-in",
+      "checkInBtn": "Check-in"
+    }
+  }
+}

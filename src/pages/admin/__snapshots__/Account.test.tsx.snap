@@ -1,0 +1,84 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Account Renders properly 1`] = `
+<DocumentFragment>
+  <div
+    class="flex flex-col bg-white px-8 py-4 rounded-2xl w-[512px]"
+  >
+    <div
+      class="flex flex-col mb-4"
+    >
+      <h1
+        class="text-3xl mb-0"
+      >
+        account.title
+      </h1>
+      <p
+        class="text-lg mt-0 text-primary/75"
+      >
+        account.description
+      </p>
+    </div>
+    <div
+      class="flex flex-col gap-2 text-primary"
+    >
+      <div
+        class="flex justify-between border-b border-primary/10 py-2"
+      >
+        <span
+          class="text-primary/60"
+        >
+          account.username
+        </span>
+        <span>
+          admin
+        </span>
+      </div>
+      <div
+        class="flex justify-between border-b border-primary/10 py-2"
+      >
+        <span
+          class="text-primary/60"
+        >
+          account.email
+        </span>
+        <span>
+          admin@example.com
+        </span>
+      </div>
+      <div
+        class="flex justify-between border-b border-primary/10 py-2"
+      >
+        <span
+          class="text-primary/60"
+        >
+          account.role
+        </span>
+        <span>
+          Admin
+        </span>
+      </div>
+    </div>
+    <div
+      class="flex items-center justify-end mt-4 pb-4"
+    >
+      <button
+        class="scale-75"
+        data-testid="logout-button"
+        look="secondary"
+      >
+        <span
+          class="flex flex-row items-center gap-2"
+        >
+          <span
+            data-testid="icon"
+          />
+          <span>
+            account.logout.idle
+          </span>
+        </span>
+      </button>
+    </div>
+  </div>
+</DocumentFragment>
+`;
