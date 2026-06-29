@@ -1,0 +1,81 @@
+.rte .ql-toolbar.ql-snow,
+.rte .ql-container.ql-snow {
+  border-color: rgb(var(--color-primary) / 0.2);
+}
+
+.rte .ql-toolbar.ql-snow {
+  background: rgb(var(--color-surface-2));
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.rte .ql-container.ql-snow {
+  background: rgb(var(--color-surface));
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.rte .ql-editor {
+  min-height: 180px;
+  color: rgb(var(--color-primary));
+}
+
+.rte .ql-editor.ql-blank::before {
+  color: rgb(var(--color-primary) / 0.45);
+  font-style: normal;
+}
+
+/* Toolbar icons + labels */
+.rte .ql-snow .ql-stroke {
+  stroke: rgb(var(--color-primary) / 0.85);
+}
+.rte .ql-snow .ql-fill {
+  fill: rgb(var(--color-primary) / 0.85);
+}
+.rte .ql-snow .ql-picker {
+  color: rgb(var(--color-primary) / 0.85);
+}
+
+.rte .ql-snow.ql-toolbar button:hover .ql-stroke,
+.rte .ql-snow.ql-toolbar button:focus .ql-stroke {
+  stroke: rgb(var(--color-primary));
+}
+.rte .ql-snow.ql-toolbar button:hover .ql-fill,
+.rte .ql-snow.ql-toolbar button:focus .ql-fill {
+  fill: rgb(var(--color-primary));
+}
+
+.rte .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+.rte .ql-snow .ql-toolbar button.ql-active .ql-stroke,
+.rte .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke {
+  stroke: #ffd700;
+}
+.rte .ql-snow.ql-toolbar button.ql-active .ql-fill,
+.rte .ql-snow .ql-toolbar button.ql-active .ql-fill {
+  fill: #ffd700;
+}
+.rte .ql-snow.ql-toolbar button.ql-active,
+.rte .ql-snow.ql-toolbar .ql-picker-label.ql-active {
+  color: #ffd700;
+}
+
+.rte .ql-snow .ql-picker-options {
+  background: rgb(var(--color-surface-2));
+  border-color: rgb(var(--color-primary) / 0.2);
+}
+.rte .ql-snow .ql-tooltip {
+  background: rgb(var(--color-surface-2));
+  color: rgb(var(--color-primary));
+  border-color: rgb(var(--color-primary) / 0.2);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.3);
+}
+.rte .ql-snow .ql-tooltip input[type='text'] {
+  background: rgb(var(--color-surface));
+  border-color: rgb(var(--color-primary) / 0.2);
+  color: rgb(var(--color-primary));
+}
+.rte .ql-snow .ql-tooltip a {
+  color: #ffd700;
+}
