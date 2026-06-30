@@ -301,7 +301,7 @@ export default function RegistrationsList() {
               <button
                 onClick={exportCSV}
                 disabled={registrations.length === 0}
-                className="flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-[#0b1521] px-3 text-sm font-semibold text-white transition hover:border-white/20 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-[#0b1521] px-3 text-sm font-semibold text-white transition hover:border-white/20 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Icon icon={LuDownload} size={14} />
                 CSV
@@ -309,7 +309,7 @@ export default function RegistrationsList() {
               <button
                 onClick={exportExcel}
                 disabled={registrations.length === 0}
-                className="flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-[#0b1521] px-3 text-sm font-semibold text-white transition hover:border-white/20 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-[#0b1521] px-3 text-sm font-semibold text-white transition hover:border-white/20 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Icon icon={LuDownload} size={14} />
                 Excel
@@ -441,14 +441,14 @@ export default function RegistrationsList() {
                       <td className="px-4 py-3">
                         <div className="relative flex items-center justify-center gap-1.5">
                           <button
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-transparent text-slate-400 transition hover:border-white/20 hover:text-white active:scale-95"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-transparent text-slate-400 transition hover:border-white/20 hover:text-white active:scale-95 cursor-pointer"
                             onClick={() => setSelectedRegistration(reg)}
                           >
                             <Icon icon={LuEye} size={14} />
                           </button>
 
                           <button
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-transparent text-slate-400 transition hover:border-white/20 hover:text-white active:scale-95"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-transparent text-slate-400 transition hover:border-white/20 hover:text-white active:scale-95 cursor-pointer"
                             onClick={() =>
                               history.push(
                                 `/admin/registrations/${selectedEventId}/${reg.objectId}/edit`,
@@ -461,7 +461,7 @@ export default function RegistrationsList() {
                           <button
                             disabled={reg.status === 'approved'}
                             className={`flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-transparent text-slate-400 transition hover:border-white/20 hover:text-white active:scale-95 ${
-                              reg.status === 'approved' ? 'cursor-not-allowed opacity-40' : ''
+                              reg.status === 'approved' ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'
                             }`}
                             onClick={() =>
                               reg.status !== 'approved' &&
@@ -474,16 +474,16 @@ export default function RegistrationsList() {
                           </button>
 
                           {openedActionId === reg.objectId && (
-                            <div className="absolute right-0 top-10 z-50 w-44 rounded-xl border border-white/10 bg-[#0f172a] shadow-xl">
+                            <div className="absolute right-0 top-10 z-50 w-44 rounded-xl border border-white/10 bg-slate-900 shadow-xl">
                               <button
-                                className="flex w-full items-center gap-2 rounded-t-xl px-3 py-2 text-xs text-slate-300 hover:bg-white/5"
+                                className="flex w-full items-center gap-2 rounded-t-xl px-3 py-2 bg-transparent text-xs text-slate-300 hover:bg-white/5 cursor-pointer"
                                 onClick={() => updateStatus(reg.objectId, 'approved')}
                               >
                                 <Icon icon={LuCircleCheck} size={13} />
                                 {t('registrationsList.approve')}
                               </button>
                               <button
-                                className="flex w-full items-center gap-2 rounded-b-xl px-3 py-2 text-xs text-slate-300 hover:bg-white/5"
+                                className="flex w-full items-center gap-2 rounded-b-xl px-3 py-2 bg-transparent text-xs text-slate-300 hover:bg-white/5 cursor-pointer"
                                 onClick={() => updateStatus(reg.objectId, 'pending')}
                               >
                                 <Icon icon={LuCircleX} size={13} />
