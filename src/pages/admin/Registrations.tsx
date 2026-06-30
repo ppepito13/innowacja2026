@@ -53,6 +53,17 @@ export default function Registrations() {
   const [qrError, setQrError] = useState<boolean>(false);
 
   useEffect(() => {
+    if (!openedActionId) return;
+    const onPointerDown = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest('[data-action-menu]')) {
+        setOpenedActionId(null);
+      }
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    return () => document.removeEventListener('mousedown', onPointerDown);
+  }, [openedActionId]);
+
+  useEffect(() => {
     setLoading(true);
     setError(null);
 
@@ -359,7 +370,10 @@ export default function Registrations() {
                   const { objectId, status, isCheckedIn } = JSON.parse(value);
 
                   return (
-                    <div className="relative flex gap-2 justify-center">
+                    <div
+                      className="relative flex gap-2 justify-center"
+                      data-action-menu={openedActionId === objectId ? '' : undefined}
+                    >
                       <button
                         className={`w-8 h-8 flex items-center justify-center rounded-lg border p-2 transition active:scale-95 ${
                           isCheckedIn
