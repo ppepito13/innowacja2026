@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import DOMPurify from 'dompurify';
 import { LuCircleAlert } from 'react-icons/lu';
 import Icon from '../components/Icon';
 import { Link } from '@lsg/components';
@@ -97,9 +98,9 @@ export default function Home() {
                     <h3 className="mb-2 line-clamp-1 text-lg font-bold text-primary">
                       {event.title}
                     </h3>
-                    <p
+                    <div
                       className="line-clamp-3 text-sm text-primary/60"
-                      dangerouslySetInnerHTML={{ __html: event.description || '' }}
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.description || '') }}
                     />
                   </div>
                 </Link>

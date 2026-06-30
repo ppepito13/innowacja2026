@@ -5,6 +5,7 @@ import { Event } from '../types/types';
 import { formatColumnName, formatDate } from '../utils/formatters';
 import { parseService, createPointer } from '../services/parseService';
 import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle, LuLink } from 'react-icons/lu';
+import DOMPurify from 'dompurify';
 import Icon from '../components/Icon';
 import { EMAIL_REGEX, PHONE_REGEX } from '../utils/regex';
 import parseClient from '../services/parseClient';
@@ -167,8 +168,8 @@ export default function EventDetails() {
               </div>
 
               <div
-                className="prose prose-invert max-w-none text-primary/70 leading-relaxed text-sm md:text-base break-words overflow-x-auto w-full"
-                dangerouslySetInnerHTML={{ __html: event.description || '' }}
+                className="rte-content max-w-none text-primary/70 leading-relaxed text-sm md:text-base break-words overflow-x-auto w-full"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.description || '') }}
               />
             </div>
           </section>
