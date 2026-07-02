@@ -16,6 +16,8 @@ import {
   EVENT_CLASS,
   DEFAULT_PRIMARY_COLOR,
   DEFAULT_ACCENT_COLOR,
+  MAP_IFRAME_WIDTH,
+  MAP_IFRAME_HEIGHT,
 } from '../../constants/eventDefaults';
 import { useAuth } from '../../auth/AuthProvider';
 
@@ -184,6 +186,8 @@ export default function EventManagement({ mode }: Props) {
     );
   }
 
+  const showMapEmbed = event?.eventFormat === 'on-site' || event?.eventFormat === 'hybrid';
+
   return (
     <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-2xl">
       <div className="flex flex-row items-center justify-between mb-2">
@@ -286,6 +290,23 @@ export default function EventManagement({ mode }: Props) {
             onChange={(v) => handleFieldChange('meetingLink', String(v))}
           />
         )}
+        {showMapEmbed && event?.location && (
+          <div className="flex flex-col gap-1 mb-6">
+            <label className="block text-xs font-medium text-primary/70">
+              {tt('fields.locationPreview')}
+            </label>
+            <iframe
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(event.location)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+              title={tt('fields.locationPreview')}
+              width={MAP_IFRAME_WIDTH}
+              height={MAP_IFRAME_HEIGHT}
+              style={{ border: 0 }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="mt-2 rounded-lg border border-primary/10 w-full"
+            />
+          </div>
+        )}
         <p className="text-sm font-semibold text-primary mt-3">{tt('sections.registration')}</p>
         <div className="flex items-start justify-between gap-4 rounded-lg border border-primary/10 p-4">
           <div className="flex flex-col">
@@ -384,9 +405,9 @@ export default function EventManagement({ mode }: Props) {
           {t('eventManagement.cancel')}
         </button>
         <button
-            type="button"
-            onClick={() => history.push(`/admin/events/${id}/formconfig`)}
-            className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
+          type="button"
+          onClick={() => history.push(`/admin/events/${id}/formconfig`)}
+          className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
         >
           {t('eventManagement.editFormConfig')}
         </button>
