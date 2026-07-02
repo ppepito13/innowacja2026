@@ -6,8 +6,19 @@ import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import { useTheme } from '../../theme/ThemeProvider';
 
+const LANGUAGES = [
+  {
+    code: 'en',
+    label: 'English',
+  },
+  {
+    code: 'pl',
+    label: 'Polski',
+  },
+];
+
 export default function Account() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const history = useHistory();
   const { user, loading, logout } = useAuth();
   const { theme, setTheme } = useTheme();
@@ -74,6 +85,32 @@ export default function Account() {
         </div>
       </div>
 
+      {/* LANGUAGE */}
+      <div className="flex flex-col mt-6">
+        <h2 className="text-xl mb-0">{t('account.language.title')}</h2>
+        <p className="text-sm mt-1 mb-3 text-primary/60">{t('account.language.description')}</p>
+        <div className="flex gap-3">
+          {LANGUAGES.map(({ code, label }) => {
+            const active = i18n.language === code;
+            return (
+              <button
+                key={code}
+                type="button"
+                onClick={() => i18n.changeLanguage(code)}
+                aria-pressed={active}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors cursor-pointer ${
+                  active
+                    ? 'bg-secondary border-secondary text-brand'
+                    : 'bg-surface-2 border-primary/15 text-primary/80 hover:text-primary hover:border-primary/30'
+                }`}
+              >
+                <span>{label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* ACTIONS */}
       <div className="flex items-center justify-end mt-4 pb-4">
         <button
@@ -84,9 +121,7 @@ export default function Account() {
           className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/20 text-primary text-sm font-semibold transition-colors cursor-pointer hover:bg-primary/5 disabled:opacity-50"
         >
           <Icon icon={LuLogOut} size={16} />
-          <span>
-            {loggingOut ? `${t('account.logout.pending')}...` : t('account.logout.idle')}
-          </span>
+          <span>{loggingOut ? `${t('account.logout.pending')}...` : t('account.logout.idle')}</span>
         </button>
       </div>
     </div>
