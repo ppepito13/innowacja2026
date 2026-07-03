@@ -184,6 +184,12 @@
       "dataProcessingAgreement": "Data Processing Agreement URL",
       "upload": "Upload",
       "uploading": "Uploading..."
+    },
+    "validation": {
+      "fillRequired": "Please fill in all required fields",
+      "titleRequired": "Event name is required",
+      "startDateRequired": "Start date is required",
+      "endDateRequired": "End date is required"
     }
   },
   "registrationEdit": {
