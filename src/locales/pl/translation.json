@@ -56,6 +56,10 @@
       "light": "Jasny",
       "dark": "Ciemny"
     },
+    "language": {
+      "title": "Język",
+      "description": "Wybierz swój język."
+    },
     "logout": {
       "idle": "Wyloguj się",
       "pending": "Wylogowywanie"
