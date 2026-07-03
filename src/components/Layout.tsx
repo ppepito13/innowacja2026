@@ -30,7 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Link href="/">{t('common.brand')}</Link>
 
         <nav className="flex items-center gap-4">
-          <Link href="#events">{t('layout.events')}</Link>
+          <Link href="/#events">{t('layout.events')}</Link>
 
           {user && <Link href="/admin/account">{t('layout.account')}</Link>}
         </nav>
