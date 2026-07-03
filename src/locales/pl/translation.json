@@ -176,6 +176,7 @@
       "locationVirtualPlaceholder": "https://meet.example.com/...",
       "locationOnSite": "Adres",
       "locationOnSitePlaceholder": "Ulica i numer Kod pocztowy, Miasto",
+      "locationPreview": "Podgląd lokalizacji wydarzenia",
       "primaryColor": "Kolor główny",
       "accentColor": "Kolor akcentu",
       "heroImageUrl": "URL zdjęcia",
@@ -196,6 +197,7 @@
     "error": "Błąd"
   },
   "eventDetails": {
+    "locationPreview": "Podgląd Lokalizacji",
     "registerNow": "Zarejestruj się teraz",
     "fillForm": "Wypełnij poniższy formularz, aby zarezerwować miejsce.",
     "fullName": "Imię i nazwisko",

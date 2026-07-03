@@ -176,6 +176,7 @@
       "locationVirtualPlaceholder": "https://meet.example.com/...",
       "locationOnSite": "Address",
       "locationOnSitePlaceholder": "Street address Postal code, City",
+      "locationPreview": "Event location preview",
       "primaryColor": "Primary Color",
       "accentColor": "Accent Color",
       "heroImageUrl": "Image URL",
@@ -196,6 +197,7 @@
     "error": "Error"
   },
   "eventDetails": {
+    "locationPreview": "Location Preview",
     "registerNow": "Register Now",
     "fillForm": "Fill out the form below to secure your spot.",
     "fullName": "Full Name",

@@ -9,6 +9,7 @@ import DOMPurify from 'dompurify';
 import Icon from '../components/Icon';
 import { EMAIL_REGEX, PHONE_REGEX } from '../utils/regex';
 import parseClient from '../services/parseClient';
+import { MAP_IFRAME_WIDTH, MAP_IFRAME_HEIGHT } from '../constants/eventDefaults';
 
 const LANGUAGES = [
   { code: 'en', label: 'EN' },
@@ -28,9 +29,11 @@ export default function EventDetails() {
 
   useEffect(() => {
     if (!eventId) return;
-    parseClient.get(`/classes/TestEvent/${eventId}`, {
-      headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY }
-    }).then(({ data }) => setEvent(data));
+    parseClient
+      .get(`/classes/TestEvent/${eventId}`, {
+        headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY },
+      })
+      .then(({ data }) => setEvent(data));
   }, [eventId]);
 
   const validateField = (value: string, field: any) => {
@@ -94,6 +97,8 @@ export default function EventDetails() {
       </div>
     );
   }
+
+  const showMapEmbed = event.eventFormat === 'on-site' || event.eventFormat === 'hybrid';
 
   return (
     <div className="min-h-screen bg-background text-primary font-sans relative pb-16 overflow-x-hidden">
@@ -172,6 +177,21 @@ export default function EventDetails() {
                 )}
               </div>
 
+              {showMapEmbed && event.location && (
+                <div className="mb-8">
+                  <iframe
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(event.location)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                    title={`${t('eventDetails.locationPreview')}`}
+                    width={MAP_IFRAME_WIDTH}
+                    height={MAP_IFRAME_HEIGHT}
+                    style={{ border: 0 }}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="rounded-lg border border-primary/10 max-w-full w-full"
+                  />
+                </div>
+              )}
+
               <div
                 className="rte-content max-w-none text-primary/70 leading-relaxed text-sm md:text-base break-words overflow-x-auto w-full"
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.description || '') }}
@@ -181,7 +201,9 @@ export default function EventDetails() {
 
           <section className="col-span-1 lg:col-span-5 bg-surface rounded-xl shadow-2xl lg:sticky lg:top-8 overflow-hidden min-w-0">
             <div className="p-5 sm:p-8">
-              <h2 className="text-xl font-bold mb-1 text-primary">{t('eventDetails.registerNow')}</h2>
+              <h2 className="text-xl font-bold mb-1 text-primary">
+                {t('eventDetails.registerNow')}
+              </h2>
               <p className="text-sm text-primary/60 mb-8">{t('eventDetails.fillForm')}</p>
 
               <form className="flex flex-col gap-6 w-full min-w-0">
@@ -192,7 +214,10 @@ export default function EventDetails() {
 
                   return (
                     <div key={key} className="w-full min-w-0 flex flex-col">
-                      <label htmlFor={key} className="block text-xs font-bold text-primary mb-2 truncate">
+                      <label
+                        htmlFor={key}
+                        className="block text-xs font-bold text-primary mb-2 truncate"
+                      >
                         {formatColumnName(key)}{' '}
                         {isRequired && <span className="text-red-500">*</span>}
                       </label>
@@ -341,7 +366,9 @@ export default function EventDetails() {
                   </div>
                 </div>
 
-                <p className="text-[11px] text-primary/60 -mt-2">* {t('eventDetails.requiredField')}</p>
+                <p className="text-[11px] text-primary/60 -mt-2">
+                  * {t('eventDetails.requiredField')}
+                </p>
 
                 <button
                   type="button"
