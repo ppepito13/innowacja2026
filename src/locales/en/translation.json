@@ -212,7 +212,12 @@
     "termsAndConditions": "terms and conditions",
     "requiredField": "Required field.",
     "register": "Register",
-    "joinOnline": "Join online"
+    "joinOnline": "Join online",
+    "validation": {
+      "required": "This field is required.",
+      "email": "Please enter a valid email address.",
+      "phone": "Please enter a valid phone number."
+    }
   },
   "formConfig": {
     "title": "Form Builder",
