@@ -5,10 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { User } from '../../types/types';
 import Icon from '../../components/Icon';
 import parseClient from '../../services/parseClient';
+import { useNavigateOrOpen } from '../../hooks/useNavigateOrOpen';
 
 export default function Users() {
   const { t } = useTranslation();
   const history = useHistory();
+  const navigate = useNavigateOrOpen();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -159,7 +161,7 @@ export default function Users() {
               <td className="py-3">
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => history.push(`/admin/users/${user.objectId}/edit`)}
+                    onClick={(e) => navigate(`/admin/users/${user.objectId}/edit`, e)}
                     className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/60 hover:text-primary cursor-pointer border-none bg-transparent"
                   >
                     <Icon icon={LuPencil} />

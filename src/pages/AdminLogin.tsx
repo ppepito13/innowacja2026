@@ -17,6 +17,7 @@ export default function AdminLogin() {
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = () => {
+    if (loading) return;
     setLoading(true);
     setError(null);
 
@@ -26,42 +27,53 @@ export default function AdminLogin() {
       .finally(() => setLoading(false));
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  };
+
   return (
-    <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-lg">
-      {/* HEADER */}
-      <div className="flex flex-col mb-4">
-        <h1 className="text-3xl mb-0">{t('login.title')}</h1>
-        <p className="text-lg mt-0 text-primary/75">{t('login.description')}</p>
-      </div>
+    <div className="flex-1 flex flex-col items-center justify-center w-full">
+      <div
+        className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-lg"
+        onKeyDown={handleKeyDown}
+      >
+        {/* HEADER */}
+        <div className="flex flex-col mb-4">
+          <h1 className="text-3xl mb-0">{t('login.title')}</h1>
+          <p className="text-lg mt-0 text-primary/75">{t('login.description')}</p>
+        </div>
 
-      {/* FORM */}
-      <div className="flex flex-col">
-        <InputTextfieldStateful
-          label={t('login.email')}
-          placeholder={t('login.email')}
-          defaultValue={email}
-          onChange={(value) => setEmail(String(value))}
-        />
-        <InputTextfieldStateful
-          label={t('login.password')}
-          placeholder={t('login.password')}
-          type="password"
-          defaultValue={password}
-          onChange={(value) => setPassword(String(value))}
-        />
-      </div>
+        {/* FORM */}
+        <div className="flex flex-col">
+          <InputTextfieldStateful
+            label={t('login.email')}
+            placeholder={t('login.email')}
+            defaultValue={email}
+            onChange={(value) => setEmail(String(value))}
+          />
+          <InputTextfieldStateful
+            label={t('login.password')}
+            placeholder={t('login.password')}
+            type="password"
+            defaultValue={password}
+            onChange={(value) => setPassword(String(value))}
+          />
+        </div>
 
-      {/* ERROR */}
-      {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+        {/* ERROR */}
+        {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
 
-      {/* ACTIONS */}
-      <div className="flex items-center justify-end mt-4 pb-4">
-        <Button className="scale-75" onClick={handleLogin} disabled={loading}>
-          <span className="flex flex-row items-center gap-2">
-            <Icon icon={LuLogIn} />
-            <span>{loading ? `${t('login.pending')}...` : t('login.submit')}</span>
-          </span>
-        </Button>
+        {/* ACTIONS */}
+        <div className="flex items-center justify-end mt-4 pb-4">
+          <Button className="scale-75" onClick={handleLogin} disabled={loading}>
+            <span className="flex flex-row items-center gap-2">
+              <Icon icon={LuLogIn} />
+              <span>{loading ? `${t('login.pending')}...` : t('login.submit')}</span>
+            </span>
+          </Button>
+        </div>
       </div>
     </div>
   );

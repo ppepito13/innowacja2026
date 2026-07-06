@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, useHistory } from 'react-router';
+import { useParams } from 'react-router';
 import {
   LuCircleCheck,
   LuChevronLeft,
@@ -17,7 +17,9 @@ import { Button, InputDatepicker, InputTextfieldStateful, ComplexTable } from '@
 import { useAuth } from '../../auth/AuthProvider';
 import { NotificationService } from '../../services/notificationService';
 import { parseService, createPointer } from '../../services/parseService';
+import { useNavigateOrOpen } from '../../hooks/useNavigateOrOpen';
 import { Registration, Event } from '../../types/types';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { formatDate, formatColumnName, formatCellValue } from '../../utils/formatters';
 import { exportRegistrationsToCsv, ExportColumn } from '../../utils/export';
 import { useTranslation } from 'react-i18next';
@@ -36,7 +38,7 @@ export default function Registrations() {
   const { user } = useAuth();
 
   const { eventId } = useParams<RegistrationParams>();
-  const history = useHistory();
+  const navigate = useNavigateOrOpen();
 
   const [event, setEvent] = useState<Event | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
@@ -112,6 +114,10 @@ export default function Registrations() {
       cancelled = true;
     };
   }, [selectedRegistration]);
+
+  useEscapeKey(
+    () => setSelectedRegistration(null),
+    selectedRegistration !== null);
 
   const columns = useMemo(() => {
     const formConfigKeys = Object.keys(event?.formConfig ?? {});
@@ -406,8 +412,8 @@ export default function Registrations() {
 
                       <button
                         className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95"
-                        onClick={() =>
-                          history.push(`/admin/registrations/${eventId}/${objectId}/edit`)
+                        onClick={(e) =>
+                          navigate(`/admin/registrations/${eventId}/${objectId}/edit`, e)
                         }
                       >
                         <Icon icon={LuPencil} size={14} />
