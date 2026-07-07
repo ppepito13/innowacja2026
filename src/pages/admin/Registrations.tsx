@@ -375,10 +375,10 @@ export default function Registrations() {
                       data-action-menu={openedActionId === objectId ? '' : undefined}
                     >
                       <button
-                        className={`w-8 h-8 flex items-center justify-center rounded-lg border p-2 transition active:scale-95 ${
+                        className={`w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface transition-colors active:scale-95 ${
                           isCheckedIn
-                            ? 'border-primary/10 bg-surface text-primary hover:bg-background'
-                            : 'border-primary/10 bg-transparent text-error cursor-not-allowed'
+                            ? 'text-primary/60 hover:bg-background hover:text-primary cursor-pointer'
+                            : 'text-error cursor-not-allowed'
                         }`}
                         onClick={() =>
                           updateCheckInTime(objectId, {
@@ -391,21 +391,17 @@ export default function Registrations() {
                         <Icon icon={LuUserCheck} size={14} />
                       </button>
                       <button
-                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                         onClick={() => {
-                          const registration = registrations.find(
-                            (registration) => registration.objectId === objectId,
-                          );
-                          if (registration) {
-                            setSelectedRegistration(registration);
-                          }
+                          const registration = registrations.find((r) => r.objectId === objectId);
+                          if (registration) setSelectedRegistration(registration);
                         }}
                       >
                         <Icon icon={LuEye} size={14} />
                       </button>
 
                       <button
-                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                         onClick={() =>
                           history.push(`/admin/registrations/${eventId}/${objectId}/edit`)
                         }
@@ -414,7 +410,7 @@ export default function Registrations() {
                       </button>
 
                       <button
-                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                         onClick={() =>
                           setOpenedActionId((id) => (id === objectId ? null : objectId))
                         }
@@ -425,7 +421,7 @@ export default function Registrations() {
                       {openedActionId === objectId && (
                         <div className="absolute right-0 top-10 z-50 w-48 rounded-xl border shadow-lg">
                           <button
-                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border border-b-0 rounded-t-xl bg-surface hover:bg-background ${status === 'approved' ? 'cursor-not-allowed' : ''}`}
+                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border border-b-0 rounded-t-xl bg-surface hover:bg-background cursor-pointer ${status === 'approved' ? 'cursor-not-allowed' : ''}`}
                             onClick={() => updateStatus(objectId, 'approved')}
                             disabled={status === 'approved'}
                           >
@@ -433,7 +429,7 @@ export default function Registrations() {
                             <span>{t('registrations.approve')}</span>
                           </button>
                           <button
-                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border rounded-b-xl bg-surface hover:bg-background ${status === 'rejected' ? 'cursor-not-allowed' : ''}`}
+                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border rounded-b-xl bg-surface hover:bg-background cursor-pointer ${status === 'rejected' ? 'cursor-not-allowed' : ''}`}
                             onClick={() => updateStatus(objectId, 'rejected')}
                             disabled={status === 'rejected'}
                           >
@@ -503,7 +499,7 @@ export default function Registrations() {
                 <h2 className="text-xl font-semibold">{t('registrations.details.title')}</h2>
 
                 <button
-                  className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface hover:bg-background"
+                  className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer"
                   onClick={() => setSelectedRegistration(null)}
                 >
                   <Icon icon={LuX} size={14} />
@@ -527,7 +523,6 @@ export default function Registrations() {
                     {formatCellValue(String(value), t)}
                   </div>
                 ))}
-
                 <div className="flex flex-col items-center gap-2 border-t border-primary/10 pt-3">
                   <span className="self-start font-semibold">
                     {t('registrations.details.qrCode')}:
