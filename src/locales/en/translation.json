@@ -192,6 +192,7 @@
     "addOption": "Add Option",
     "removeOption": "Remove option",
     "i18nEn" : "Translation en",
+    "i18nPl": "Translation pl",
     "fieldType": {
       "text": "Text",
       "email": "Email",

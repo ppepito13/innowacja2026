@@ -15,7 +15,8 @@ const defaultField = (): FormField => ({
   placeholder: "",
   required: false,
   options: [],
-  i18n: { pl: "", en: "" }
+  i18n: { pl: "", en: "" },
+  optionsTranslation: []
 });
 
 export default function FormConfig() {
@@ -59,7 +60,8 @@ export default function FormConfig() {
         i18n: {
           pl: String(entry.i18n?.pl ?? ""),
           en: String(entry.i18n?.en ?? ""),
-        }
+        },
+        optionsTranslation: entry.optionsTranslation ?? [],
       };
     });
   };
@@ -99,7 +101,7 @@ export default function FormConfig() {
         en: f.i18n.en,
         pl: f.i18n.pl,
       }
-      const entry: FormConfigEntry = { type: f.type, required: f.required, i18n: i18nInstance};
+      const entry: FormConfigEntry = { type: f.type, required: f.required, i18n: i18nInstance, optionsTranslation: f.optionsTranslation};
       if (f.placeholder) entry.placeholder = f.placeholder;
       if (f.label) entry.label = f.label.trim();
       if (TYPES_WITH_OPTIONS.includes(f.type)) {

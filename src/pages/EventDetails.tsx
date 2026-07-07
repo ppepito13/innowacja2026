@@ -12,7 +12,7 @@ const LANGUAGES = [
   { code: 'en', label: 'EN' },
   { code: 'pl', label: 'PL' },
 ];
-let currentLabel = "PL"
+
 export default function EventDetails() {
   const { eventId } = useParams<{ eventId: string }>();
   const [event, setEvent] = useState<Event | null>(null);
@@ -23,7 +23,8 @@ export default function EventDetails() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t, i18n } = useTranslation();
-
+  let currentLabel = i18n.language;
+  console.log(currentLabel);
   useEffect(() => {
     if (!eventId) return;
     parseService.getById<Event>('TestEvent', eventId).then(setEvent);
@@ -102,7 +103,7 @@ export default function EventDetails() {
               type="button"
               onClick={() => {
                 i18n.changeLanguage(code);
-                currentLabel = label;
+                currentLabel = i18n.language;
               }
               }
               className={`cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide ${
@@ -165,7 +166,6 @@ export default function EventDetails() {
 
             <form className="flex flex-col gap-6">
               {Object.entries(event.formConfig ?? {}).map(([key, config]) => {
-                console.log(key,config);
                 const field = config as any;
                 const isRequired = field.required === true;
                 const value = formData[key] || '';
@@ -173,7 +173,7 @@ export default function EventDetails() {
                 return (
                   <div key={key}>
                     <label htmlFor={key} className="block text-xs font-bold text-white mb-2">
-                      {currentLabel === "PL" ? field.i18n["pl"] : field.i18n["en"]}{' '}
+                      {currentLabel === "pl" ? field.i18n["pl"] : field.i18n["en"]}{' '}
                       {isRequired && <span className="text-red-500">*</span>}
                     </label>
 
@@ -263,9 +263,9 @@ export default function EventDetails() {
                           <option value="" disabled hidden>
                             {t('eventDetails.selectOption')}
                           </option>
-                          {field.options?.map((value: string) => (
-                            <option key={value} value={value}>
-                              {value}
+                          {field.options?.map((value: string, index: number) => (
+                            <option key={value} value={i18n.language === "pl" ? field.optionsTranslation[index].i18n.pl : field.optionsTranslation[index].i18n.en}>
+                              {i18n.language === "pl" ? field.optionsTranslation[index].i18n.pl : field.optionsTranslation[index].i18n.en}
                             </option>
                           ))}
                         </select>

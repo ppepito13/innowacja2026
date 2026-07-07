@@ -26,7 +26,13 @@ export interface FieldTypeOption {
   labelKey: string;
   icon: string;
 }
-
+export interface optionsTranslation{
+  id: string;
+  i18n: {
+    pl: string;
+    en: string
+  };
+}
 export interface FormField {
   /**
    * Local-only identifier used for React list keys and UI state (e.g. tracking
@@ -44,6 +50,7 @@ export interface FormField {
     pl: string;
     en: string
   };
+  optionsTranslation: optionsTranslation[];
 }
 
 export interface FormConfigEntry {
@@ -53,6 +60,7 @@ export interface FormConfigEntry {
   label?: string;
   options?: string[];
   i18n: Record<string,unknown>;
+  optionsTranslation: optionsTranslation[];
 }
 
 export type FormConfig = Record<string, FormConfigEntry>;

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import type { FieldType, FormField } from "../../types/types";
+import type {FieldType, FormField, optionsTranslation} from "../../types/types";
 import { TYPES_WITH_OPTIONS } from "./constants";
 import TypeDropdown from "./TypeDropdown";
 import OptionsList from "./OptionsList";
@@ -152,11 +152,17 @@ export default function FieldCard({
       {needsOptions && (
         <OptionsList
           options={field.options}
+          optionsTranslation={field.optionsTranslation}
           onChange={(opts: string[]) => onUpdate({ options: opts })}
-          onAdd={() => onUpdate({ options: [...field.options, ""] })}
-          onRemove={(i: number) =>
-            onUpdate({ options: field.options.filter((_, j) => j !== i) })
-          }
+          onChangeTranslation={(opts: optionsTranslation[]) => onUpdate({ optionsTranslation: opts })}
+          onAdd={() => onUpdate({
+            options: [...field.options, ""],
+            optionsTranslation: [...field.optionsTranslation, { id: '1', i18n: { pl: "", en: "" } }],
+          })}
+          onRemove={(i: number) => onUpdate({
+            options: field.options.filter((_, j) => j !== i),
+            optionsTranslation: field.optionsTranslation.filter((_, j) => j !== i),
+          })}
         />
       )}
     </div>
