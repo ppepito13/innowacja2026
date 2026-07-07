@@ -12,14 +12,14 @@ export interface EventACL {
 // --- FormConfig Types ---
 
 export type FieldType =
-  | "text"
-  | "email"
-  | "phone"
-  | "textarea"
-  | "checkbox"
-  | "radio"
-  | "multiselect"
-  | "dropdown";
+  | 'text'
+  | 'email'
+  | 'phone'
+  | 'textarea'
+  | 'checkbox'
+  | 'radio'
+  | 'multiselect'
+  | 'dropdown';
 
 export interface FieldTypeOption {
   value: FieldType;
@@ -63,7 +63,9 @@ export interface Event {
   endDate?: MongoDate;
   location?: string;
   dateType: 'single' | 'multi';
-  eventFormat: 'virtual' | 'on-site';
+  eventFormat: 'virtual' | 'on-site' | 'hybrid';
+  meetingLink?: string;
+  requiresApproval?: boolean;
   primaryColor: string;
   accentColor?: string;
   heroImageUrl?: string;
@@ -80,7 +82,8 @@ export interface Registration {
   objectId: string;
   event: Event; // Pointer
   formData: Record<string, unknown>; // JSON/Object
-  status: 'pending' | 'approved'; // String: pending/approved
+  status: 'pending' | 'approved' | 'rejected'; // String: pending/approved/rejected
+  isCheckedIn?: boolean;
   checkInTime: Date | MongoDate | null; // Date/Nullable
   consent: boolean;
   createdAt: string;
@@ -95,6 +98,7 @@ export interface User {
   role: 'Admin' | 'Organizer'; // String: Admin/Organizer
   lastLoginAt?: string;
   fullName?: string;
+  themePreference?: 'light' | 'dark';
   isLocked?: boolean;
   createdAt: string;
   updatedAt: string;

@@ -1,5 +1,7 @@
 {
   "common": {
+    "brand": "Commerzbank Wydarzenia",
+    "loading": "Wczytywanie...",
     "boolean": {
       "true": "Tak",
       "false": "Nie"
@@ -7,7 +9,21 @@
   },
   "layout": {
     "projectName": "Projekt Innowacja",
+    "events": "Wydarzenia",
     "account": "Konto"
+  },
+  "theme": {
+    "toggleToDark": "Przełącz na tryb ciemny",
+    "toggleToLight": "Przełącz na tryb jasny"
+  },
+  "home": {
+    "heroTitle": "Networking. Kodowanie. Świętowanie.",
+    "heroSubtitle": "Rejestracje na wydarzenia Commerzbank Łódź",
+    "activeEvents": "Aktywne Wydarzenia",
+    "loading": "Wczytywanie wydarzeń...",
+    "loadError": "Nie udało się wczytać wydarzeń. Spróbuj ponownie później.",
+    "noEvents": "Obecnie nie ma żadnych aktywnych wydarzeń.",
+    "noImage": "Brak zdjęcia"
   },
   "nav": {
     "brand": "Panel Admina",
@@ -35,6 +51,16 @@
     "username": "Nazwa użytkownika",
     "email": "Email",
     "role": "Rola",
+    "appearance": {
+      "title": "Wygląd",
+      "description": "Wybierz między trybem jasnym a ciemnym.",
+      "light": "Jasny",
+      "dark": "Ciemny"
+    },
+    "language": {
+      "title": "Język",
+      "description": "Wybierz swój język."
+    },
     "logout": {
       "idle": "Wyloguj się",
       "pending": "Wylogowywanie"
@@ -56,9 +82,13 @@
       "title": "Szczegóły rejestracji",
       "status": {
         "approved": "Zatwierdzona",
-        "pending": "Oczekująca"
+        "pending": "Oczekująca",
+        "rejected": "Odrzucona"
       },
-      "date": "Data"
+      "date": "Data",
+      "qrCode": "Kod QR do odprawy",
+      "qrLoading": "Generowanie kodu QR…",
+      "qrError": "Nie udało się wygenerować kodu QR."
     },
     "actions": "Czynności",
     "pagination": {
@@ -95,7 +125,12 @@
     "rowsPerPage": "Wierszy na stronę",
     "page": "Strona",
     "of": "z",
-    "deleteConfirm": "Czy na pewno chcesz usunąć \"{{title}}\"?"
+    "deleteConfirm": "Czy na pewno chcesz usunąć \"{{title}}\"?",
+    "editEvent": "Edytuj wydarzenie",
+    "goToRegistrations": "Przejdź do rejestracji",
+    "goToCheckin": "Przejdź do zameldowania",
+    "viewPublicPage": "Zobacz stronę publiczną",
+    "deleteEvent": "Usuń wydarzenie"
   },
   "eventManagement": {
     "new": {
@@ -115,14 +150,18 @@
       }
     },
     "cancel": "Anuluj",
+    "editFormConfig": "Edytuj wygląd formularza",
     "loading": "Ładowanie danych",
     "error": "Błąd",
     "sections": {
       "colors": "System kolorów",
-      "heroImage": "Zdjęcie główne"
+      "heroImage": "Zdjęcie główne",
+      "registration": "Potwierdzanie rejestracji"
     },
     "fields": {
       "title": "Nazwa wydarzenia",
+      "requiresApproval": "Wymagaj potwierdzenia organizatora",
+      "requiresApprovalHint": "Jeśli włączono, rejestracje będą oczekiwać na ręczną akceptację organizatora.",
       "description": "Opis",
       "descriptionPlaceholder": "Opisz swoje wydarzenie...",
       "dateType": "Typ daty",
@@ -133,10 +172,12 @@
       "eventFormat": "Format wydarzenia",
       "formatVirtual": "Wirtualne",
       "formatOnSite": "Stacjonarne",
+      "formatHybrid": "Hybrydowe",
       "locationVirtual": "Link do spotkania",
       "locationVirtualPlaceholder": "https://meet.example.com/...",
       "locationOnSite": "Adres",
       "locationOnSitePlaceholder": "Ulica i numer Kod pocztowy, Miasto",
+      "locationPreview": "Podgląd lokalizacji wydarzenia",
       "primaryColor": "Kolor główny",
       "accentColor": "Kolor akcentu",
       "heroImageUrl": "URL zdjęcia",
@@ -144,6 +185,12 @@
       "dataProcessingAgreement": "URL polityki przetwarzania danych",
       "upload": "Wgraj",
       "uploading": "Wgrywanie..."
+    },
+    "validation": {
+      "fillRequired": "Uzupełnij wszystkie wymagane pola",
+      "titleRequired": "Nazwa wydarzenia jest wymagana",
+      "startDateRequired": "Data początkowa jest wymagana",
+      "endDateRequired": "Data końcowa jest wymagana"
     }
   },
   "registrationEdit": {
@@ -157,6 +204,7 @@
     "error": "Błąd"
   },
   "eventDetails": {
+    "locationPreview": "Podgląd Lokalizacji",
     "registerNow": "Zarejestruj się teraz",
     "fillForm": "Wypełnij poniższy formularz, aby zarezerwować miejsce.",
     "fullName": "Imię i nazwisko",
@@ -170,7 +218,13 @@
     "readMoreIn": "Dowiedz się więcej w",
     "termsAndConditions": "regulaminie",
     "requiredField": "Pole wymagane.",
-    "register": "Zarejestruj"
+    "register": "Zarejestruj",
+    "joinOnline": "Dołącz online",
+    "validation": {
+      "required": "To pole jest wymagane.",
+      "email": "Podaj poprawny adres e-mail.",
+      "phone": "Podaj poprawny numer telefonu."
+    }
   },
   "formConfig": {
     "title": "Kreator formularza",
@@ -246,6 +300,8 @@
       "password": "Hasło",
       "passwordHint": "Domyślne hasło to \"password\". Użytkownik może je zmienić po pierwszym logowaniu.",
       "role": "Rola",
+      "events": "Wydarzenia",
+      "noEvents": "Brak dostępnych wydarzeń.",
       "roleHint": "Dostęp tylko do przypisanych wydarzeń.",
       "cancel": "Anuluj",
       "submit": "Dodaj użytkownika",
@@ -260,6 +316,8 @@
       "newPassword": "Nowe hasło",
       "passwordHint": "Zostaw puste, aby zachować obecne hasło.",
       "role": "Rola",
+      "events": "Wydarzenia",
+      "noEvents": "Brak dostępnych wydarzeń.",
       "lockAccount": "Zablokuj konto",
       "lockAccountHint": "Użytkownik nie będzie mógł się zalogować.",
       "cancel": "Anuluj",
@@ -271,6 +329,7 @@
     "title": "Zameldowanie na wydarzenie",
     "subtitle": "Zeskanuj kody QR lub ręcznie zamelduj uczestników.",
     "export": "Eksport",
+    "recentScans": "Ostatnie skanowania",
     "tabs": {
       "qrScanner": "Skaner QR",
       "manual": "Ręczne zameldowanie"
@@ -286,7 +345,24 @@
       "warningTitle": "Wynik Skanowania",
       "warning": "{{name}}: Uczestnik jest już zameldowany z dnia {{time}}.",
       "errorTitle": "Błąd Skanowania",
-      "error": "{{name}}: {{message}}"
+      "error": "{{name}}: {{message}}",
+      "invalidCode": "Ten kod QR jest nieprawidłowy lub został zmodyfikowany.",
+      "notApproved": "Rejestracja nie została zatwierdzona.",
+      "notFound": "Nie znaleziono rejestracji.",
+      "wrongEvent": "Ten bilet dotyczy innego wydarzenia."
+    },
+    "manual": {
+      "title": "Ręczna lista uczestników",
+      "description": "Wyszukaj uczestnika i ręcznie zmień jego status zameldowania.",
+      "search": "Szukaj po nazwisku lub e-mailu...",
+      "attendee": "Uczestnik",
+      "status": "Status",
+      "action": "Akcja",
+      "noResults": "Nie znaleziono uczestników.",
+      "checkedIn": "Odznaczony",
+      "notPresent": "Nieobecny",
+      "undo": "Cofnij",
+      "checkInBtn": "Odznacz"
     }
   },
   "registrationsList": {

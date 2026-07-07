@@ -1,8 +1,11 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import type { FormField, FormConfig as FormConfigType, FormConfigEntry } from "../types/types";
+import type { FormField, FormConfig as FormConfigType, FormConfigEntry, Event, MongoDate} from "../types/types";
 import { FieldCard, TYPES_WITH_OPTIONS } from "../components/formConfig";
-
+import { useParams } from 'react-router';
+import {parseService} from "../services/parseService";
+import {DEFAULT_ACCENT_COLOR, DEFAULT_PRIMARY_COLOR, EVENT_CLASS} from "../constants/eventDefaults";
+type EventEditParams = { id: string };
 const uid = (): string => Math.random().toString(36).slice(2, 9);
 
 const defaultField = (): FormField => ({
@@ -16,12 +19,45 @@ const defaultField = (): FormField => ({
 
 export default function FormConfig() {
   const { t } = useTranslation();
+  const { id } = useParams<EventEditParams>();
 
   const [fields, setFields] = useState<FormField[]>([defaultField()]);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState<boolean>(false);
   const [jsonPreview, setJsonPreview] = useState<boolean>(false);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    parseService
+        .getById<Event>(EVENT_CLASS, id)
+        .then((rawEvent) => {
+          setEvent(rawEvent);
+          if (rawEvent.formConfig) {
+            setFields(configToFields(rawEvent.formConfig));
+          }
+        })
+        .catch((e: any) => setError(e.message));
+  }, []);
+
+// Konwertuje formConfig z bazy → tablicę FormField[] do edycji
+  const configToFields = (config: Record<string, unknown>): FormField[] => {
+    const entries = Object.entries(config);
+    if (entries.length === 0) return [defaultField()];
+
+    return entries.map(([key, raw]) => {
+      const entry = raw as FormConfigEntry;
+      return {
+        id: uid(),
+        label: entry.label ?? key,
+        type: entry.type ?? "text",
+        placeholder: entry.placeholder ?? "",
+        required: entry.required ?? false,
+        options: entry.options ?? [],
+      };
+    });
+  };
 
   const updateField = useCallback((id: string, patch: Partial<FormField>) => {
     setFields((prev) =>
@@ -93,41 +129,36 @@ export default function FormConfig() {
     if (!validate()) return;
     const config = buildFormConfig();
     console.log("formConfig →", JSON.stringify(config, null, 2));
+    parseService
+        .update<Event>(EVENT_CLASS, id, { formConfig: config })
+        .then(() => {
+          setSaved(true);
+          setTimeout(() => setSaved(false), 2500);
+        })
+        .catch((e: any) => setError(e.message));
     setSaved(true);
+
     setTimeout(() => setSaved(false), 2500);
   };
 
   const formConfig = buildFormConfig();
-
   return (
-    <div className="font-mono bg-[#0b1120] min-h-screen text-slate-200">
+    <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-4xl">
       {/* Header */}
-      <div className="flex justify-between items-center px-8 pt-7 pb-5 border-b border-slate-800 bg-gradient-to-b from-[#0f1729] to-[#0b1120] flex-wrap gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-2">
         <div>
-          <h1 className="m-0 text-[22px] font-bold -tracking-wide text-slate-50">
-            {t("formConfig.title")}
-          </h1>
-          <p className="mt-1 mb-0 text-[13px] text-slate-500 tracking-wide">
-            {t("formConfig.subtitle")}
-          </p>
+          <h1 className="text-3xl mb-0">{t("formConfig.title")}</h1>
+          <p className="text-lg mt-0 text-primary/75">{t("formConfig.subtitle")}</p>
         </div>
-        <div className="flex gap-2.5 items-center">
-          <button
-            onClick={() => setJsonPreview(!jsonPreview)}
-            className="bg-slate-800 text-slate-400 border border-slate-700 rounded-md px-4 py-2 text-[13px] font-mono cursor-pointer hover:bg-slate-700 transition-colors"
-          >
-            {jsonPreview ? t("formConfig.hideJson") : t("formConfig.showJson")}
-          </button>
-          <button
-            onClick={handleSave}
-            className="bg-amber-400 text-slate-900 border-none rounded-md px-5 py-2 text-[13px] font-bold font-mono cursor-pointer tracking-wide hover:bg-amber-300 transition-colors"
-          >
-            {saved ? `✓ ${t("formConfig.saved")}` : t("formConfig.save")}
-          </button>
-        </div>
+        <button
+          onClick={() => setJsonPreview(!jsonPreview)}
+          className="self-start px-4 py-2 rounded-lg border border-primary/20 bg-transparent text-sm text-primary cursor-pointer hover:bg-background transition-colors"
+        >
+          {jsonPreview ? t("formConfig.hideJson") : t("formConfig.showJson")}
+        </button>
       </div>
 
-      <div className="flex gap-6 px-8 py-6 items-start flex-wrap">
+      <div className="flex gap-6 items-start flex-wrap mt-2">
         {/* Field cards */}
         <div className="flex-[1_1_460px] flex flex-col gap-4 min-w-0">
           {fields.map((field, i) => (
@@ -145,7 +176,7 @@ export default function FormConfig() {
 
           <button
             onClick={addField}
-            className="bg-gray-900 border-2 border-dashed border-slate-800 rounded-[10px] text-amber-400 px-5 py-4 text-sm font-semibold font-mono cursor-pointer flex items-center justify-center hover:border-slate-600 hover:bg-gray-800 transition-colors"
+            className="bg-transparent border-2 border-dashed border-primary/20 rounded-lg text-primary/70 px-5 py-4 text-sm font-semibold cursor-pointer flex items-center justify-center hover:border-primary/40 hover:bg-background transition-colors"
           >
             <span className="text-xl mr-2">＋</span>
             {t("formConfig.addField")}
@@ -154,28 +185,40 @@ export default function FormConfig() {
 
         {/* JSON Preview */}
         {jsonPreview && (
-          <div className="flex-[0_0_340px] bg-gray-900 rounded-[10px] border border-slate-800 overflow-hidden sticky top-6 max-h-[80vh]">
-            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-800">
-              <span className="text-xs tracking-wider text-slate-400">
+          <div className="flex-[0_0_340px] bg-surface-2 rounded-lg border border-primary/10 overflow-auto sticky top-6 max-h-[80vh]">
+            <div className="flex justify-between items-center px-4 py-3 border-b border-primary/10">
+              <span className="text-xs tracking-wider text-primary/70">
                 formConfig
               </span>
-              <span className="bg-amber-400/10 text-amber-400 rounded px-2 py-0.5 text-[10px] font-bold tracking-wider">
+              <span className="bg-secondary text-brand rounded px-2 py-0.5 text-[10px] font-bold tracking-wider">
                 JSON
               </span>
             </div>
-            <pre className="m-0 p-4 text-xs leading-relaxed text-slate-400 overflow-x-auto whitespace-pre-wrap break-words">
+            <pre className="m-0 p-4 text-xs font-mono leading-relaxed text-primary/80 overflow-x-auto whitespace-pre-wrap break-words">
               {JSON.stringify(formConfig, null, 2)}
             </pre>
           </div>
         )}
       </div>
 
-      {/* Validation error banner */}
-      {Object.keys(errors).length > 0 && (
-        <div className="mx-8 mb-6 px-4 py-2.5 bg-red-900/10 border border-red-900 rounded-lg text-red-300 text-[13px]">
-          ⚠ {t("formConfig.errors.validationFailed")}
-        </div>
-      )}
+      {/* Footer: validation error + save */}
+      <div className="flex flex-col items-end mt-6 pb-4 gap-2">
+        {Object.keys(errors).length > 0 && (
+          <p className="text-sm text-red-600 mt-0 mb-0">
+            ⚠ {t("formConfig.errors.validationFailed")}
+          </p>
+        )}
+        <button
+          onClick={handleSave}
+          className="px-8 py-3 rounded-full bg-secondary text-brand text-sm font-semibold border-none cursor-pointer hover:opacity-90 transition-opacity"
+        >
+          {saved ? `✓ ${t("formConfig.saved")}` : t("formConfig.save")}
+        </button>
+      </div>
     </div>
   );
 }
+// TODO: Unifikacja tworzenia pól formularza na podstawie formConfig (string czy text, choice czy dropdown etc)
+// TODO: event.formConfig is null ? event.formConfig : buildFormConfig()
+// TODO: Poprawa tła, ale to drugorzędne
+// TODO: Przewijalny JSON formConfiga

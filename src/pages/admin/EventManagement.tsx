@@ -8,11 +8,16 @@ import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import ColorField from '../../components/ColorField';
 import RadioGroup from '../../components/RadioGroup';
+import Toggle from '../../components/Toggle';
+import RichTextEditor from '../../components/RichTextEditor';
+import DOMPurify from 'dompurify';
 import parseClient from '../../services/parseClient';
 import {
   EVENT_CLASS,
   DEFAULT_PRIMARY_COLOR,
   DEFAULT_ACCENT_COLOR,
+  MAP_IFRAME_WIDTH,
+  MAP_IFRAME_HEIGHT,
 } from '../../constants/eventDefaults';
 import { useAuth } from '../../auth/AuthProvider';
 
@@ -27,6 +32,8 @@ const EMPTY_EVENT: Event = {
   endDate: {},
   eventFormat: 'on-site',
   location: '',
+  meetingLink: '',
+  requiresApproval: false,
   primaryColor: DEFAULT_PRIMARY_COLOR,
   accentColor: DEFAULT_ACCENT_COLOR,
   heroImageUrl: '',
@@ -54,10 +61,12 @@ export default function EventManagement({ mode }: Props) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFieldChange = <K extends keyof Event>(field: K, value: Event[K] | undefined) => {
     setEvent((prev) => (prev ? { ...prev, [field]: value } : null));
+    setFieldErrors((prev) => (prev[field] ? { ...prev, [field]: '' } : prev));
   };
 
   useEffect(() => {
@@ -73,7 +82,9 @@ export default function EventManagement({ mode }: Props) {
           ...rawEvent,
           dateType: rawEvent.dateType ?? 'single',
           eventFormat: rawEvent.eventFormat ?? 'on-site',
+          requiresApproval: rawEvent.requiresApproval ?? false,
           location: rawEvent.location ?? '',
+          meetingLink: rawEvent.meetingLink ?? '',
           primaryColor: rawEvent.primaryColor ?? DEFAULT_PRIMARY_COLOR,
           accentColor: rawEvent.accentColor ?? DEFAULT_ACCENT_COLOR,
           heroImageUrl: rawEvent.heroImageUrl ?? '',
@@ -94,6 +105,7 @@ export default function EventManagement({ mode }: Props) {
         ...(value === 'single' && { endDate: undefined }),
       };
     });
+    setFieldErrors((prev) => (prev.endDate ? { ...prev, endDate: '' } : prev));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,25 +128,44 @@ export default function EventManagement({ mode }: Props) {
     }
   };
 
+  const uploadImage = async (file: File): Promise<string> => {
+    const { data } = await parseClient.post(`/files/${encodeURIComponent(file.name)}`, file, {
+      headers: { 'Content-Type': file.type },
+    });
+    return data.url as string;
+  };
+
+  const validate = (): boolean => {
+    if (!event) return false;
+    const errors: Record<string, string> = {};
+    if (!event.title.trim()) errors.title = tt('validation.titleRequired');
+    if (!event.startDate?.date) errors.startDate = tt('validation.startDateRequired');
+    if (event.dateType === 'multi' && !event.endDate?.date) {
+      errors.endDate = tt('validation.endDateRequired');
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = () => {
-    if (!event) return;
+    if (!event || !validate()) return;
     setSaving(true);
     setError(null);
 
     const payload: Event = {
       title: event.title,
-      description: event.description,
-      ...(event.startDate && {
-        startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() },
-      }),
-      ...(event.dateType === 'multi' && event.endDate
-        ? { endDate: { __type: 'Date', iso: event.endDate.date?.toISOString() } }
+      description: DOMPurify.sanitize(event.description),
+      startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() },
+      ...(event.dateType === 'multi' && event.endDate?.date
+        ? { endDate: { __type: 'Date', iso: event.endDate.date.toISOString() } }
         : isEdit
           ? { endDate: { __op: 'Delete' } }
           : undefined),
       dateType: event.dateType,
       eventFormat: event.eventFormat,
       location: event.location,
+      meetingLink: event.meetingLink,
+      requiresApproval: event.requiresApproval,
       primaryColor: event.primaryColor,
       accentColor: event.accentColor,
       heroImageUrl: event.heroImageUrl,
@@ -168,8 +199,10 @@ export default function EventManagement({ mode }: Props) {
     );
   }
 
+  const showMapEmbed = event?.eventFormat === 'on-site' || event?.eventFormat === 'hybrid';
+
   return (
-    <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full max-w-2xl">
+    <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-2xl">
       <div className="flex flex-row items-center justify-between mb-2">
         <div className="flex flex-col">
           <h1 className="text-3xl mb-0">{ttm('title')}</h1>
@@ -182,7 +215,7 @@ export default function EventManagement({ mode }: Props) {
           </p>
         </div>
         <button
-          className="w-9 h-9 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
+          className="w-9 h-9 flex items-center justify-center rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95"
           onClick={() => history.goBack()}
         >
           <Icon icon={LuArrowLeft} />
@@ -198,13 +231,16 @@ export default function EventManagement({ mode }: Props) {
           defaultValue={event?.title ?? ''}
           onChange={(v) => handleFieldChange('title', String(v))}
         />
-        <InputTextfieldStateful
-          label={tt('fields.description')}
-          placeholder={tt('fields.descriptionPlaceholder')}
-          defaultValue={event?.description ?? ''}
-          textArea={true}
-          onChange={(v) => handleFieldChange('description', String(v))}
-        />
+        {fieldErrors.title && <p className="text-xs text-red-600 mt-0 mb-0">{fieldErrors.title}</p>}
+        <div className="flex flex-col gap-1 mt-1">
+          <label className="text-sm font-medium text-primary">{tt('fields.description')}</label>
+          <RichTextEditor
+            value={event?.description ?? ''}
+            placeholder={tt('fields.descriptionPlaceholder')}
+            onChange={(html) => handleFieldChange('description', html)}
+            uploadImage={uploadImage}
+          />
+        </div>
         <RadioGroup
           label={tt('fields.dateType')}
           value={event?.dateType ?? 'single'}
@@ -223,6 +259,9 @@ export default function EventManagement({ mode }: Props) {
                 handleFieldChange('startDate', v ? { date: new Date(v) } : undefined)
               }
             />
+            {fieldErrors.startDate && (
+              <p className="text-xs text-red-600 mt-1 mb-0">{fieldErrors.startDate}</p>
+            )}
           </div>
           {event?.dateType === 'multi' && (
             <div className="flex-1">
@@ -233,6 +272,9 @@ export default function EventManagement({ mode }: Props) {
                   handleFieldChange('endDate', v ? { date: new Date(v) } : undefined)
                 }
               />
+              {fieldErrors.endDate && (
+                <p className="text-xs text-red-600 mt-1 mb-0">{fieldErrors.endDate}</p>
+              )}
             </div>
           )}
         </div>
@@ -243,6 +285,7 @@ export default function EventManagement({ mode }: Props) {
           options={[
             { value: 'virtual', label: tt('fields.formatVirtual') },
             { value: 'on-site', label: tt('fields.formatOnSite') },
+            { value: 'hybrid', label: tt('fields.formatHybrid') },
           ]}
         />
         <InputTextfieldStateful
@@ -259,6 +302,45 @@ export default function EventManagement({ mode }: Props) {
           defaultValue={event?.location ?? ''}
           onChange={(v) => handleFieldChange('location', String(v))}
         />
+        {event?.eventFormat === 'hybrid' && (
+          <InputTextfieldStateful
+            label={tt('fields.locationVirtual')}
+            placeholder={tt('fields.locationVirtualPlaceholder')}
+            defaultValue={event?.meetingLink ?? ''}
+            onChange={(v) => handleFieldChange('meetingLink', String(v))}
+          />
+        )}
+        {showMapEmbed && event?.location && (
+          <div className="flex flex-col gap-1 mb-6">
+            <label className="block text-xs font-medium text-primary/70">
+              {tt('fields.locationPreview')}
+            </label>
+            <iframe
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(event.location)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+              title={tt('fields.locationPreview')}
+              width={MAP_IFRAME_WIDTH}
+              height={MAP_IFRAME_HEIGHT}
+              style={{ border: 0 }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="mt-2 rounded-lg border border-primary/10 w-full"
+            />
+          </div>
+        )}
+        <p className="text-sm font-semibold text-primary mt-3">{tt('sections.registration')}</p>
+        <div className="flex items-start justify-between gap-4 rounded-lg border border-primary/10 p-4">
+          <div className="flex flex-col">
+            <label htmlFor="requiresApproval" className="text-sm font-medium text-primary">
+              {tt('fields.requiresApproval')}
+            </label>
+            <p className="text-xs text-primary/60 mt-1">{tt('fields.requiresApprovalHint')}</p>
+          </div>
+          <Toggle
+            id="requiresApproval"
+            checked={event?.requiresApproval ?? false}
+            onChange={(v) => handleFieldChange('requiresApproval', v)}
+          />
+        </div>
         <p className="text-sm font-semibold text-primary mt-3">{tt('sections.colors')}</p>
         <div className="flex flex-col sm:flex-row gap-4">
           <ColorField
@@ -334,23 +416,35 @@ export default function EventManagement({ mode }: Props) {
         />
       </div>
 
-      <div className="flex items-center justify-end mt-6 pb-4 gap-3">
-        <button
-          type="button"
-          onClick={() => history.goBack()}
-          className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
-        >
-          {t('eventManagement.cancel')}
-        </button>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={saving || uploading}
-          className="flex items-center gap-2 px-8 py-3 rounded-full bg-secondary text-primary text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
-        >
-          <Icon icon={isEdit ? LuSave : LuPlus} size={16} />
-          <span>{saving ? `${ttm('submit.pending')}...` : ttm('submit.idle')}</span>
-        </button>
+      <div className="flex flex-col items-end mt-6 pb-4 gap-2">
+        {Object.values(fieldErrors).some(Boolean) && (
+          <p className="text-sm text-red-600 mt-0 mb-0">{tt('validation.fillRequired')}</p>
+        )}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => history.goBack()}
+            className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
+          >
+            {t('eventManagement.cancel')}
+          </button>
+          <button
+            type="button"
+            onClick={() => history.push(`/admin/events/${id}/formconfig`)}
+            className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
+          >
+            {t('eventManagement.editFormConfig')}
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={saving || uploading}
+            className="flex items-center gap-2 px-8 py-3 rounded-full bg-secondary text-brand text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            <Icon icon={isEdit ? LuSave : LuPlus} size={16} />
+            <span>{saving ? `${ttm('submit.pending')}...` : ttm('submit.idle')}</span>
+          </button>
+        </div>
       </div>
     </div>
   );

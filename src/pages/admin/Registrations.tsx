@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, useHistory } from 'react-router';
+import { useParams } from 'react-router';
 import {
   LuCircleCheck,
   LuChevronLeft,
@@ -10,14 +10,21 @@ import {
   LuPencil,
   LuX,
   LuCircleX,
-  LuClock, LuUserCheck,
+  LuClock,
+  LuUserCheck,
 } from 'react-icons/lu';
 import { Button, InputDatepicker, InputTextfieldStateful, ComplexTable } from '@lsg/components';
 import { useAuth } from '../../auth/AuthProvider';
+import { NotificationService } from '../../services/notificationService';
 import { parseService, createPointer } from '../../services/parseService';
+import { useNavigateOrOpen } from '../../hooks/useNavigateOrOpen';
 import { Registration, Event } from '../../types/types';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { formatDate, formatColumnName, formatCellValue } from '../../utils/formatters';
+import { exportRegistrationsToCsv, ExportColumn } from '../../utils/export';
 import { useTranslation } from 'react-i18next';
+
+import { QRCodeSVG } from 'qrcode.react';
 
 import Icon from '../../components/Icon';
 import parseClient from '../../services/parseClient';
@@ -31,7 +38,7 @@ export default function Registrations() {
   const { user } = useAuth();
 
   const { eventId } = useParams<RegistrationParams>();
-  const history = useHistory();
+  const navigate = useNavigateOrOpen();
 
   const [event, setEvent] = useState<Event | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
@@ -44,6 +51,19 @@ export default function Registrations() {
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
   const [openedActionId, setOpenedActionId] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
+  const [qrToken, setQrToken] = useState<string | null>(null);
+  const [qrError, setQrError] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!openedActionId) return;
+    const onPointerDown = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest('[data-action-menu]')) {
+        setOpenedActionId(null);
+      }
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    return () => document.removeEventListener('mousedown', onPointerDown);
+  }, [openedActionId]);
 
   useEffect(() => {
     setLoading(true);
@@ -51,22 +71,53 @@ export default function Registrations() {
 
     Promise.all([
       parseService.getById<Event>('TestEvent', eventId),
-      parseClient.get(`/classes/TestEvent/${eventId}`, {
-        headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY }
-      }).then(({ data }: { data: { ACL?: Record<string, { read?: boolean; write?: boolean }> } }) => data.ACL),
+      parseClient
+        .get(`/classes/TestEvent/${eventId}`, {
+          headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY },
+        })
+        .then(
+          ({ data }: { data: { ACL?: Record<string, { read?: boolean; write?: boolean }> } }) =>
+            data.ACL,
+        ),
       parseService.query<Registration>('Registration', {
         event: createPointer('TestEvent', eventId),
       }),
     ])
       .then(([event, acl, registrations]) => {
-        console.log('event ACL:', acl);
-        console.log('user objectId:', user?.objectId);
         setEvent({ ...event, ACL: acl ?? {} });
         setRegistrations(registrations);
       })
       .catch((error) => setError(error.message))
       .finally(() => setLoading(false));
   }, [eventId]);
+
+  useEffect(() => {
+    if (!selectedRegistration) {
+      setQrToken(null);
+      setQrError(false);
+      return;
+    }
+    let cancelled = false;
+    setQrToken(null);
+    setQrError(false);
+    parseService
+      .runFunction<{ token: string }>('generateQrToken', {
+        registrationId: selectedRegistration.objectId,
+      })
+      .then((res) => {
+        if (!cancelled) setQrToken(res.token);
+      })
+      .catch(() => {
+        if (!cancelled) setQrError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedRegistration]);
+
+  useEscapeKey(
+    () => setSelectedRegistration(null),
+    selectedRegistration !== null);
 
   const columns = useMemo(() => {
     const formConfigKeys = Object.keys(event?.formConfig ?? {});
@@ -87,6 +138,25 @@ export default function Registrations() {
 
     return value !== undefined ? String(value) : 'N/A';
   };
+
+  const getExportValue = (registration: Registration, column: string): string => {
+    if (column === 'createdAt') {
+      return formatDate(registration.createdAt);
+    }
+
+    if (column === 'status') {
+      return registration.status;
+    }
+
+    const value = registration.formData?.[column];
+
+    return value !== undefined ? String(value) : '';
+  };
+
+  const exportColumns: ExportColumn<Registration>[] = columns.map((column) => ({
+    header: formatColumnName(column),
+    getValue: (registration) => getExportValue(registration, column),
+  }));
 
   const filtered = useMemo(() => {
     return registrations.filter((registration) => {
@@ -123,9 +193,23 @@ export default function Registrations() {
   const renderStatus = (status: Registration['status']) => {
     switch (status) {
       case 'approved':
-        return <Icon icon={LuCircleCheck} size={14} />;
+        return (
+          <span className="text-success">
+            <Icon icon={LuCircleCheck} size={14} />
+          </span>
+        );
       case 'pending':
-        return <Icon icon={LuClock} size={14} />;
+        return (
+          <span className="text-secondary">
+            <Icon icon={LuClock} size={14} />
+          </span>
+        );
+      case 'rejected':
+        return (
+          <span className="text-error">
+            <Icon icon={LuCircleX} size={14} />
+          </span>
+        );
       default:
         return null;
     }
@@ -140,6 +224,20 @@ export default function Registrations() {
           registration.objectId === registrationId ? { ...registration, status } : registration,
         ),
       );
+
+      if (status === 'approved') {
+        const registration = registrations.find((r) => r.objectId === registrationId);
+
+        const email = registration?.formData?.email || (registration as any)?.email;
+
+        if (email) {
+          await NotificationService.sendEmail(
+            email,
+            'Your registration has been approved!',
+            `<h2>Good news!</h2> <p>Your registration for ${event?.title ? event.title : 'the'} event has been approved. See you there!</p>`,
+          );
+        }
+      }
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -148,13 +246,21 @@ export default function Registrations() {
     }
   };
 
-  const updateCheckInTime = async (registrationId: string, checkInTime: Registration['checkInTime']) => {
+  const updateCheckInTime = async (
+    registrationId: string,
+    checkInTime: Registration['checkInTime'],
+  ) => {
     try {
-      await parseService.update<Registration>('Registration', registrationId, { checkInTime });
+      await parseService.update<Registration>('Registration', registrationId, {
+        checkInTime,
+        isCheckedIn: true,
+      });
 
       setRegistrations((previousRegistrations) =>
         previousRegistrations.map((registration) =>
-          registration.objectId === registrationId ? { ...registration, checkInTime } : registration,
+          registration.objectId === registrationId
+            ? { ...registration, checkInTime, isCheckedIn: true }
+            : registration,
         ),
       );
     } catch (error: any) {
@@ -169,41 +275,12 @@ export default function Registrations() {
     user?.role === 'Admin' ||
     (user?.objectId != null && event?.ACL?.[user.objectId]?.read === true);
 
-  const exportRegistrations = () => {
-    if (registrations.length === 0) {
-      return;
-    }
-
-    const rows = registrations.map((registration) =>
-      columns.map((column) => {
-        if (column === 'status') {
-          return registration.status;
-        }
-
-        const value = getCellValue(registration, column);
-
-        if (
-          typeof value === 'string' &&
-          (value.includes(',') || value.includes('') || value.includes('\n'))
-        ) {
-          return `"${value.replace(/"/g, '""')}"`;
-        }
-
-        return value;
-      }),
-    );
-
-    const data = [columns, ...rows].map((row) => row.join(',')).join('\n');
-
-    const blob = new Blob(['\uFEFF' + data], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-
-    link.href = url;
-    link.download = `registrations-${event?.title ?? eventId}-${new Date().toISOString().slice(0, 10)}.csv`;
-    link.click();
-
-    URL.revokeObjectURL(url);
+  const handleExport = () => {
+    exportRegistrationsToCsv<Registration>({
+      eventTitle: event?.title ?? eventId,
+      columns: exportColumns,
+      rows: registrations,
+    });
   };
 
   if (loading) {
@@ -220,7 +297,7 @@ export default function Registrations() {
 
   return (
     <>
-      <div className="flex flex-col bg-white px-4 sm:px-8 py-4 rounded-2xl w-full">
+      <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full">
         {/* HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex flex-col">
@@ -231,11 +308,11 @@ export default function Registrations() {
           </div>
 
           {canExport && (
-            <Button onClick={() => exportRegistrations()} disabled={registrations.length === 0}>
-        <span className="flex flex-row items-center gap-2 text-lg">
-            <Icon icon={LuDownload} />
-            <span>{t('registrations.export')}</span>
-        </span>
+            <Button onClick={handleExport} disabled={registrations.length === 0}>
+              <span className="flex flex-row items-center gap-2 text-lg">
+                <Icon icon={LuDownload} />
+                <span>{t('registrations.export')}</span>
+              </span>
             </Button>
           )}
         </div>
@@ -274,7 +351,7 @@ export default function Registrations() {
 
         {/* TABLE */}
         {paginated.length === 0 ? (
-          <div className="w-full rounded-xl border mt-4 py-10 text-center text-sm text-primary/50">
+          <div className="w-full rounded-xl border mt-4 py-10 text-center text-sm text-primary/70">
             {t('registrations.noRegistrations')}
           </div>
         ) : (
@@ -289,7 +366,7 @@ export default function Registrations() {
                       {renderStatus(value as Registration['status'])}
                     </div>
                   ) : (
-                    formatCellValue(value,t)
+                    formatCellValue(value, t)
                   ),
               })),
               {
@@ -299,48 +376,50 @@ export default function Registrations() {
                   const { objectId, status, isCheckedIn } = JSON.parse(value);
 
                   return (
-                    <div className="relative flex gap-2 justify-center">
+                    <div
+                      className="relative flex gap-2 justify-center"
+                      data-action-menu={openedActionId === objectId ? '' : undefined}
+                    >
                       <button
-                        className={`w-8 h-8 flex items-center justify-center rounded-lg border p-2 transition active:scale-95 ${
+                        className={`w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface transition-colors active:scale-95 ${
                           isCheckedIn
-                            ? 'border-primary/10 bg-white text-primary hover:bg-background'
-                            : 'border-red-200 bg-red-50 text-red-600 cursor-not-allowed'
+                            ? 'text-primary/60 hover:bg-background hover:text-primary cursor-pointer'
+                            : 'text-error cursor-not-allowed'
                         }`}
-                        onClick={() => updateCheckInTime(objectId, { __type: 'Date', iso: new Date().toISOString() })}
+                        onClick={() =>
+                          updateCheckInTime(objectId, {
+                            __type: 'Date',
+                            iso: new Date().toISOString(),
+                          })
+                        }
                         disabled={!isCheckedIn}
                       >
                         <Icon icon={LuUserCheck} size={14} />
                       </button>
                       <button
-                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                         onClick={() => {
-                          const registration = registrations.find(
-                            (registration) => registration.objectId === objectId,
-                          );
-                          if (registration) {
-                            setSelectedRegistration(registration);
-                          }
+                          const registration = registrations.find((r) => r.objectId === objectId);
+                          if (registration) setSelectedRegistration(registration);
                         }}
                       >
                         <Icon icon={LuEye} size={14} />
                       </button>
 
                       <button
-                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
-                        onClick={() =>
-                          history.push(`/admin/registrations/${eventId}/${objectId}/edit`)
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
+                        onClick={(e) =>
+                          navigate(`/admin/registrations/${eventId}/${objectId}/edit`, e)
                         }
                       >
                         <Icon icon={LuPencil} size={14} />
                       </button>
 
                       <button
-                        className={`w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95 ${status === 'approved' ? 'opacity-75 cursor-not-allowed' : ''}`}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                         onClick={() =>
-                          status !== 'approved' &&
                           setOpenedActionId((id) => (id === objectId ? null : objectId))
                         }
-                        disabled={status === 'approved'}
                       >
                         <Icon icon={LuEllipsis} size={14} />
                       </button>
@@ -348,15 +427,17 @@ export default function Registrations() {
                       {openedActionId === objectId && (
                         <div className="absolute right-0 top-10 z-50 w-48 rounded-xl border shadow-lg">
                           <button
-                            className="flex w-full items-center gap-2 px-3 py-2 text-xs border border-b-0 rounded-t-xl bg-white hover:bg-background"
+                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border border-b-0 rounded-t-xl bg-surface hover:bg-background cursor-pointer ${status === 'approved' ? 'cursor-not-allowed' : ''}`}
                             onClick={() => updateStatus(objectId, 'approved')}
+                            disabled={status === 'approved'}
                           >
                             <Icon icon={LuCircleCheck} size={14} />
                             <span>{t('registrations.approve')}</span>
                           </button>
                           <button
-                            className="flex w-full items-center gap-2 px-3 py-2 text-xs border rounded-b-xl bg-white hover:bg-background"
-                            onClick={() => updateStatus(objectId, 'pending')}
+                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border rounded-b-xl bg-surface hover:bg-background cursor-pointer ${status === 'rejected' ? 'cursor-not-allowed' : ''}`}
+                            onClick={() => updateStatus(objectId, 'rejected')}
+                            disabled={status === 'rejected'}
                           >
                             <Icon icon={LuCircleX} size={14} />
                             <span>{t('registrations.reject')}</span>
@@ -374,12 +455,11 @@ export default function Registrations() {
                 ...columns.map((column) =>
                   column === 'status' ? registration.status : getCellValue(registration, column),
                 ),
-                JSON.stringify(
-                  {
-                    objectId: registration.objectId,
-                    status: registration.status,
-                    isCheckedIn: registration.checkInTime == null,
-                  }),
+                JSON.stringify({
+                  objectId: registration.objectId,
+                  status: registration.status,
+                  isCheckedIn: registration.checkInTime == null,
+                }),
               ],
             }))}
           />
@@ -394,7 +474,7 @@ export default function Registrations() {
 
           <div className="flex gap-2">
             <button
-              className={`rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95 ${totalPages === 1 ? 'opacity-75 cursor-not-allowed' : ''}`}
+              className="rounded-lg border border-primary/15 bg-surface-2 p-2 text-primary transition-colors hover:bg-primary/10 active:scale-95 disabled:text-primary/35 disabled:cursor-not-allowed"
               onClick={() => setPage((page) => Math.max(1, page - 1))}
               disabled={totalPages === 1}
             >
@@ -402,7 +482,7 @@ export default function Registrations() {
             </button>
 
             <button
-              className={`rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95 ${totalPages === 1 ? 'opacity-75 cursor-not-allowed' : ''}`}
+              className="rounded-lg border border-primary/15 bg-surface-2 p-2 text-primary transition-colors hover:bg-primary/10 active:scale-95 disabled:text-primary/35 disabled:cursor-not-allowed"
               onClick={() => setPage((page) => Math.min(totalPages, page + 1))}
               disabled={totalPages === 1}
             >
@@ -418,14 +498,14 @@ export default function Registrations() {
             onClick={() => setSelectedRegistration(null)}
           >
             <div
-              className="w-[90vw] max-w-[360px] rounded-2xl bg-white px-6 py-5 pt-2 shadow-xl"
+              className="w-[90vw] max-w-[360px] rounded-2xl bg-surface px-6 py-5 pt-2 shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">{t('registrations.details.title')}</h2>
 
                 <button
-                  className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-white hover:bg-background"
+                  className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer"
                   onClick={() => setSelectedRegistration(null)}
                 >
                   <Icon icon={LuX} size={14} />
@@ -436,7 +516,9 @@ export default function Registrations() {
                 <span className="font-semibold">Status:</span>{' '}
                 {selectedRegistration.status === 'approved'
                   ? t('registrations.details.status.approved')
-                  : t('registrations.details.status.pending')}
+                  : selectedRegistration.status === 'rejected'
+                    ? t('registrations.details.status.rejected')
+                    : t('registrations.details.status.pending')}
                 <div className="flex gap-2 items-center">
                   <span className="font-semibold">{t('registrations.details.date')}:</span>
                   {formatDate(selectedRegistration.createdAt)}
@@ -444,9 +526,25 @@ export default function Registrations() {
                 {Object.entries(selectedRegistration.formData ?? {}).map(([key, value]) => (
                   <div key={key} className="flex gap-2 items-center">
                     <span className="font-semibold">{formatColumnName(key)}:</span>
-                    {formatCellValue(String(value),t)}
+                    {formatCellValue(String(value), t)}
                   </div>
                 ))}
+                <div className="flex flex-col items-center gap-2 border-t border-primary/10 pt-3">
+                  <span className="self-start font-semibold">
+                    {t('registrations.details.qrCode')}:
+                  </span>
+                  {qrToken ? (
+                    <div className="rounded-lg border border-primary/10 bg-surface p-3">
+                      <QRCodeSVG value={qrToken} size={180} level="M" />
+                    </div>
+                  ) : (
+                    <span className="text-xs text-primary/70">
+                      {qrError
+                        ? t('registrations.details.qrError')
+                        : t('registrations.details.qrLoading')}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>

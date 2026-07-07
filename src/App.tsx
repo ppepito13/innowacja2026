@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import { AuthProvider } from './auth/AuthProvider';
+import { ThemeProvider } from './theme/ThemeProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
 
 import Layout from './components/Layout';
@@ -33,7 +34,8 @@ const EventManagementEdit = () => <EventManagement mode="edit" />;
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <ThemeProvider>
+        <Router>
         <Switch>
           {/* Public Fullscreen Routes */}
           <Route exact path="/events/:eventId" component={EventDetails} />
@@ -63,8 +65,18 @@ function App() {
                 />
                 <ProtectedRoute
                   exact
+                <ProtectedRoute
+                  exact
                   path="/admin/registrations"
                   component={RegistrationsList}
+                  requiredRole={['Admin', 'Organizer']}
+                />
+                <ProtectedRoute
+                  exact
+                  path="/admin/events/:id/formconfig"
+                  component={FormConfig}
+                  requiredRole={['Admin', 'Organizer']}
+                />
                   requiredRole={['Admin', 'Organizer']}
                 />
                 <ProtectedRoute
@@ -81,7 +93,7 @@ function App() {
                 />
                 <ProtectedRoute
                   exact
-                  path="/admin/check-in"
+                  path="/admin/check-in/:eventId?"
                   component={CheckIn}
                   requiredRole="Admin"
                 />
@@ -118,9 +130,10 @@ function App() {
                 <Route exact path="/" component={Home} />
               </Switch>
             </Layout>
-          </Route>
-        </Switch>
-      </Router>
+            </Route>
+          </Switch>
+        </Router>
+      </ThemeProvider>
     </AuthProvider>
   );
 }
