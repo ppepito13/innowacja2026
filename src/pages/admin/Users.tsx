@@ -5,10 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { User } from '../../types/types';
 import Icon from '../../components/Icon';
 import parseClient from '../../services/parseClient';
+import { useNavigateOrOpen } from '../../hooks/useNavigateOrOpen';
 
 export default function Users() {
   const { t } = useTranslation();
   const history = useHistory();
+  const navigate = useNavigateOrOpen();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -124,7 +126,7 @@ export default function Users() {
       ) : (
         <div className="overflow-x-auto w-full">
           <table className="w-full text-sm min-w-[480px]">
-            <thead>
+<thead>
               <tr className="border-b border-primary/10 text-left">
                 <th
                   className="pb-3 font-medium text-primary/70 cursor-pointer select-none"
@@ -166,7 +168,7 @@ export default function Users() {
                   <td className="py-3">
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => history.push(`/admin/users/${user.objectId}/edit`)}
+                        onClick={(e) => navigate(`/admin/users/${user.objectId}/edit`, e)}
                         className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                       >
                         <Icon icon={LuPencil} />

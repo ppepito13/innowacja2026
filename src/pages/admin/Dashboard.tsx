@@ -14,6 +14,7 @@ import {
 } from 'react-icons/lu';
 import { parseService } from '../../services/parseService';
 import { useAuth } from '../../auth/AuthProvider';
+import { useNavigateOrOpen } from '../../hooks/useNavigateOrOpen';
 import { Event, EventOrganizer } from '../../types/types';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
@@ -31,6 +32,7 @@ function formatDate(d: Event['startDate']): string {
 export default function Dashboard() {
   const { t } = useTranslation();
   const history = useHistory();
+  const navigate = useNavigateOrOpen();
   const { user } = useAuth();
 
   const [events, setEvents] = useState<Event[]>([]);
@@ -265,28 +267,28 @@ export default function Dashboard() {
                   <td className="py-3">
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => history.push(`/admin/events/${event.objectId}/edit`)}
+                        onClick={(e) => navigate(`/admin/events/${event.objectId}/edit`, e)}
                         className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                         title={t('dashboard.editEvent')}
                       >
                         <Icon icon={LuPencil} />
                       </button>
                       <button
-                        onClick={() => history.push(`/admin/registrations/${event.objectId}`)}
+                        onClick={(e) => navigate(`/admin/registrations/${event.objectId}`, e)}
                         className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                         title={t('dashboard.goToRegistrations')}
                       >
                         <Icon icon={LuUsers} />
                       </button>
                       <button
-                        onClick={() => history.push(`/admin/check-in/${event.objectId}`)}
+                        onClick={(e) => navigate(`/admin/check-in/${event.objectId}`, e)}
                         className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                         title={t('dashboard.goToCheckin')}
                       >
                         <Icon icon={LuQrCode} />
                       </button>
                       <button
-                        onClick={() => history.push(`/events/${event.objectId}`)}
+                        onClick={(e) => navigate(`/events/${event.objectId}`, e)}
                         className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                         title={t('dashboard.viewPublicPage')}
                       >

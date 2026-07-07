@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useHistory } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../auth/AuthProvider';
+import { useNavigateOrOpen } from '../hooks/useNavigateOrOpen';
 
 import './AdminLayout.css';
 
@@ -41,6 +42,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const history = useHistory();
+  const navigate = useNavigateOrOpen();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -66,8 +68,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     setMobileOpen(false);
   };
 
-  const handleNavClick = (path: string) => {
-    history.push(path);
+  const handleNavClick = (path: string, e: React.MouseEvent<HTMLElement>) => {
+    navigate(path, e);
     setMobileOpen(false);
   };
 
@@ -109,7 +111,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             return (
               <button
                 key={item.path}
-                onClick={() => handleNavClick(item.path)}
+                onClick={(e) => handleNavClick(item.path, e)}
                 title={collapsed ? t(item.labelKey) : undefined}
                 className={`admin-nav-item ${collapsedClass} ${activeClass}`}
               >
