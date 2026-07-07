@@ -3,6 +3,7 @@ import type {FieldType, FormField, optionsTranslation} from "../../types/types";
 import { TYPES_WITH_OPTIONS } from "./constants";
 import TypeDropdown from "./TypeDropdown";
 import OptionsList from "./OptionsList";
+import Toggle from "../Toggle";
 
 interface FieldCardProps {
   field: FormField;
@@ -28,24 +29,24 @@ export default function FieldCard({
 
   return (
     <div
-      className={`bg-gray-900 rounded-[10px] p-5 border border-slate-800 relative transition-colors duration-200 ${
-        error ? "border-l-[3px] border-l-red-500" : "border-l-[3px] border-l-amber-400/25"
+      className={`rounded-lg border p-5 relative transition-colors duration-200 ${
+        error ? "border-red-500/60" : "border-primary/10"
       }`}
     >
       {/* Header: index badge + delete */}
       <div className="flex justify-between items-center mb-3.5">
-        <span className="bg-slate-800 text-amber-400 rounded-md px-2.5 py-0.5 text-xs font-bold tracking-wider">
+        <span className="bg-secondary text-brand rounded-md px-2.5 py-0.5 text-xs font-bold tracking-wider">
           {index + 1}
         </span>
         <button
           onClick={onRemove}
-          className="bg-slate-800 border border-slate-700 rounded-md w-[30px] h-[30px] flex items-center justify-center cursor-pointer hover:bg-slate-700 transition-colors"
+          className="bg-transparent border border-primary/10 rounded-lg w-[30px] h-[30px] flex items-center justify-center cursor-pointer text-red-500 hover:bg-background transition-colors"
           title={t("formConfig.removeField")}
         >
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
             <path
               d="M5 2h6M2 4h12M6 4v8M10 4v8M3 4l1 10h8l1-10"
-              stroke="#ef4444"
+              stroke="currentColor"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -55,9 +56,9 @@ export default function FieldCard({
       </div>
 
       {/* Label + Placeholder */}
-      <div className="flex gap-4 mb-3 flex-wrap items-end">
-        <div className="flex-1">
-          <label className="block text-[11px] text-slate-500 tracking-wider uppercase mb-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label className="block text-xs font-medium text-primary/70 mb-1.5">
             {t("formConfig.label")}
           </label>
           <input
@@ -68,10 +69,10 @@ export default function FieldCard({
               error ? "border-red-500" : "border-slate-700"
             }`}
           />
-          {error && <div className="text-red-500 text-[11px] mt-0.5">{error}</div>}
+          {error && <div className="text-red-600 text-xs mt-1">{error}</div>}
         </div>
-        <div className="flex-1">
-          <label className="block text-[11px] text-slate-500 tracking-wider uppercase mb-1">
+        <div>
+          <label className="block text-xs font-medium text-primary/70 mb-1.5">
             {t("formConfig.placeholder")}
           </label>
           <input
@@ -86,7 +87,7 @@ export default function FieldCard({
       {/* Type + Required */}
       <div className="flex gap-4 mb-3 flex-wrap items-end">
         <div>
-          <label className="block text-[11px] text-slate-500 tracking-wider uppercase mb-1">
+          <label className="block text-xs font-medium text-primary/70 mb-1.5">
             {t("formConfig.type")}
           </label>
           <TypeDropdown
@@ -108,23 +109,14 @@ export default function FieldCard({
           />
         </div>
 
-        <label className="flex flex-col items-start gap-1 cursor-pointer">
-          <span className="block text-[11px] text-slate-500 tracking-wider uppercase">
+        <label className="flex flex-col items-start gap-1.5 cursor-pointer pb-1">
+          <span className="block text-xs font-medium text-primary/70">
             {t("formConfig.required")}
           </span>
-          <div
-            onClick={() => onUpdate({ required: !field.required })}
-            className={`w-10 h-[22px] rounded-full border border-slate-700 relative cursor-pointer transition-colors duration-200 ${
-              field.required ? "bg-amber-400" : "bg-slate-800"
-            }`}
-          >
-            <div
-              className="w-4 h-4 rounded-full bg-slate-50 absolute top-[2px] shadow-sm transition-transform duration-200"
-              style={{
-                transform: field.required ? "translateX(18px)" : "translateX(2px)",
-              }}
-            />
-          </div>
+          <Toggle
+            checked={field.required}
+            onChange={(v) => onUpdate({ required: v })}
+          />
         </label>
         <div className="w-32">
           <label className="block text-[11px] text-slate-500 tracking-wider uppercase mb-1">

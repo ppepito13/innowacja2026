@@ -66,7 +66,7 @@ export default function RegistrationEdit() {
   }
 
   return (
-    <div className="flex flex-col bg-white px-8 py-4 rounded-2xl w-[512px]">
+    <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-lg">
       {/* HEADER */}
       <div className="flex flex-row items-center justify-between">
         <div className="flex flex-col">
@@ -77,7 +77,7 @@ export default function RegistrationEdit() {
         </div>
 
         <button
-          className="w-9 h-9 flex items-center justify-center rounded-lg border border-primary/10 bg-white p-2 text-primary transition hover:bg-background active:scale-95"
+          className="w-9 h-9 flex items-center justify-center rounded-lg border border-primary/10 bg-surface p-2 text-primary transition hover:bg-background active:scale-95"
           onClick={() => history.goBack()}
         >
           <Icon icon={LuArrowLeft} />

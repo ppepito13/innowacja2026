@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Event } from '../types/types';
 import { formatColumnName, formatDate } from '../utils/formatters';
 import { parseService, createPointer } from '../services/parseService';
-import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle } from 'react-icons/lu';
+import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle, LuLink } from 'react-icons/lu';
+import DOMPurify from 'dompurify';
 import Icon from '../components/Icon';
 import { EMAIL_REGEX, PHONE_REGEX } from '../utils/regex';
+import parseClient from '../services/parseClient';
+import { MAP_IFRAME_WIDTH, MAP_IFRAME_HEIGHT } from '../constants/eventDefaults';
 
 const LANGUAGES = [
   { code: 'en', label: 'EN' },
@@ -27,7 +30,11 @@ export default function EventDetails() {
   console.log(currentLabel);
   useEffect(() => {
     if (!eventId) return;
-    parseService.getById<Event>('TestEvent', eventId).then(setEvent);
+    parseClient
+      .get(`/classes/TestEvent/${eventId}`, {
+        headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY },
+      })
+      .then(({ data }) => setEvent(data));
   }, [eventId]);
 
   const validateField = (value: string, field: any) => {
@@ -68,8 +75,9 @@ export default function EventDetails() {
       await parseService.create('Registration', {
         event: createPointer('TestEvent', event.objectId!),
         formData,
-        status: 'pending',
+        status: event.requiresApproval ? 'pending' : 'approved',
         consent: true,
+        ACL: event.ACL,
       });
 
       setFormData({});
@@ -85,51 +93,60 @@ export default function EventDetails() {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-[#111111] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-primary flex items-center justify-center">
         <Icon icon={LuLoaderCircle} size={32} className="animate-spin" />
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-[#0b1521] text-white font-sans relative pb-16">
-      <header className="bg-[#1f2937] p-4 flex items-center justify-between shadow-md relative z-20">
-        <div className="text-xl font-bold text-white">Commerzbank Events</div>
+  const showMapEmbed = event.eventFormat === 'on-site' || event.eventFormat === 'hybrid';
 
-        <div className="flex gap-2 text-sm">
-          {LANGUAGES.map(({ code, label }) => (
-            <button
-              key={code}
-              type="button"
-              onClick={() => {
+  return (
+    <div className="min-h-screen bg-background text-primary font-sans relative pb-16 overflow-x-hidden">
+      <header className="bg-surface p-4 flex items-center justify-between shadow-md relative z-20">
+        <Link
+          to="/"
+          className="text-xl font-bold text-primary no-underline hover:opacity-80 transition-opacity"
+        >
+          {t('common.brand')}
+        </Link>
+
+        <div className="flex items-center gap-3 text-sm">
+          <div className="flex gap-2">
+            {LANGUAGES.map(({ code, label }) => (
+              <button
+                key={code}
+                type="button"
+                onClick={() => {
                 i18n.changeLanguage(code);
                 currentLabel = i18n.language;
               }
-              }
-              className={`cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide ${
-                i18n.language === code ? 'text-white' : 'text-gray-500 hover:text-gray-300'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+                        }
+                className={`cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide ${
+                  i18n.language === code ? 'text-primary' : 'text-primary/50 hover:text-primary/70'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
-      <div className="w-full h-[50vh] relative z-0">
+      <div className="w-full h-[35vh] sm:h-[50vh] relative z-0">
         <img src={event.heroImageUrl} alt={event.title} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0b1521]/40 to-[#0b1521]"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background"></div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-40">
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
-          <section className="w-full lg:w-[60%] bg-[#162436] rounded-xl shadow-2xl overflow-hidden">
-            <div className="p-8 md:p-10">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white tracking-tight">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-16 sm:-mt-40">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full min-w-0">
+          <section className="col-span-1 lg:col-span-7 bg-surface rounded-xl shadow-2xl overflow-hidden min-w-0">
+            <div className="p-5 md:p-10">
+              <h1 className="text-2xl md:text-4xl font-bold mb-4 text-primary tracking-tight">
                 {event.title}
               </h1>
 
-              <div className="flex flex-wrap gap-6 text-sm text-gray-400 mb-8 pb-6 border-b border-gray-700/50">
+              <div className="flex flex-wrap gap-6 text-sm text-primary/60 mb-8 pb-6 border-b border-primary/10">
                 <div className="flex items-center gap-2">
                   <Icon icon={LuCalendarDays} size={16} />
                   <span>
@@ -151,104 +168,69 @@ export default function EventDetails() {
                     <span>{event.location}</span>
                   </div>
                 )}
+
+                {event.eventFormat === 'hybrid' && event.meetingLink && (
+                  <a
+                    href={event.meetingLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-primary/60 hover:text-primary transition-colors"
+                  >
+                    <Icon icon={LuLink} size={16} />
+                    <span>{t('eventDetails.joinOnline')}</span>
+                  </a>
+                )}
               </div>
 
+              {showMapEmbed && event.location && (
+                <div className="mb-8">
+                  <iframe
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(event.location)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                    title={`${t('eventDetails.locationPreview')}`}
+                    width={MAP_IFRAME_WIDTH}
+                    height={MAP_IFRAME_HEIGHT}
+                    style={{ border: 0 }}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="rounded-lg border border-primary/10 max-w-full w-full"
+                  />
+                </div>
+              )}
+
               <div
-                className="prose prose-invert max-w-none text-gray-300 leading-relaxed text-sm md:text-base"
-                dangerouslySetInnerHTML={{ __html: event.description || '' }}
+                className="rte-content max-w-none text-primary/70 leading-relaxed text-sm md:text-base break-words overflow-x-auto w-full"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.description || '') }}
               />
             </div>
           </section>
 
-          <section className="w-full lg:w-[40%] bg-[#162436] rounded-xl shadow-2xl p-8 sticky top-8">
-            <h2 className="text-xl font-bold mb-1 text-white">{t('eventDetails.registerNow')}</h2>
-            <p className="text-sm text-gray-400 mb-8">{t('eventDetails.fillForm')}</p>
+          <section className="col-span-1 lg:col-span-5 bg-surface rounded-xl shadow-2xl lg:sticky lg:top-8 overflow-hidden min-w-0">
+            <div className="p-5 sm:p-8">
+              <h2 className="text-xl font-bold mb-1 text-primary">
+                {t('eventDetails.registerNow')}
+              </h2>
+              <p className="text-sm text-primary/60 mb-8">{t('eventDetails.fillForm')}</p>
 
-            <form className="flex flex-col gap-6">
-              {Object.entries(event.formConfig ?? {}).map(([key, config]) => {
-                const field = config as any;
-                const isRequired = field.required === true;
-                const value = formData[key] || '';
+              <form className="flex flex-col gap-6 w-full min-w-0">
+                {Object.entries(event.formConfig ?? {}).map(([key, config]) => {
+                  const field = config as any;
+                  const isRequired = field.required === true;
+                  const value = formData[key] || '';
 
-                return (
-                  <div key={key}>
-                    <label htmlFor={key} className="block text-xs font-bold text-white mb-2">
-                      {currentLabel === "pl" ? field.i18n["pl"] : field.i18n["en"]}{' '}
-                      {isRequired && <span className="text-red-500">*</span>}
-                    </label>
+                  return (
+                    <div key={key} className="w-full min-w-0 flex flex-col">
+                      <label
+                        htmlFor={key}
+                        className="block text-xs font-bold text-primary mb-2 truncate"
+                      >
+                        {currentLabel === "pl" ? field.i18n["pl"] : field.i18n["en"]}{' '}
+                        {isRequired && <span className="text-red-500">*</span>}
+                      </label>
 
-                    {field.type === 'text' && (
-                      <input
-                        id={key}
-                        type="text"
-                        value={value}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setFormData((prev) => ({ ...prev, [key]: val }));
-                          setFormErrors((prev) => ({
-                            ...prev,
-                            [key]: validateField(val, field),
-                          }));
-                        }}
-                        className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
-                      />
-                    )}
-
-                    {field.type === 'email' && (
-                      <input
-                        id={key}
-                        type="email"
-                        value={value}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setFormData((prev) => ({ ...prev, [key]: val }));
-                          setFormErrors((prev) => ({
-                            ...prev,
-                            [key]: validateField(val, field),
-                          }));
-                        }}
-                        className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
-                      />
-                    )}
-
-                    {field.type === 'phone' && (
-                      <input
-                        id={key}
-                        type="tel"
-                        value={value}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setFormData((prev) => ({ ...prev, [key]: val }));
-                          setFormErrors((prev) => ({
-                            ...prev,
-                            [key]: validateField(val, field),
-                          }));
-                        }}
-                        className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
-                      />
-                    )}
-
-                    {field.type === 'number' && (
-                      <input
-                        id={key}
-                        type="number"
-                        value={value}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setFormData((prev) => ({ ...prev, [key]: val }));
-                          setFormErrors((prev) => ({
-                            ...prev,
-                            [key]: validateField(val, field),
-                          }));
-                        }}
-                        className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors"
-                      />
-                    )}
-
-                    {field.type === 'dropdown' && (
-                      <div className="relative w-full box-border">
-                        <select
+                      {(field.type === 'string' || field.type === 'text') && (
+                        <input
                           id={key}
+                          type="text"
                           value={value}
                           onChange={(e) => {
                             const val = e.target.value;
@@ -258,85 +240,154 @@ export default function EventDetails() {
                               [key]: validateField(val, field),
                             }));
                           }}
-                          className="w-full box-border bg-[#24364b] border border-transparent rounded-md px-4 py-3 text-sm text-white focus:outline-none focus:border-gray-500 transition-colors appearance-none"
-                        >
-                          <option value="" disabled hidden>
-                            {t('eventDetails.selectOption')}
-                          </option>
-                          {field.options?.map((value: string, index: number) => (
+                          className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
+                        />
+                      )}
+
+                      {field.type === 'email' && (
+                        <input
+                          id={key}
+                          type="email"
+                          value={value}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setFormData((prev) => ({ ...prev, [key]: val }));
+                            setFormErrors((prev) => ({
+                              ...prev,
+                              [key]: validateField(val, field),
+                            }));
+                          }}
+                          className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
+                        />
+                      )}
+
+                      {field.type === 'phone' && (
+                        <input
+                          id={key}
+                          type="tel"
+                          value={value}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setFormData((prev) => ({ ...prev, [key]: val }));
+                            setFormErrors((prev) => ({
+                              ...prev,
+                              [key]: validateField(val, field),
+                            }));
+                          }}
+                          className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
+                        />
+                      )}
+
+                      {field.type === 'number' && (
+                        <input
+                          id={key}
+                          type="number"
+                          value={value}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setFormData((prev) => ({ ...prev, [key]: val }));
+                            setFormErrors((prev) => ({
+                              ...prev,
+                              [key]: validateField(val, field),
+                            }));
+                          }}
+                          className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
+                        />
+                      )}
+
+                      {(field.type === 'select' || field.type === 'dropdown') && (
+                        <div className="relative w-full box-border min-w-0">
+                          <select
+                            id={key}
+                            value={value}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setFormData((prev) => ({ ...prev, [key]: val }));
+                              setFormErrors((prev) => ({
+                                ...prev,
+                                [key]: validateField(val, field),
+                              }));
+                            }}
+                            className="w-full box-border bg-surface-2 border border-transparent rounded-md pl-4 pr-10 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors appearance-none truncate"
+                          >
+                            <option value="" disabled hidden>
+                              {t('eventDetails.selectOption')}
+                            </option>
+                            {(field.options || field.values)?.map((val: string, index: number) => (
                             <option key={value} value={i18n.language === "pl" ? field.optionsTranslation[index].i18n.pl : field.optionsTranslation[index].i18n.en}>
                               {i18n.language === "pl" ? field.optionsTranslation[index].i18n.pl : field.optionsTranslation[index].i18n.en}
-                            </option>
-                          ))}
-                        </select>
+                              </option>
+                            ))}
+                          </select>
 
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                          <Icon icon={LuChevronDown} size={16} />
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-primary/60">
+                            <Icon icon={LuChevronDown} size={16} />
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {formErrors[key] && (
-                      <p className="text-xs text-yellow-400 mt-1">{formErrors[key]}</p>
-                    )}
-                  </div>
-                );
-              })}
+                      {formErrors[key] && (
+                        <p className="text-xs text-yellow-400 mt-1">{formErrors[key]}</p>
+                      )}
+                    </div>
+                  );
+                })}
 
-              <div className="bg-[#1e2e40] border border-gray-600/50 rounded-md p-4 mt-2">
-                <div className="flex items-start gap-3">
-                  <div className="flex items-center mt-1">
-                    <input
-                      id="consent"
-                      type="checkbox"
-                      checked={consent}
-                      onChange={(e) => setConsent(e.target.checked)}
-                      className="w-4 h-4 rounded-full border border-gray-500 bg-[#162436] focus:ring-0 cursor-pointer appearance-none checked:bg-current"
-                      style={{ color: event.primaryColor, borderColor: event.accentColor }}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="consent"
-                      className="text-sm font-medium text-white cursor-pointer block mb-1"
-                    >
-                      {t('eventDetails.dataConsent')} <span className="text-red-500">*</span>
-                    </label>
-                    <p className="text-xs text-gray-300">
-                      {t('eventDetails.readMoreIn')}{' '}
-                      <a
-                        href={
-                          event.dataProcessingAgreement !== undefined
-                            ? event.dataProcessingAgreement
-                            : '#terms'
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline text-gray-200 hover:text-white"
+                <div className="bg-surface-2 border border-primary/15 rounded-md p-4 mt-2 w-full box-border min-w-0">
+                  <div className="flex items-start gap-3">
+                    <div className="flex items-center mt-1 shrink-0">
+                      <input
+                        id="consent"
+                        type="checkbox"
+                        checked={consent}
+                        onChange={(e) => setConsent(e.target.checked)}
+                        className="w-4 h-4 rounded-full border border-secondary bg-surface focus:ring-0 cursor-pointer appearance-none checked:bg-secondary"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="consent"
+                        className="text-sm font-medium text-primary cursor-pointer block mb-1 break-words"
                       >
-                        {t('eventDetails.termsAndConditions')}
-                      </a>
-                      .
-                    </p>
+                        {t('eventDetails.dataConsent')} <span className="text-red-500">*</span>
+                      </label>
+                      <p className="text-xs text-primary/70">
+                        {t('eventDetails.readMoreIn')}{' '}
+                        <a
+                          href={
+                            event.dataProcessingAgreement !== undefined
+                              ? event.dataProcessingAgreement
+                              : '#terms'
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline text-primary/80 hover:text-primary"
+                        >
+                          {t('eventDetails.termsAndConditions')}
+                        </a>
+                        .
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <p className="text-[11px] text-gray-400 -mt-2">* {t('eventDetails.requiredField')}</p>
+                <p className="text-[11px] text-primary/60 -mt-2">
+                  * {t('eventDetails.requiredField')}
+                </p>
 
-              <button
-                type="button"
-                className="w-full mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                style={{ backgroundColor: event.accentColor }}
-                onClick={handleSubmit}
-                disabled={loading || !isFormValid}
-              >
-                {t('eventDetails.register')}
-              </button>
+                <button
+                  type="button"
+                  className="w-full box-border mt-2 py-3 px-4 rounded-md bg-secondary text-brand font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  onClick={handleSubmit}
+                  disabled={loading || !isFormValid}
+                >
+                  {t('eventDetails.register')}
+                </button>
 
-              {success && <p className="text-green-400 text-sm">{t('eventDetails.success')}</p>}
-              {error && <p className="text-red-400 text-sm">{error}</p>}
-            </form>
+                {success && <p className="text-green-400 text-sm">{t('eventDetails.success')}</p>}
+                {error && <p className="text-red-400 text-sm">{error}</p>}
+              </form>
+            </div>
           </section>
         </div>
       </main>

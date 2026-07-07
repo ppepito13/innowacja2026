@@ -80,6 +80,12 @@ export const parseService = {
   async remove(className: string, objectId: string): Promise<void> {
     await parseClient.delete(`/classes/${className}/${objectId}`);
   },
+
+  /** Wywołaj funkcję Parse Cloud Code */
+  async runFunction<T>(name: string, params: Record<string, unknown> = {}): Promise<T> {
+    const { data } = await parseClient.post<{ result: T }>(`/functions/${name}`, params);
+    return data.result;
+  },
 };
 
 //  Auth
@@ -105,6 +111,10 @@ export const authService = {
   async logout(): Promise<void> {
     await parseClient.post('/logout');
     localStorage.removeItem(SESSION_TOKEN_KEY);
+  },
+
+  async updateThemePreference(objectId: string, theme: 'light' | 'dark'): Promise<void> {
+    await parseClient.put(`/users/${objectId}`, { themePreference: theme });
   },
 
   async getCurrentUser(): Promise<ParseObject | null> {
