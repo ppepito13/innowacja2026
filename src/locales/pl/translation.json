@@ -184,6 +184,12 @@
       "dataProcessingAgreement": "URL polityki przetwarzania danych",
       "upload": "Wgraj",
       "uploading": "Wgrywanie..."
+    },
+    "validation": {
+      "fillRequired": "Uzupełnij wszystkie wymagane pola",
+      "titleRequired": "Nazwa wydarzenia jest wymagana",
+      "startDateRequired": "Data początkowa jest wymagana",
+      "endDateRequired": "Data końcowa jest wymagana"
     }
   },
   "registrationEdit": {
@@ -212,7 +218,12 @@
     "termsAndConditions": "regulaminie",
     "requiredField": "Pole wymagane.",
     "register": "Zarejestruj",
-    "joinOnline": "Dołącz online"
+    "joinOnline": "Dołącz online",
+    "validation": {
+      "required": "To pole jest wymagane.",
+      "email": "Podaj poprawny adres e-mail.",
+      "phone": "Podaj poprawny numer telefonu."
+    }
   },
   "formConfig": {
     "title": "Kreator formularza",
@@ -288,6 +299,8 @@
       "password": "Hasło",
       "passwordHint": "Domyślne hasło to \"password\". Użytkownik może je zmienić po pierwszym logowaniu.",
       "role": "Rola",
+      "events": "Wydarzenia",
+      "noEvents": "Brak dostępnych wydarzeń.",
       "roleHint": "Dostęp tylko do przypisanych wydarzeń.",
       "cancel": "Anuluj",
       "submit": "Dodaj użytkownika",
@@ -302,6 +315,8 @@
       "newPassword": "Nowe hasło",
       "passwordHint": "Zostaw puste, aby zachować obecne hasło.",
       "role": "Rola",
+      "events": "Wydarzenia",
+      "noEvents": "Brak dostępnych wydarzeń.",
       "lockAccount": "Zablokuj konto",
       "lockAccountHint": "Użytkownik nie będzie mógł się zalogować.",
       "cancel": "Anuluj",

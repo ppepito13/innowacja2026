@@ -268,35 +268,35 @@ export default function Dashboard() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={(e) => navigate(`/admin/events/${event.objectId}/edit`, e)}
-                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/60 hover:text-primary cursor-pointer border-none bg-transparent"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                         title={t('dashboard.editEvent')}
                       >
                         <Icon icon={LuPencil} />
                       </button>
                       <button
                         onClick={(e) => navigate(`/admin/registrations/${event.objectId}`, e)}
-                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/60 hover:text-primary cursor-pointer border-none bg-transparent"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                         title={t('dashboard.goToRegistrations')}
                       >
                         <Icon icon={LuUsers} />
                       </button>
                       <button
                         onClick={(e) => navigate(`/admin/check-in/${event.objectId}`, e)}
-                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/60 hover:text-primary cursor-pointer border-none bg-transparent"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                         title={t('dashboard.goToCheckin')}
                       >
                         <Icon icon={LuQrCode} />
                       </button>
                       <button
                         onClick={(e) => navigate(`/events/${event.objectId}`, e)}
-                        className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/60 hover:text-primary cursor-pointer border-none bg-transparent"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
                         title={t('dashboard.viewPublicPage')}
                       >
                         <Icon icon={LuLink} />
                       </button>
                       <button
                         onClick={() => handleDelete(event)}
-                        className="p-2 rounded-lg hover:bg-red-50 transition-colors text-primary/60 hover:text-red-600 cursor-pointer border-none bg-transparent"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-error/10 hover:text-error cursor-pointer active:scale-95"
                         title={t('dashboard.deleteEvent')}
                       >
                         <Icon icon={LuTrash2} />

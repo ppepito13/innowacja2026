@@ -184,6 +184,12 @@
       "dataProcessingAgreement": "Data Processing Agreement URL",
       "upload": "Upload",
       "uploading": "Uploading..."
+    },
+    "validation": {
+      "fillRequired": "Please fill in all required fields",
+      "titleRequired": "Event name is required",
+      "startDateRequired": "Start date is required",
+      "endDateRequired": "End date is required"
     }
   },
   "registrationEdit": {
@@ -212,7 +218,12 @@
     "termsAndConditions": "terms and conditions",
     "requiredField": "Required field.",
     "register": "Register",
-    "joinOnline": "Join online"
+    "joinOnline": "Join online",
+    "validation": {
+      "required": "This field is required.",
+      "email": "Please enter a valid email address.",
+      "phone": "Please enter a valid phone number."
+    }
   },
   "formConfig": {
     "title": "Form Builder",
@@ -288,6 +299,8 @@
       "password": "Password",
       "passwordHint": "Default password is \"password\". User can change it after first login.",
       "role": "Role",
+      "events": "Events",
+      "noEvents": "No events available.",
       "roleHint": "Access only to assigned events.",
       "cancel": "Cancel",
       "submit": "Add User",
@@ -302,6 +315,8 @@
       "newPassword": "New Password",
       "passwordHint": "Leave empty to keep current password.",
       "role": "Role",
+      "events": "Events",
+      "noEvents": "No events available.",
       "lockAccount": "Lock account",
       "lockAccountHint": "User will not be able to log in.",
       "cancel": "Cancel",

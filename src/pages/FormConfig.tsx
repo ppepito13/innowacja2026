@@ -143,34 +143,22 @@ export default function FormConfig() {
 
   const formConfig = buildFormConfig();
   return (
-    <div className="font-mono bg-background min-h-screen text-primary">
+    <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-4xl">
       {/* Header */}
-      <div className="flex justify-between items-center px-8 pt-7 pb-5 border-b border-primary/10 bg-gradient-to-b from-surface to-background flex-wrap gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-2">
         <div>
-          <h1 className="m-0 text-[22px] font-bold -tracking-wide text-primary">
-            {t("formConfig.title")}
-          </h1>
-          <p className="mt-1 mb-0 text-[13px] text-primary/50 tracking-wide">
-            {t("formConfig.subtitle")}
-          </p>
+          <h1 className="text-3xl mb-0">{t("formConfig.title")}</h1>
+          <p className="text-lg mt-0 text-primary/75">{t("formConfig.subtitle")}</p>
         </div>
-        <div className="flex gap-2.5 items-center">
-          <button
-            onClick={() => setJsonPreview(!jsonPreview)}
-            className="bg-surface-2 text-primary/60 border border-primary/20 rounded-md px-4 py-2 text-[13px] font-mono cursor-pointer hover:bg-surface-2 transition-colors"
-          >
-            {jsonPreview ? t("formConfig.hideJson") : t("formConfig.showJson")}
-          </button>
-          <button
-            onClick={handleSave}
-            className="bg-secondary text-brand border-none rounded-md px-5 py-2 text-[13px] font-bold font-mono cursor-pointer tracking-wide hover:bg-secondary transition-colors"
-          >
-            {saved ? `✓ ${t("formConfig.saved")}` : t("formConfig.save")}
-          </button>
-        </div>
+        <button
+          onClick={() => setJsonPreview(!jsonPreview)}
+          className="self-start px-4 py-2 rounded-lg border border-primary/20 bg-transparent text-sm text-primary cursor-pointer hover:bg-background transition-colors"
+        >
+          {jsonPreview ? t("formConfig.hideJson") : t("formConfig.showJson")}
+        </button>
       </div>
 
-      <div className="flex gap-6 px-8 py-6 items-start flex-wrap">
+      <div className="flex gap-6 items-start flex-wrap mt-2">
         {/* Field cards */}
         <div className="flex-[1_1_460px] flex flex-col gap-4 min-w-0">
           {fields.map((field, i) => (
@@ -188,7 +176,7 @@ export default function FormConfig() {
 
           <button
             onClick={addField}
-            className="bg-surface border-2 border-dashed border-primary/10 rounded-[10px] text-secondary px-5 py-4 text-sm font-semibold font-mono cursor-pointer flex items-center justify-center hover:border-primary/40 hover:bg-surface-2 transition-colors"
+            className="bg-transparent border-2 border-dashed border-primary/20 rounded-lg text-primary/70 px-5 py-4 text-sm font-semibold cursor-pointer flex items-center justify-center hover:border-primary/40 hover:bg-background transition-colors"
           >
             <span className="text-xl mr-2">＋</span>
             {t("formConfig.addField")}
@@ -197,28 +185,36 @@ export default function FormConfig() {
 
         {/* JSON Preview */}
         {jsonPreview && (
-          <div className="flex-[0_0_340px] bg-surface rounded-[10px] border border-primary/10 overflow-auto sticky top-6 max-h-[80vh]">
+          <div className="flex-[0_0_340px] bg-surface-2 rounded-lg border border-primary/10 overflow-auto sticky top-6 max-h-[80vh]">
             <div className="flex justify-between items-center px-4 py-3 border-b border-primary/10">
-              <span className="text-xs tracking-wider text-primary/60">
+              <span className="text-xs tracking-wider text-primary/70">
                 formConfig
               </span>
-              <span className="bg-secondary/10 text-secondary rounded px-2 py-0.5 text-[10px] font-bold tracking-wider">
+              <span className="bg-secondary text-brand rounded px-2 py-0.5 text-[10px] font-bold tracking-wider">
                 JSON
               </span>
             </div>
-            <pre className="m-0 p-4 text-xs leading-relaxed text-primary/60 overflow-x-auto whitespace-pre-wrap break-words">
+            <pre className="m-0 p-4 text-xs font-mono leading-relaxed text-primary/80 overflow-x-auto whitespace-pre-wrap break-words">
               {JSON.stringify(formConfig, null, 2)}
             </pre>
           </div>
         )}
       </div>
 
-      {/* Validation error banner */}
-      {Object.keys(errors).length > 0 && (
-        <div className="mx-8 mb-6 px-4 py-2.5 bg-red-900/10 border border-red-900 rounded-lg text-red-300 text-[13px]">
-          ⚠ {t("formConfig.errors.validationFailed")}
-        </div>
-      )}
+      {/* Footer: validation error + save */}
+      <div className="flex flex-col items-end mt-6 pb-4 gap-2">
+        {Object.keys(errors).length > 0 && (
+          <p className="text-sm text-red-600 mt-0 mb-0">
+            ⚠ {t("formConfig.errors.validationFailed")}
+          </p>
+        )}
+        <button
+          onClick={handleSave}
+          className="px-8 py-3 rounded-full bg-secondary text-brand text-sm font-semibold border-none cursor-pointer hover:opacity-90 transition-opacity"
+        >
+          {saved ? `✓ ${t("formConfig.saved")}` : t("formConfig.save")}
+        </button>
+      </div>
     </div>
   );
 }

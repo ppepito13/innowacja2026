@@ -20,33 +20,35 @@ export default function Users() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
-    parseClient.get('/users', {
-      headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY }
-    })
-      .then(res => setUsers(res.data.results))
-      .catch(err => setError(err.message))
+    parseClient
+      .get('/users', {
+        headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY },
+      })
+      .then((res) => setUsers(res.data.results))
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
   const handleDelete = (objectId: string) => {
     if (!window.confirm(t('users.deleteConfirm'))) return;
-    parseClient.delete(`/users/${objectId}`, {
-      headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY }
-    })
-      .then(() => setUsers(prev => prev.filter(u => u.objectId !== objectId)))
-      .catch(err => setError(err.response?.data?.error || err.message));
+    parseClient
+      .delete(`/users/${objectId}`, {
+        headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY },
+      })
+      .then(() => setUsers((prev) => prev.filter((u) => u.objectId !== objectId)))
+      .catch((err) => setError(err.response?.data?.error || err.message));
   };
 
   const handleSort = (field: 'username' | 'role') => {
     if (sortField === field) {
-      setSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
       setSortField(field);
       setSortDir('asc');
     }
   };
 
-  const filtered = users.filter(u => {
+  const filtered = users.filter((u) => {
     const matchSearch =
       u.username.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase());
@@ -71,7 +73,6 @@ export default function Users() {
 
   return (
     <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-4xl">
-
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-1">
         <div>
@@ -99,19 +100,21 @@ export default function Users() {
           type="text"
           placeholder={t('users.search')}
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           className="border border-primary/20 rounded-lg px-3 py-2 text-sm w-full sm:w-64 focus:outline-none focus:border-primary"
         />
         <select
           value={roleFilter}
-          onChange={e => setRoleFilter(e.target.value as typeof roleFilter)}
+          onChange={(e) => setRoleFilter(e.target.value as typeof roleFilter)}
           className="border border-primary/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
         >
           <option value="All">{t('users.allRoles')}</option>
           <option value="Admin">{t('users.roles.Admin')}</option>
           <option value="Organizer">{t('users.roles.Organizer')}</option>
         </select>
-        <span className="ml-auto text-sm text-primary/70">{t('users.found', { count: filtered.length })}</span>
+        <span className="ml-auto text-sm text-primary/70">
+          {t('users.found', { count: filtered.length })}
+        </span>
       </div>
 
       {/* ERROR */}
@@ -123,66 +126,72 @@ export default function Users() {
       ) : (
         <div className="overflow-x-auto w-full">
           <table className="w-full text-sm min-w-[480px]">
-          <thead>
-          <tr className="border-b border-primary/10 text-left">
-            <th
-              className="pb-3 font-medium text-primary/70 cursor-pointer select-none"
-              onClick={() => handleSort('username')}
-            >
-              {t('users.columns.user')} <SortIcon field="username" />
-            </th>
-            <th
-              className="pb-3 font-medium text-primary/70 cursor-pointer select-none"
-              onClick={() => handleSort('role')}
-            >
-              {t('users.columns.role')} <SortIcon field="role" />
-            </th>
-            <th className="pb-3 font-medium text-primary/70">{t('users.columns.lastLogin')}</th>
-            <th className="pb-3 font-medium text-primary/70">{t('users.columns.actions')}</th>
-          </tr>
-          </thead>
-          <tbody>
-          {sorted.map(user => (
-            <tr key={user.objectId} className="border-b border-primary/5 transition-colors">
-              <td className="py-3">
-                <p className="font-medium text-primary">{user.fullName || user.username}</p>
-                <p className="text-primary/70 text-xs">{user.email}</p>
-              </td>
-              <td className="py-3">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    user.role === 'Admin' ? 'bg-secondary text-brand' : 'bg-primary/10 text-primary'
-                  }`}>
-                    {t(`users.roles.${user.role}`)}
-                  </span>
-              </td>
-              <td className="py-3 text-sm text-primary/70">
-                {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : '—'}
-              </td>
-              <td className="py-3">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e) => navigate(`/admin/users/${user.objectId}/edit`, e)}
-                    className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/60 hover:text-primary cursor-pointer border-none bg-transparent"
-                  >
-                    <Icon icon={LuPencil} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(user.objectId)}
-                    className="p-2 rounded-lg hover:bg-primary/5 transition-colors text-primary/60 hover:text-error cursor-pointer border-none bg-transparent"
-                  >
-                    <Icon icon={LuTrash2} />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-          {sorted.length === 0 && (
-            <tr>
-              <td colSpan={4} className="py-8 text-center text-primary/60">{t('users.noUsers')}</td>
-            </tr>
-          )}
-          </tbody>
-        </table>
+<thead>
+              <tr className="border-b border-primary/10 text-left">
+                <th
+                  className="pb-3 font-medium text-primary/70 cursor-pointer select-none"
+                  onClick={() => handleSort('username')}
+                >
+                  {t('users.columns.user')} <SortIcon field="username" />
+                </th>
+                <th
+                  className="pb-3 font-medium text-primary/70 cursor-pointer select-none"
+                  onClick={() => handleSort('role')}
+                >
+                  {t('users.columns.role')} <SortIcon field="role" />
+                </th>
+                <th className="pb-3 font-medium text-primary/70">{t('users.columns.lastLogin')}</th>
+                <th className="pb-3 font-medium text-primary/70">{t('users.columns.actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sorted.map((user) => (
+                <tr key={user.objectId} className="border-b border-primary/5 transition-colors">
+                  <td className="py-3">
+                    <p className="font-medium text-primary">{user.fullName || user.username}</p>
+                    <p className="text-primary/70 text-xs">{user.email}</p>
+                  </td>
+                  <td className="py-3">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        user.role === 'Admin'
+                          ? 'bg-secondary text-brand'
+                          : 'bg-primary/10 text-primary'
+                      }`}
+                    >
+                      {t(`users.roles.${user.role}`)}
+                    </span>
+                  </td>
+                  <td className="py-3 text-sm text-primary/70">
+                    {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : '—'}
+                  </td>
+                  <td className="py-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => navigate(`/admin/users/${user.objectId}/edit`, e)}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer active:scale-95"
+                      >
+                        <Icon icon={LuPencil} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(user.objectId)}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-error/10 hover:text-error cursor-pointer active:scale-95"
+                      >
+                        <Icon icon={LuTrash2} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {sorted.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="py-8 text-center text-primary/60">
+                    {t('users.noUsers')}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       )}
 
