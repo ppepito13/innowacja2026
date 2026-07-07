@@ -15,6 +15,7 @@ import AdminLogin from './pages/AdminLogin';
 // Admin pages
 import Dashboard from './pages/admin/Dashboard';
 import EventManagement from './pages/admin/EventManagement';
+import RegistrationsList from './pages/admin/RegistrationsList';
 import Registrations from './pages/admin/Registrations';
 import RegistrationEdit from './pages/admin/RegistrationEdit';
 import CheckIn from './pages/admin/CheckIn';
@@ -64,8 +65,18 @@ function App() {
                 />
                 <ProtectedRoute
                   exact
+                <ProtectedRoute
+                  exact
+                  path="/admin/registrations"
+                  component={RegistrationsList}
+                  requiredRole={['Admin', 'Organizer']}
+                />
+                <ProtectedRoute
+                  exact
                   path="/admin/events/:id/formconfig"
                   component={FormConfig}
+                  requiredRole={['Admin', 'Organizer']}
+                />
                   requiredRole={['Admin', 'Organizer']}
                 />
                 <ProtectedRoute

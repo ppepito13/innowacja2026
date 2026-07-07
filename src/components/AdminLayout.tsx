@@ -17,7 +17,7 @@ import { ReactComponent as ChevronRightIcon } from '../assets/chevron-right-icon
 import { ReactComponent as HomeIcon } from '../assets/home-icon.svg';
 import { ReactComponent as MenuIcon } from '../assets/menu-icon.svg';
 import { ReactComponent as CloseIcon } from '../assets/close-icon.svg';
-
+import { ReactComponent as RegistrationsIcon } from '../assets/registrations-icon.svg';
 
 interface NavItem {
   icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
@@ -28,6 +28,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { icon: CalendarIcon, labelKey: 'nav.events', path: '/admin' },
+  { icon: RegistrationsIcon, labelKey: 'nav.registrations', path: '/admin/registrations' },
   { icon: QrCodeIcon, labelKey: 'nav.checkIn', path: '/admin/check-in', adminOnly: true },
   { icon: UsersIcon, labelKey: 'nav.users', path: '/admin/users', adminOnly: true },
   { icon: SettingsIcon, labelKey: 'nav.account', path: '/admin/account' },
@@ -50,6 +51,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     const p = location.pathname;
     if (item.path === '/admin') {
       return p === '/admin' || p.startsWith('/admin/events');
+    }
+    if (item.path === '/admin/registrations') {
+      return p === '/admin/registrations' || p.startsWith('/admin/registrations/');
     }
     return p === item.path || p.startsWith(item.path + '/');
   };
