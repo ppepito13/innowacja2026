@@ -64,7 +64,7 @@ export default function FieldCard({
             value={field.label}
             onChange={(e) => onUpdate({ label: e.target.value })}
             placeholder={t("formConfig.labelPlaceholder")}
-            className={`w-full bg-[#0b1120] border rounded-md px-3 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500 ${
+            className={`w-full bg-[#0b1120] border rounded-md px-1 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500 ${
               error ? "border-red-500" : "border-slate-700"
             }`}
           />
@@ -78,7 +78,7 @@ export default function FieldCard({
             value={field.placeholder}
             onChange={(e) => onUpdate({ placeholder: e.target.value })}
             placeholder={t("formConfig.placeholderPlaceholder")}
-            className="w-full bg-[#0b1120] border border-slate-700 rounded-md px-3 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500"
+            className="w-full bg-[#0b1120] border border-slate-700 rounded-md px-1 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500"
           />
         </div>
       </div>
@@ -126,6 +126,26 @@ export default function FieldCard({
             />
           </div>
         </label>
+        <div className="w-32">
+          <label className="block text-[11px] text-slate-500 tracking-wider uppercase mb-1">
+            {t("formConfig.i18nPl")}
+          </label>
+          <input
+              value={field.i18n.pl}
+              onChange={(e) => onUpdate({ i18n: { ...field.i18n, pl: e.target.value } })}
+              className="w-full bg-[#0b1120] border border-slate-700 rounded-md px-1 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500"
+          />
+        </div>
+        <div className="w-32">
+          <label className="block text-[11px] text-slate-500 tracking-wider uppercase mb-1">
+            {t("formConfig.i18nEn")}
+          </label>
+          <input
+              value={field.i18n.en}
+              onChange={(e) => onUpdate({ i18n: { ...field.i18n, en: e.target.value } })}
+              className="w-full bg-[#0b1120] border border-slate-700 rounded-md px-1 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500"
+          />
+        </div>
       </div>
 
       {/* Options (radio / multiselect / dropdown only) */}

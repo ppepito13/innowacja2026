@@ -191,6 +191,7 @@
     "option": "Opcja",
     "addOption": "Dodaj opcję",
     "removeOption": "Usuń opcję",
+    "i18nPl": "tlumaczenie pl",
     "fieldType": {
       "text": "Tekst",
       "email": "Email",

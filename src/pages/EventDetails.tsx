@@ -12,7 +12,7 @@ const LANGUAGES = [
   { code: 'en', label: 'EN' },
   { code: 'pl', label: 'PL' },
 ];
-
+let currentLabel = "PL"
 export default function EventDetails() {
   const { eventId } = useParams<{ eventId: string }>();
   const [event, setEvent] = useState<Event | null>(null);
@@ -100,7 +100,11 @@ export default function EventDetails() {
             <button
               key={code}
               type="button"
-              onClick={() => i18n.changeLanguage(code)}
+              onClick={() => {
+                i18n.changeLanguage(code);
+                currentLabel = label;
+              }
+              }
               className={`cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide ${
                 i18n.language === code ? 'text-white' : 'text-gray-500 hover:text-gray-300'
               }`}
@@ -161,6 +165,7 @@ export default function EventDetails() {
 
             <form className="flex flex-col gap-6">
               {Object.entries(event.formConfig ?? {}).map(([key, config]) => {
+                console.log(key,config);
                 const field = config as any;
                 const isRequired = field.required === true;
                 const value = formData[key] || '';
@@ -168,7 +173,7 @@ export default function EventDetails() {
                 return (
                   <div key={key}>
                     <label htmlFor={key} className="block text-xs font-bold text-white mb-2">
-                      {formatColumnName(key)}{' '}
+                      {currentLabel === "PL" ? field.i18n["pl"] : field.i18n["en"]}{' '}
                       {isRequired && <span className="text-red-500">*</span>}
                     </label>
 

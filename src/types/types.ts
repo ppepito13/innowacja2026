@@ -40,6 +40,10 @@ export interface FormField {
   placeholder: string;
   required: boolean;
   options: string[];
+  i18n: {
+    pl: string;
+    en: string
+  };
 }
 
 export interface FormConfigEntry {
@@ -48,6 +52,7 @@ export interface FormConfigEntry {
   placeholder?: string;
   label?: string;
   options?: string[];
+  i18n: Record<string,unknown>;
 }
 
 export type FormConfig = Record<string, FormConfigEntry>;
