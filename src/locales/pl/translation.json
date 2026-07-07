@@ -218,7 +218,12 @@
     "termsAndConditions": "regulaminie",
     "requiredField": "Pole wymagane.",
     "register": "Zarejestruj",
-    "joinOnline": "Dołącz online"
+    "joinOnline": "Dołącz online",
+    "validation": {
+      "required": "To pole jest wymagane.",
+      "email": "Podaj poprawny adres e-mail.",
+      "phone": "Podaj poprawny numer telefonu."
+    }
   },
   "formConfig": {
     "title": "Kreator formularza",
