@@ -61,10 +61,12 @@ export default function EventManagement({ mode }: Props) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFieldChange = <K extends keyof Event>(field: K, value: Event[K] | undefined) => {
     setEvent((prev) => (prev ? { ...prev, [field]: value } : null));
+    setFieldErrors((prev) => (prev[field] ? { ...prev, [field]: '' } : prev));
   };
 
   useEffect(() => {
@@ -103,6 +105,7 @@ export default function EventManagement({ mode }: Props) {
         ...(value === 'single' && { endDate: undefined }),
       };
     });
+    setFieldErrors((prev) => (prev.endDate ? { ...prev, endDate: '' } : prev));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,19 +135,29 @@ export default function EventManagement({ mode }: Props) {
     return data.url as string;
   };
 
+  const validate = (): boolean => {
+    if (!event) return false;
+    const errors: Record<string, string> = {};
+    if (!event.title.trim()) errors.title = tt('validation.titleRequired');
+    if (!event.startDate?.date) errors.startDate = tt('validation.startDateRequired');
+    if (event.dateType === 'multi' && !event.endDate?.date) {
+      errors.endDate = tt('validation.endDateRequired');
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = () => {
-    if (!event) return;
+    if (!event || !validate()) return;
     setSaving(true);
     setError(null);
 
     const payload: Event = {
       title: event.title,
       description: DOMPurify.sanitize(event.description),
-      ...(event.startDate && {
-        startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() },
-      }),
-      ...(event.dateType === 'multi' && event.endDate
-        ? { endDate: { __type: 'Date', iso: event.endDate.date?.toISOString() } }
+      startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() },
+      ...(event.dateType === 'multi' && event.endDate?.date
+        ? { endDate: { __type: 'Date', iso: event.endDate.date.toISOString() } }
         : isEdit
           ? { endDate: { __op: 'Delete' } }
           : undefined),
@@ -218,6 +231,7 @@ export default function EventManagement({ mode }: Props) {
           defaultValue={event?.title ?? ''}
           onChange={(v) => handleFieldChange('title', String(v))}
         />
+        {fieldErrors.title && <p className="text-xs text-red-600 mt-0 mb-0">{fieldErrors.title}</p>}
         <div className="flex flex-col gap-1 mt-1">
           <label className="text-sm font-medium text-primary">{tt('fields.description')}</label>
           <RichTextEditor
@@ -245,6 +259,9 @@ export default function EventManagement({ mode }: Props) {
                 handleFieldChange('startDate', v ? { date: new Date(v) } : undefined)
               }
             />
+            {fieldErrors.startDate && (
+              <p className="text-xs text-red-600 mt-1 mb-0">{fieldErrors.startDate}</p>
+            )}
           </div>
           {event?.dateType === 'multi' && (
             <div className="flex-1">
@@ -255,6 +272,9 @@ export default function EventManagement({ mode }: Props) {
                   handleFieldChange('endDate', v ? { date: new Date(v) } : undefined)
                 }
               />
+              {fieldErrors.endDate && (
+                <p className="text-xs text-red-600 mt-1 mb-0">{fieldErrors.endDate}</p>
+              )}
             </div>
           )}
         </div>
@@ -396,30 +416,35 @@ export default function EventManagement({ mode }: Props) {
         />
       </div>
 
-      <div className="flex items-center justify-end mt-6 pb-4 gap-3">
-        <button
-          type="button"
-          onClick={() => history.goBack()}
-          className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
-        >
-          {t('eventManagement.cancel')}
-        </button>
-        <button
-          type="button"
-          onClick={() => history.push(`/admin/events/${id}/formconfig`)}
-          className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
-        >
-          {t('eventManagement.editFormConfig')}
-        </button>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={saving || uploading}
-          className="flex items-center gap-2 px-8 py-3 rounded-full bg-secondary text-brand text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
-        >
-          <Icon icon={isEdit ? LuSave : LuPlus} size={16} />
-          <span>{saving ? `${ttm('submit.pending')}...` : ttm('submit.idle')}</span>
-        </button>
+      <div className="flex flex-col items-end mt-6 pb-4 gap-2">
+        {Object.values(fieldErrors).some(Boolean) && (
+          <p className="text-sm text-red-600 mt-0 mb-0">{tt('validation.fillRequired')}</p>
+        )}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => history.goBack()}
+            className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
+          >
+            {t('eventManagement.cancel')}
+          </button>
+          <button
+            type="button"
+            onClick={() => history.push(`/admin/events/${id}/formconfig`)}
+            className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
+          >
+            {t('eventManagement.editFormConfig')}
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={saving || uploading}
+            className="flex items-center gap-2 px-8 py-3 rounded-full bg-secondary text-brand text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            <Icon icon={isEdit ? LuSave : LuPlus} size={16} />
+            <span>{saving ? `${ttm('submit.pending')}...` : ttm('submit.idle')}</span>
+          </button>
+        </div>
       </div>
     </div>
   );
