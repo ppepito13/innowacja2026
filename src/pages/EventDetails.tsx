@@ -26,7 +26,8 @@ export default function EventDetails() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t, i18n } = useTranslation();
-
+  let currentLabel = i18n.language;
+  console.log(currentLabel);
   useEffect(() => {
     if (!eventId) return;
     parseClient
@@ -116,7 +117,11 @@ export default function EventDetails() {
               <button
                 key={code}
                 type="button"
-                onClick={() => i18n.changeLanguage(code)}
+                onClick={() => {
+                i18n.changeLanguage(code);
+                currentLabel = i18n.language;
+              }
+                        }
                 className={`cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide ${
                   i18n.language === code ? 'text-primary' : 'text-primary/50 hover:text-primary/70'
                 }`}
@@ -218,7 +223,7 @@ export default function EventDetails() {
                         htmlFor={key}
                         className="block text-xs font-bold text-primary mb-2 truncate"
                       >
-                        {formatColumnName(key)}{' '}
+                        {currentLabel === "pl" ? field.i18n["pl"] : field.i18n["en"]}{' '}
                         {isRequired && <span className="text-red-500">*</span>}
                       </label>
 
@@ -308,9 +313,9 @@ export default function EventDetails() {
                             <option value="" disabled hidden>
                               {t('eventDetails.selectOption')}
                             </option>
-                            {(field.options || field.values)?.map((val: string) => (
-                              <option key={val} value={val}>
-                                {val}
+                            {(field.options || field.values)?.map((val: string, index: number) => (
+                            <option key={value} value={i18n.language === "pl" ? field.optionsTranslation[index].i18n.pl : field.optionsTranslation[index].i18n.en}>
+                              {i18n.language === "pl" ? field.optionsTranslation[index].i18n.pl : field.optionsTranslation[index].i18n.en}
                               </option>
                             ))}
                           </select>

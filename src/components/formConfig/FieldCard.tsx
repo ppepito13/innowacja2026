@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import type { FieldType, FormField } from "../../types/types";
+import type {FieldType, FormField, optionsTranslation} from "../../types/types";
 import { TYPES_WITH_OPTIONS } from "./constants";
 import TypeDropdown from "./TypeDropdown";
 import OptionsList from "./OptionsList";
@@ -65,8 +65,8 @@ export default function FieldCard({
             value={field.label}
             onChange={(e) => onUpdate({ label: e.target.value })}
             placeholder={t("formConfig.labelPlaceholder")}
-            className={`w-full box-border bg-transparent border rounded-lg px-3 py-2 text-primary text-sm outline-none transition-colors focus:border-primary/60 ${
-              error ? "border-red-500" : "border-primary/20"
+            className={`w-full bg-[#0b1120] border rounded-md px-1 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500 ${
+              error ? "border-red-500" : "border-slate-700"
             }`}
           />
           {error && <div className="text-red-600 text-xs mt-1">{error}</div>}
@@ -79,7 +79,7 @@ export default function FieldCard({
             value={field.placeholder}
             onChange={(e) => onUpdate({ placeholder: e.target.value })}
             placeholder={t("formConfig.placeholderPlaceholder")}
-            className="w-full box-border bg-transparent border border-primary/20 rounded-lg px-3 py-2 text-primary text-sm outline-none transition-colors focus:border-primary/60"
+            className="w-full bg-[#0b1120] border border-slate-700 rounded-md px-1 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500"
           />
         </div>
       </div>
@@ -118,17 +118,43 @@ export default function FieldCard({
             onChange={(v) => onUpdate({ required: v })}
           />
         </label>
+        <div className="w-32">
+          <label className="block text-[11px] text-slate-500 tracking-wider uppercase mb-1">
+            {t("formConfig.i18nPl")}
+          </label>
+          <input
+              value={field.i18n.pl}
+              onChange={(e) => onUpdate({ i18n: { ...field.i18n, pl: e.target.value } })}
+              className="w-full bg-[#0b1120] border border-slate-700 rounded-md px-1 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500"
+          />
+        </div>
+        <div className="w-32">
+          <label className="block text-[11px] text-slate-500 tracking-wider uppercase mb-1">
+            {t("formConfig.i18nEn")}
+          </label>
+          <input
+              value={field.i18n.en}
+              onChange={(e) => onUpdate({ i18n: { ...field.i18n, en: e.target.value } })}
+              className="w-full bg-[#0b1120] border border-slate-700 rounded-md px-1 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500"
+          />
+        </div>
       </div>
 
       {/* Options (radio / multiselect / dropdown only) */}
       {needsOptions && (
         <OptionsList
           options={field.options}
+          optionsTranslation={field.optionsTranslation}
           onChange={(opts: string[]) => onUpdate({ options: opts })}
-          onAdd={() => onUpdate({ options: [...field.options, ""] })}
-          onRemove={(i: number) =>
-            onUpdate({ options: field.options.filter((_, j) => j !== i) })
-          }
+          onChangeTranslation={(opts: optionsTranslation[]) => onUpdate({ optionsTranslation: opts })}
+          onAdd={() => onUpdate({
+            options: [...field.options, ""],
+            optionsTranslation: [...field.optionsTranslation, { id: '1', i18n: { pl: "", en: "" } }],
+          })}
+          onRemove={(i: number) => onUpdate({
+            options: field.options.filter((_, j) => j !== i),
+            optionsTranslation: field.optionsTranslation.filter((_, j) => j !== i),
+          })}
         />
       )}
     </div>
