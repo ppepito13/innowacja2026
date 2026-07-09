@@ -10,6 +10,8 @@ import Icon from '../components/Icon';
 import { EMAIL_REGEX, PHONE_REGEX } from '../utils/regex';
 import parseClient from '../services/parseClient';
 import { MAP_IFRAME_WIDTH, MAP_IFRAME_HEIGHT } from '../constants/eventDefaults';
+import { useTheme } from '../theme/ThemeProvider';
+import ThemeToggle from '../components/ThemeToggle';
 
 const LANGUAGES = [
   { code: 'en', label: 'EN' },
@@ -26,6 +28,7 @@ export default function EventDetails() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t, i18n } = useTranslation();
+  const { theme } = useTheme();
   let currentLabel = i18n.language;
   console.log(currentLabel);
   useEffect(() => {
@@ -111,25 +114,28 @@ export default function EventDetails() {
           {t('common.brand')}
         </Link>
 
-        <div className="flex items-center gap-3 text-sm">
-          <div className="flex gap-2">
-            {LANGUAGES.map(({ code, label }) => (
-              <button
-                key={code}
-                type="button"
-                onClick={() => {
-                i18n.changeLanguage(code);
-                currentLabel = i18n.language;
-              }
-                        }
-                className={`cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide ${
-                  i18n.language === code ? 'text-primary' : 'text-primary/50 hover:text-primary/70'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 text-sm">
+            <div className="flex gap-2">
+              {LANGUAGES.map(({ code, label }) => (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => {
+                    i18n.changeLanguage(code);
+                    currentLabel = i18n.language;
+                  }}
+                  className={`cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide ${
+                    i18n.language === code ? 'text-primary' : 'text-primary/50 hover:text-primary/70'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
+
+          <ThemeToggle />
         </div>
       </header>
 
@@ -223,7 +229,7 @@ export default function EventDetails() {
                         htmlFor={key}
                         className="block text-xs font-bold text-primary mb-2 truncate"
                       >
-                        {currentLabel === "pl" ? field.i18n["pl"] : field.i18n["en"]}{' '}
+                        {currentLabel === 'pl' ? field.i18n['pl'] : field.i18n['en']}{' '}
                         {isRequired && <span className="text-red-500">*</span>}
                       </label>
 
@@ -314,8 +320,17 @@ export default function EventDetails() {
                               {t('eventDetails.selectOption')}
                             </option>
                             {(field.options || field.values)?.map((val: string, index: number) => (
-                            <option key={value} value={i18n.language === "pl" ? field.optionsTranslation[index].i18n.pl : field.optionsTranslation[index].i18n.en}>
-                              {i18n.language === "pl" ? field.optionsTranslation[index].i18n.pl : field.optionsTranslation[index].i18n.en}
+                              <option
+                                key={value}
+                                value={
+                                  i18n.language === 'pl'
+                                    ? field.optionsTranslation[index].i18n.pl
+                                    : field.optionsTranslation[index].i18n.en
+                                }
+                              >
+                                {i18n.language === 'pl'
+                                  ? field.optionsTranslation[index].i18n.pl
+                                  : field.optionsTranslation[index].i18n.en}
                               </option>
                             ))}
                           </select>
@@ -327,7 +342,7 @@ export default function EventDetails() {
                       )}
 
                       {formErrors[key] && (
-                        <p className="text-xs text-yellow-400 mt-1">{formErrors[key]}</p>
+                        <p className={`text-xs mt-1 ${theme === "light" ? "text-error" : "text-secondary"}`}>{formErrors[key]}</p>
                       )}
                     </div>
                   );
