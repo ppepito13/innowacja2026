@@ -36,100 +36,101 @@ function App() {
     <AuthProvider>
       <ThemeProvider>
         <Router>
-        <Switch>
-          {/* Public Fullscreen Routes */}
-          <Route exact path="/events/:eventId" component={EventDetails} />
+          <Switch>
+            {/* Public Fullscreen Routes */}
+            <Route exact path="/events/:eventId" component={EventDetails} />
 
-          {/* Admin routes — sidebar layout */}
-          <Route path="/admin">
-            <AdminLayout>
-              <Switch>
-                {/* Admin Routes */}
-                <ProtectedRoute
-                  exact
-                  path="/admin"
-                  component={Dashboard}
-                  requiredRole={['Admin', 'Organizer']}
-                />
-                <ProtectedRoute
-                  exact
-                  path="/admin/events/new"
-                  component={EventManagementNew}
-                  requiredRole={['Admin', 'Organizer']}
-                />
-                <ProtectedRoute
-                  exact
-                  path="/admin/events/:id/edit"
-                  component={EventManagementEdit}
-                  requiredRole={['Admin', 'Organizer']}
-                />
-                <ProtectedRoute
-                  exact
-                <ProtectedRoute
-                  exact
-                  path="/admin/registrations"
-                  component={RegistrationsList}
-                  requiredRole={['Admin', 'Organizer']}
-                />
-                <ProtectedRoute
-                  exact
-                  path="/admin/events/:id/formconfig"
-                  component={FormConfig}
-                  requiredRole={['Admin', 'Organizer']}
-                />
-                  requiredRole={['Admin', 'Organizer']}
-                />
-                <ProtectedRoute
-                  exact
-                  path="/admin/registrations/:eventId"
-                  component={Registrations}
-                  requiredRole={['Admin', 'Organizer']}
-                />
-                <ProtectedRoute
-                  exact
-                  path="/admin/registrations/:eventId/:registrationId/edit"
-                  component={RegistrationEdit}
-                  requiredRole="Admin"
-                />
-                <ProtectedRoute
-                  exact
-                  path="/admin/check-in/:eventId?"
-                  component={CheckIn}
-                  requiredRole="Admin"
-                />
-                <ProtectedRoute exact path="/admin/users" component={Users} requiredRole="Admin" />
-                <ProtectedRoute
-                  exact
-                  path="/admin/users/new"
-                  component={UserNew}
-                  requiredRole="Admin"
-                />
-                <ProtectedRoute
-                  exact
-                  path="/admin/users/:id/edit"
-                  component={UserEdit}
-                  requiredRole="Admin"
-                />
-                <ProtectedRoute
-                  exact
-                  path="/admin/account"
-                  component={Account}
-                  requiredRole={['Admin', 'Organizer']}
-                />
-              </Switch>
-            </AdminLayout>
-          </Route>
+            {/* Admin routes — sidebar layout */}
+            <Route path="/admin">
+              <AdminLayout>
+                <Switch>
+                  {/* Admin Routes */}
+                  <ProtectedRoute
+                    exact
+                    path="/admin"
+                    component={Dashboard}
+                    requiredRole={['Admin', 'Organizer']}
+                  />
+                  <ProtectedRoute
+                    exact
+                    path="/admin/events/new"
+                    component={EventManagementNew}
+                    requiredRole={['Admin', 'Organizer']}
+                  />
+                  <ProtectedRoute
+                    exact
+                    path="/admin/events/:id/edit"
+                    component={EventManagementEdit}
+                    requiredRole={['Admin', 'Organizer']}
+                  />
+                  <ProtectedRoute
+                    exact
+                    path="/admin/registrations"
+                    component={RegistrationsList}
+                    requiredRole={['Admin', 'Organizer']}
+                  />
+                  <ProtectedRoute
+                    exact
+                    path="/admin/events/:id/formconfig"
+                    component={FormConfig}
+                    requiredRole={['Admin', 'Organizer']}
+                  />
+                  <ProtectedRoute
+                    exact
+                    path="/admin/registrations/:eventId"
+                    component={Registrations}
+                    requiredRole={['Admin', 'Organizer']}
+                  />
+                  <ProtectedRoute
+                    exact
+                    path="/admin/registrations/:eventId/:registrationId/edit"
+                    component={RegistrationEdit}
+                    requiredRole="Admin"
+                  />
+                  <ProtectedRoute
+                    exact
+                    path="/admin/check-in/:eventId?"
+                    component={CheckIn}
+                    requiredRole="Admin"
+                  />
+                  <ProtectedRoute
+                    exact
+                    path="/admin/users"
+                    component={Users}
+                    requiredRole="Admin"
+                  />
+                  <ProtectedRoute
+                    exact
+                    path="/admin/users/new"
+                    component={UserNew}
+                    requiredRole="Admin"
+                  />
+                  <ProtectedRoute
+                    exact
+                    path="/admin/users/:id/edit"
+                    component={UserEdit}
+                    requiredRole="Admin"
+                  />
+                  <ProtectedRoute
+                    exact
+                    path="/admin/account"
+                    component={Account}
+                    requiredRole={['Admin', 'Organizer']}
+                  />
+                </Switch>
+              </AdminLayout>
+            </Route>
 
-          {/* Public routes — original Layout */}
-          <Route>
-            <Layout>
-              <Switch>
-                <Route exact path="/login" component={AdminLogin} />
-                <Route exact path="/test" component={Test} />
-                <Route exact path="/formconfig" component={FormConfig} />
-                <Route exact path="/" component={Home} />
-              </Switch>
-            </Layout>
+            {/* Public routes — original Layout */}
+            <Route>
+              <Layout>
+                <Switch>
+                  <Route exact path="/login" component={AdminLogin} />
+                  <Route exact path="/test" component={Test} />
+                  <Route exact path="/formconfig" component={FormConfig} />
+                  <Route exact path="/" component={Home} />
+                </Switch>
+              </Layout>
             </Route>
           </Switch>
         </Router>
