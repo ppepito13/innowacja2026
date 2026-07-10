@@ -387,7 +387,8 @@
       "search": "Szukaj uczestników...",
       "allStatuses": "Wszystkie statusy",
       "pending": "Oczekujące",
-      "approved": "Zatwierdzone"
+      "approved": "Zatwierdzone",
+      "rejected": "Odrzucone"
     },
     "columns": {
       "date": "Data rejestracji",
@@ -396,7 +397,8 @@
     },
     "status": {
       "approved": "Zatwierdzona",
-      "pending": "Oczekująca"
+      "pending": "Oczekująca",
+      "rejected": "Odrzucona"
     },
     "pagination": {
       "current": "Strona",

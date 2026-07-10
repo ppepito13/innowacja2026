@@ -25,7 +25,7 @@ import '../../components/BulkActionBar.css';
 const EVENT_CLASS = 'TestEvent';
 const ROWS_PER_PAGE = 10;
 
-type StatusFilter = 'all' | 'pending' | 'approved';
+type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
 type SortField = string;
 type SortDir = 'asc' | 'desc';
 
@@ -261,10 +261,18 @@ export default function RegistrationsList() {
 
   const toggleSelectAll = useCallback(() => {
     setSelectedIds((prev) => {
-      const pageIds = paginated.map((r) => r.objectId);
-      const allSelected = pageIds.every((id) => prev.has(id));
-      if (allSelected) return new Set();
-      return new Set(pageIds);
+      const selectableIds = paginated
+        .filter((r) => r.status !== 'approved')
+        .map((r) => r.objectId);
+      if (selectableIds.length === 0) return prev;
+      const allSelected = selectableIds.every((id) => prev.has(id));
+      const next = new Set(prev);
+      if (allSelected) {
+        selectableIds.forEach((id) => next.delete(id));
+      } else {
+        selectableIds.forEach((id) => next.add(id));
+      }
+      return next;
     });
   }, [paginated]);
 
@@ -287,7 +295,8 @@ export default function RegistrationsList() {
     }
   };
 
-  const allOnPageSelected = paginated.length > 0 && paginated.every((r) => selectedIds.has(r.objectId));
+  const selectableOnPage = paginated.filter((r) => r.status !== 'approved');
+  const allOnPageSelected = selectableOnPage.length > 0 && selectableOnPage.every((r) => selectedIds.has(r.objectId));
 
   const renderStatusBadge = (status: Registration['status']) => {
     if (status === 'approved') {
@@ -295,6 +304,14 @@ export default function RegistrationsList() {
         <span className="inline-flex items-center gap-1 rounded-full bg-green-900/40 px-2 py-0.5 text-xs font-medium text-green-400">
           <Icon icon={LuCircleCheck} size={12} />
           {t('registrationsList.status.approved')}
+        </span>
+      );
+    }
+    if (status === 'rejected') {
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-red-900/40 px-2 py-0.5 text-xs font-medium text-red-400">
+          <Icon icon={LuCircleX} size={12} />
+          {t('registrationsList.status.rejected')}
         </span>
       );
     }
@@ -397,6 +414,7 @@ export default function RegistrationsList() {
             <option value="all">{t('registrationsList.filters.allStatuses')}</option>
             <option value="pending">{t('registrationsList.filters.pending')}</option>
             <option value="approved">{t('registrationsList.filters.approved')}</option>
+            <option value="rejected">{t('registrationsList.filters.rejected')}</option>
           </select>
         </div>
 
@@ -443,9 +461,10 @@ export default function RegistrationsList() {
                     <th className="w-10 px-4 py-3">
                       <input
                         type="checkbox"
-                        className="bulk-checkbox"
+                        className="bulk-checkbox disabled:cursor-not-allowed disabled:opacity-40"
                         checked={allOnPageSelected}
                         onChange={toggleSelectAll}
+                        disabled={selectableOnPage.length === 0}
                       />
                     </th>
                     <th
@@ -488,9 +507,10 @@ export default function RegistrationsList() {
                       <td className="px-4 py-3">
                         <input
                           type="checkbox"
-                          className="bulk-checkbox"
+                          className="bulk-checkbox disabled:cursor-not-allowed disabled:opacity-40"
                           checked={selectedIds.has(reg.objectId)}
                           onChange={() => toggleSelect(reg.objectId)}
+                          disabled={reg.status === 'approved'}
                         />
                       </td>
                       <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-400">
@@ -548,7 +568,7 @@ export default function RegistrationsList() {
                               </button>
                               <button
                                 className="flex w-full items-center gap-2 rounded-b-xl px-3 py-2 bg-transparent text-xs text-slate-300 hover:bg-white/5 cursor-pointer"
-                                onClick={() => updateStatus(reg.objectId, 'pending')}
+                                onClick={() => updateStatus(reg.objectId, 'rejected')}
                               >
                                 <Icon icon={LuCircleX} size={13} />
                                 {t('registrationsList.reject')}

@@ -387,7 +387,8 @@
       "search": "Search attendees...",
       "allStatuses": "All Approval",
       "pending": "Pending",
-      "approved": "Approved"
+      "approved": "Approved",
+      "rejected": "Rejected"
     },
     "columns": {
       "date": "Registration Date",
@@ -396,7 +397,8 @@
     },
     "status": {
       "approved": "Approved",
-      "pending": "Pending"
+      "pending": "Pending",
+      "rejected": "Rejected"
     },
     "pagination": {
       "current": "Page",
