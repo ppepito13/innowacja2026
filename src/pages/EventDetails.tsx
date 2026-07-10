@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Event } from '../types/types';
 import { formatColumnName, formatDate } from '../utils/formatters';
 import { parseService, createPointer } from '../services/parseService';
-import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle, LuLink } from 'react-icons/lu';
+import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle, LuLink, LuTriangleAlert } from 'react-icons/lu';
 import DOMPurify from 'dompurify';
 import Icon from '../components/Icon';
 import { EMAIL_REGEX, PHONE_REGEX } from '../utils/regex';
@@ -12,6 +12,7 @@ import parseClient from '../services/parseClient';
 import { MAP_IFRAME_WIDTH, MAP_IFRAME_HEIGHT } from '../constants/eventDefaults';
 import { useTheme } from '../theme/ThemeProvider';
 import ThemeToggle from '../components/ThemeToggle';
+import { QRCodeSVG } from 'qrcode.react';
 
 const LANGUAGES = [
   { code: 'en', label: 'EN' },
@@ -27,6 +28,9 @@ export default function EventDetails() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [qrToken, setQrToken] = useState<string | null>(null);
+  const [qrError, setQrError] = useState(false);
+  const [qrLoading, setQrLoading] = useState(false);
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   let currentLabel = i18n.language;
@@ -73,9 +77,11 @@ export default function EventDetails() {
     setLoading(true);
     setError(null);
     setSuccess(false);
+    setQrToken(null);
+    setQrError(false);
 
     try {
-      await parseService.create('Registration', {
+      const registration = await parseService.create('Registration', {
         event: createPointer('TestEvent', event.objectId!),
         formData,
         status: event.requiresApproval ? 'pending' : 'approved',
@@ -87,11 +93,33 @@ export default function EventDetails() {
       setConsent(false);
       setFormErrors({});
       setSuccess(true);
+
+      setQrLoading(true);
+      parseService
+        .runFunction<{ token: string }>('generateQrToken', {
+          registrationId: registration.objectId,
+        })
+        .then((res) => setQrToken(res.token))
+        .catch(() => setQrError(true))
+        .finally(() => setQrLoading(false));
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (e: any) {
       setError(e.message || 'Error');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRegisterAgain = () => {
+    setSuccess(false);
+    setFormData({});
+    setConsent(false);
+    setFormErrors({});
+    setError(null);
+    setQrToken(null);
+    setQrError(false);
+    setQrLoading(false);
   };
 
   if (!event) {
@@ -140,11 +168,27 @@ export default function EventDetails() {
       </header>
 
       <div className="w-full h-[35vh] sm:h-[50vh] relative z-0">
-        <img src={event.heroImageUrl} alt={event.title} className="w-full h-full object-cover" />
+        {event.heroImageUrl && (
+          <img src={event.heroImageUrl} alt={event.title} className="w-full h-full object-cover" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background"></div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-16 sm:-mt-40">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-16 sm:-mt-56">
+        {error && (
+          <div className="mb-8 w-full flex flex-col items-center sm:w-1/2 mx-auto bg-surface rounded-xl shadow-2xl px-6 py-3">
+            <div className="flex items-center justify-center gap-2">
+              <span className="flex items-center text-error">
+                <Icon icon={LuTriangleAlert} size={18} />
+              </span>
+              <h3 className="text-xl font-bold text-primary">
+                {t('eventDetails.errorTitle')}
+              </h3>
+            </div>
+            <p className="text-base text-primary/70 mt-0 max-w-fit">{error}</p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full min-w-0">
           <section className="col-span-1 lg:col-span-7 bg-surface rounded-xl shadow-2xl overflow-hidden min-w-0">
             <div className="p-5 md:p-10">
@@ -212,196 +256,237 @@ export default function EventDetails() {
 
           <section className="col-span-1 lg:col-span-5 bg-surface rounded-xl shadow-2xl lg:sticky lg:top-8 overflow-hidden min-w-0">
             <div className="p-5 sm:p-8">
-              <h2 className="text-xl font-bold mb-1 text-primary">
-                {t('eventDetails.registerNow')}
-              </h2>
-              <p className="text-sm text-primary/60 mb-8">{t('eventDetails.fillForm')}</p>
+              {!success ? (
+                <>
+                  <h2 className="text-xl font-bold mb-1 text-primary">
+                    {t('eventDetails.registerNow')}
+                  </h2>
+                  <p className="text-sm text-primary/60 mb-8">{t('eventDetails.fillForm')}</p>
 
-              <form className="flex flex-col gap-6 w-full min-w-0">
-                {Object.entries(event.formConfig ?? {}).map(([key, config]) => {
-                  const field = config as any;
-                  const isRequired = field.required === true;
-                  const value = formData[key] || '';
+                  <form className="flex flex-col gap-6 w-full min-w-0">
+                    {Object.entries(event.formConfig ?? {}).map(([key, config]) => {
+                      const field = config as any;
+                      const isRequired = field.required === true;
+                      const value = formData[key] || '';
 
-                  return (
-                    <div key={key} className="w-full min-w-0 flex flex-col">
-                      <label
-                        htmlFor={key}
-                        className="block text-xs font-bold text-primary mb-2 truncate"
-                      >
-                        {currentLabel === 'pl' ? field.i18n['pl'] : field.i18n['en']}{' '}
-                        {isRequired && <span className="text-red-500">*</span>}
-                      </label>
-
-                      {(field.type === 'string' || field.type === 'text') && (
-                        <input
-                          id={key}
-                          type="text"
-                          value={value}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setFormData((prev) => ({ ...prev, [key]: val }));
-                            setFormErrors((prev) => ({
-                              ...prev,
-                              [key]: validateField(val, field),
-                            }));
-                          }}
-                          className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
-                        />
-                      )}
-
-                      {field.type === 'email' && (
-                        <input
-                          id={key}
-                          type="email"
-                          value={value}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setFormData((prev) => ({ ...prev, [key]: val }));
-                            setFormErrors((prev) => ({
-                              ...prev,
-                              [key]: validateField(val, field),
-                            }));
-                          }}
-                          className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
-                        />
-                      )}
-
-                      {field.type === 'phone' && (
-                        <input
-                          id={key}
-                          type="tel"
-                          value={value}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setFormData((prev) => ({ ...prev, [key]: val }));
-                            setFormErrors((prev) => ({
-                              ...prev,
-                              [key]: validateField(val, field),
-                            }));
-                          }}
-                          className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
-                        />
-                      )}
-
-                      {field.type === 'number' && (
-                        <input
-                          id={key}
-                          type="number"
-                          value={value}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setFormData((prev) => ({ ...prev, [key]: val }));
-                            setFormErrors((prev) => ({
-                              ...prev,
-                              [key]: validateField(val, field),
-                            }));
-                          }}
-                          className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
-                        />
-                      )}
-
-                      {(field.type === 'select' || field.type === 'dropdown') && (
-                        <div className="relative w-full box-border min-w-0">
-                          <select
-                            id={key}
-                            value={value}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setFormData((prev) => ({ ...prev, [key]: val }));
-                              setFormErrors((prev) => ({
-                                ...prev,
-                                [key]: validateField(val, field),
-                              }));
-                            }}
-                            className="w-full box-border bg-surface-2 border border-transparent rounded-md pl-4 pr-10 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors appearance-none truncate"
+                      return (
+                        <div key={key} className="w-full min-w-0 flex flex-col">
+                          <label
+                            htmlFor={key}
+                            className="block text-xs font-bold text-primary mb-2 truncate"
                           >
-                            <option value="" disabled hidden>
-                              {t('eventDetails.selectOption')}
-                            </option>
-                            {(field.options || field.values)?.map((val: string, index: number) => (
-                              <option
-                                key={value}
-                                value={
-                                  i18n.language === 'pl'
-                                    ? field.optionsTranslation[index].i18n.pl
-                                    : field.optionsTranslation[index].i18n.en
-                                }
+                            {currentLabel === 'pl' ? field.i18n['pl'] : field.i18n['en']}{' '}
+                            {isRequired && <span className="text-red-500">*</span>}
+                          </label>
+
+                          {(field.type === 'string' || field.type === 'text') && (
+                            <input
+                              id={key}
+                              type="text"
+                              value={value}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setFormData((prev) => ({ ...prev, [key]: val }));
+                                setFormErrors((prev) => ({
+                                  ...prev,
+                                  [key]: validateField(val, field),
+                                }));
+                              }}
+                              className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
+                            />
+                          )}
+
+                          {field.type === 'email' && (
+                            <input
+                              id={key}
+                              type="email"
+                              value={value}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setFormData((prev) => ({ ...prev, [key]: val }));
+                                setFormErrors((prev) => ({
+                                  ...prev,
+                                  [key]: validateField(val, field),
+                                }));
+                              }}
+                              className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
+                            />
+                          )}
+
+                          {field.type === 'phone' && (
+                            <input
+                              id={key}
+                              type="tel"
+                              value={value}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setFormData((prev) => ({ ...prev, [key]: val }));
+                                setFormErrors((prev) => ({
+                                  ...prev,
+                                  [key]: validateField(val, field),
+                                }));
+                              }}
+                              className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
+                            />
+                          )}
+
+                          {field.type === 'number' && (
+                            <input
+                              id={key}
+                              type="number"
+                              value={value}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setFormData((prev) => ({ ...prev, [key]: val }));
+                                setFormErrors((prev) => ({
+                                  ...prev,
+                                  [key]: validateField(val, field),
+                                }));
+                              }}
+                              className="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
+                            />
+                          )}
+
+                          {(field.type === 'select' || field.type === 'dropdown') && (
+                            <div className="relative w-full box-border min-w-0">
+                              <select
+                                id={key}
+                                value={value}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setFormData((prev) => ({ ...prev, [key]: val }));
+                                  setFormErrors((prev) => ({
+                                    ...prev,
+                                    [key]: validateField(val, field),
+                                  }));
+                                }}
+                                className="w-full box-border bg-surface-2 border border-transparent rounded-md pl-4 pr-10 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors appearance-none truncate"
                               >
-                                {i18n.language === 'pl'
-                                  ? field.optionsTranslation[index].i18n.pl
-                                  : field.optionsTranslation[index].i18n.en}
-                              </option>
-                            ))}
-                          </select>
+                                <option value="" disabled hidden>
+                                  {t('eventDetails.selectOption')}
+                                </option>
+                                {(field.options || field.values)?.map((val: string, index: number) => (
+                                  <option
+                                    key={value}
+                                    value={
+                                      i18n.language === 'pl'
+                                        ? field.optionsTranslation[index].i18n.pl
+                                        : field.optionsTranslation[index].i18n.en
+                                    }
+                                  >
+                                    {i18n.language === 'pl'
+                                      ? field.optionsTranslation[index].i18n.pl
+                                      : field.optionsTranslation[index].i18n.en}
+                                  </option>
+                                ))}
+                              </select>
 
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-primary/60">
-                            <Icon icon={LuChevronDown} size={16} />
-                          </div>
+                              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-primary/60">
+                                <Icon icon={LuChevronDown} size={16} />
+                              </div>
+                            </div>
+                          )}
+
+                          {formErrors[key] && (
+                            <p className={`text-xs mt-1 ${theme === "light" ? "text-error" : "text-secondary"}`}>{formErrors[key]}</p>
+                          )}
                         </div>
-                      )}
+                      );
+                    })}
 
-                      {formErrors[key] && (
-                        <p className={`text-xs mt-1 ${theme === "light" ? "text-error" : "text-secondary"}`}>{formErrors[key]}</p>
-                      )}
+                    <div className="bg-surface-2 border border-primary/15 rounded-md p-4 mt-2 w-full box-border min-w-0">
+                      <div className="flex items-start gap-3">
+                        <div className="flex items-center mt-1 shrink-0">
+                          <input
+                            id="consent"
+                            type="checkbox"
+                            checked={consent}
+                            onChange={(e) => setConsent(e.target.checked)}
+                            className="w-4 h-4 rounded-full border border-secondary bg-surface focus:ring-0 cursor-pointer appearance-none checked:bg-secondary"
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="consent"
+                            className="text-sm font-medium text-primary cursor-pointer block mb-1 break-words"
+                          >
+                            {t('eventDetails.dataConsent')} <span className="text-red-500">*</span>
+                          </label>
+                          <p className="text-xs text-primary/70">
+                            {t('eventDetails.readMoreIn')}{' '}
+                            <a
+                              href={
+                                event.dataProcessingAgreement !== undefined
+                                  ? event.dataProcessingAgreement
+                                  : '#terms'
+                              }
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline text-primary/80 hover:text-primary"
+                            >
+                              {t('eventDetails.termsAndConditions')}
+                            </a>
+                            .
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  );
-                })}
 
-                <div className="bg-surface-2 border border-primary/15 rounded-md p-4 mt-2 w-full box-border min-w-0">
-                  <div className="flex items-start gap-3">
-                    <div className="flex items-center mt-1 shrink-0">
-                      <input
-                        id="consent"
-                        type="checkbox"
-                        checked={consent}
-                        onChange={(e) => setConsent(e.target.checked)}
-                        className="w-4 h-4 rounded-full border border-secondary bg-surface focus:ring-0 cursor-pointer appearance-none checked:bg-secondary"
-                      />
+                    <p className="text-[11px] text-primary/60 -mt-2">
+                      * {t('eventDetails.requiredField')}
+                    </p>
+
+                    <button
+                      type="button"
+                      className="w-full box-border mt-2 py-3 px-4 rounded-md bg-secondary text-brand font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      onClick={handleSubmit}
+                      disabled={loading || !isFormValid}
+                    >
+                      {t('eventDetails.register')}
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-3">
+                  <p className="text-success text-xl font-semibold mt-2 mb-0">
+                    {t('eventDetails.success')}
+                  </p>
+
+                  <p className="text-sm text-primary/60 text-center mt-0">
+                    {event.requiresApproval ? (
+                      t('eventDetails.waitForApproval')
+                    ) : (
+                      t('eventDetails.showCodeAtEntrance')
+                    )}
+                  </p>
+
+                  {!event.requiresApproval && qrLoading && (
+                    <span className="text-xs text-primary/60">
+                      {t('eventDetails.qrLoading')}
+                    </span>
+                  )}
+
+                  {!event.requiresApproval && !qrLoading && qrToken && (
+                    <div className="rounded-lg border border-primary/10 bg-white p-3">
+                      <QRCodeSVG value={qrToken} size={180} level="M" />
                     </div>
-                    <div>
-                      <label
-                        htmlFor="consent"
-                        className="text-sm font-medium text-primary cursor-pointer block mb-1 break-words"
-                      >
-                        {t('eventDetails.dataConsent')} <span className="text-red-500">*</span>
-                      </label>
-                      <p className="text-xs text-primary/70">
-                        {t('eventDetails.readMoreIn')}{' '}
-                        <a
-                          href={
-                            event.dataProcessingAgreement !== undefined
-                              ? event.dataProcessingAgreement
-                              : '#terms'
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline text-primary/80 hover:text-primary"
-                        >
-                          {t('eventDetails.termsAndConditions')}
-                        </a>
-                        .
-                      </p>
-                    </div>
-                  </div>
+                  )}
+
+                  {!event.requiresApproval && !qrLoading && qrError && (
+                    <span className="text-xs text-error">
+                      {t('eventDetails.qrError')}
+                    </span>
+                  )}
+
+                  <button
+                    type="button"
+                    className="w-full box-border mt-2 py-3 px-4 rounded-md bg-secondary text-brand font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    onClick={handleRegisterAgain}
+                  >
+                    {t('eventDetails.registerAgain')}
+                  </button>
                 </div>
-
-                <p className="text-[11px] text-primary/60 -mt-2">
-                  * {t('eventDetails.requiredField')}
-                </p>
-
-                <button
-                  type="button"
-                  className="w-full box-border mt-2 py-3 px-4 rounded-md bg-secondary text-brand font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
-                  onClick={handleSubmit}
-                  disabled={loading || !isFormValid}
-                >
-                  {t('eventDetails.register')}
-                </button>
-
-                {success && <p className="text-green-400 text-sm">{t('eventDetails.success')}</p>}
-                {error && <p className="text-red-400 text-sm">{error}</p>}
-              </form>
+              )}
             </div>
           </section>
         </div>

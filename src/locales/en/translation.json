@@ -220,6 +220,13 @@
     "requiredField": "Required field.",
     "register": "Register",
     "joinOnline": "Join online",
+    "success": "You have been registered successfully",
+    "errorTitle": "Unexpected error",
+    "showCodeAtEntrance": "Show this code at the event entrance.",
+    "waitForApproval": "Your registration is under review.",
+    "qrLoading": "Generating QR code...",
+    "qrError": "Could not generate QR code.",
+    "registerAgain": "Register another person",
     "validation": {
       "required": "This field is required.",
       "email": "Please enter a valid email address.",
