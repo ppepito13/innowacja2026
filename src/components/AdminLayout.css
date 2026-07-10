@@ -272,9 +272,9 @@
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  align-items: stretch; /* centering the subpage cards horizontally */
+  align-items: center; /* centering the subpage cards horizontally */
   /* justify-content: flex-start; so the cards don't float in vertical middle if they are small */
-  padding: 32px;
+  padding: 32px 64px 32px 64px;
   min-width: 0;
 }
 
