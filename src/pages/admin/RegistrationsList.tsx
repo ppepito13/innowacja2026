@@ -301,23 +301,23 @@ export default function RegistrationsList() {
   const renderStatusBadge = (status: Registration['status']) => {
     if (status === 'approved') {
       return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-green-900/40 px-2 py-0.5 text-xs font-medium text-green-400">
-          <Icon icon={LuCircleCheck} size={12} />
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-green-300 bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800 dark:border-green-700/60 dark:bg-green-900/50 dark:text-green-300">
+          <Icon icon={LuCircleCheck} size={13} />
           {t('registrationsList.status.approved')}
         </span>
       );
     }
     if (status === 'rejected') {
       return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-red-900/40 px-2 py-0.5 text-xs font-medium text-red-400">
-          <Icon icon={LuCircleX} size={12} />
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-red-300 bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:border-red-700/60 dark:bg-red-900/50 dark:text-red-300">
+          <Icon icon={LuCircleX} size={13} />
           {t('registrationsList.status.rejected')}
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-yellow-900/40 px-2 py-0.5 text-xs font-medium text-yellow-400">
-        <Icon icon={LuClock} size={12} />
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:border-amber-700/60 dark:bg-amber-900/50 dark:text-amber-300">
+        <Icon icon={LuClock} size={13} />
         {t('registrationsList.status.pending')}
       </span>
     );
@@ -327,13 +327,13 @@ export default function RegistrationsList() {
   return (
     <div className="box-border grid w-full min-w-0 max-w-full grid-cols-1 gap-6 [&_*]:box-border">
       {/* Header card */}
-      <div className="flex w-full min-w-0 flex-col rounded-2xl border border-white/5 bg-[#0f172a] px-6 py-5">
-        <h1 className="text-2xl font-bold text-white">{t('registrationsList.title')}</h1>
-        <p className="text-sm text-slate-400">{t('registrationsList.description')}</p>
+      <div className="flex w-full min-w-0 flex-col rounded-2xl border border-primary/10 bg-surface px-4 sm:px-8 py-4 sm:py-5">
+        <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-0">{t('registrationsList.title')}</h1>
+        <p className="text-sm sm:text-base text-primary/75 mt-1">{t('registrationsList.description')}</p>
       </div>
 
       {/* Main card */}
-      <div className="grid w-full min-w-0 max-w-full grid-cols-1 gap-4 overflow-hidden rounded-2xl border border-white/5 bg-[#0f172a] px-6 py-5">
+      <div className="grid w-full min-w-0 max-w-full grid-cols-1 gap-4 overflow-hidden rounded-2xl border border-primary/10 bg-surface px-4 sm:px-8 py-4 sm:py-5">
 
         {/* Top controls row */}
         <div className="flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
@@ -341,12 +341,12 @@ export default function RegistrationsList() {
           {/* Event selector */}
           <div className="min-w-0 flex-1">
             {eventsLoading ? (
-              <div className="h-10 w-full animate-pulse rounded-lg bg-white/5" />
+              <div className="h-10 w-full animate-pulse rounded-lg bg-primary/5" />
             ) : (
               <select
                 value={selectedEventId}
                 onChange={(e) => setSelectedEventId(e.target.value)}
-                className="h-10 w-full !min-w-0 rounded-lg border border-white/10 bg-[#0b1521] px-3 text-sm text-white outline-none focus:border-white/20 sm:max-w-xs"
+                className="h-10 w-full !min-w-0 rounded-lg border border-primary/20 bg-surface px-3 text-sm text-primary outline-none focus:border-primary sm:max-w-xs"
               >
                 {events.length === 0 && (
                   <option value="">{t('registrationsList.noEvents')}</option>
@@ -366,7 +366,7 @@ export default function RegistrationsList() {
               <button
                 onClick={exportCSV}
                 disabled={registrations.length === 0}
-                className="flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-[#0b1521] px-3 text-sm font-semibold text-white transition hover:border-white/20 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-10 items-center gap-2 rounded-lg border border-primary/20 bg-surface px-3 text-sm font-semibold text-primary transition hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Icon icon={LuDownload} size={14} />
                 CSV
@@ -374,7 +374,7 @@ export default function RegistrationsList() {
               <button
                 onClick={exportExcel}
                 disabled={registrations.length === 0}
-                className="flex h-10 items-center gap-2 rounded-lg border border-white/10 bg-[#0b1521] px-3 text-sm font-semibold text-white transition hover:border-white/20 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-10 items-center gap-2 rounded-lg border border-primary/20 bg-surface px-3 text-sm font-semibold text-primary transition hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Icon icon={LuDownload} size={14} />
                 Excel
@@ -387,7 +387,7 @@ export default function RegistrationsList() {
         <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_14rem] sm:items-center">
           {/* Search */}
           <div className="relative h-10 min-w-0">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-primary/50">
               <Icon icon={LuSearch} size={14} />
             </span>
             <input
@@ -398,7 +398,7 @@ export default function RegistrationsList() {
                 setPage(1);
               }}
               placeholder={t('registrationsList.filters.search')}
-              className="!h-10 w-full !min-w-0 rounded-lg border border-white/10 bg-[#0b1521] pl-9 pr-3 text-sm text-white placeholder-slate-500 outline-none focus:border-white/20"
+              className="!h-10 w-full !min-w-0 rounded-lg border border-primary/20 bg-surface pl-9 pr-3 text-sm text-primary placeholder-primary/40 outline-none focus:border-primary"
             />
           </div>
 
@@ -409,7 +409,7 @@ export default function RegistrationsList() {
               setStatusFilter(e.target.value as StatusFilter);
               setPage(1);
             }}
-            className="!h-10 w-full !min-w-0 rounded-lg border border-white/10 bg-[#0b1521] px-3 text-sm text-white outline-none focus:border-white/20"
+            className="!h-10 w-full !min-w-0 rounded-lg border border-primary/20 bg-surface px-3 text-sm text-primary outline-none focus:border-primary"
           >
             <option value="all">{t('registrationsList.filters.allStatuses')}</option>
             <option value="pending">{t('registrationsList.filters.pending')}</option>
@@ -420,27 +420,27 @@ export default function RegistrationsList() {
 
         {/* Results count */}
         {!registrationsLoading && selectedEventId && (
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-primary/60">
             {t('registrationsList.found', { count: filtered.length })}
           </p>
         )}
 
         {/* Error */}
         {error && (
-          <p className="rounded-lg bg-red-900/30 px-4 py-2 text-sm text-red-400">{error}</p>
+          <p className="rounded-lg bg-red-900/20 border border-red-500/20 px-4 py-2 text-sm text-red-500">{error}</p>
         )}
 
         {/* Loading */}
         {registrationsLoading && (
           <div className="flex items-center justify-center py-12">
-            <span className="text-sm text-slate-400">{t('registrationsList.loading')}...</span>
+            <span className="text-sm text-primary/60">{t('registrationsList.loading')}...</span>
           </div>
         )}
 
         {/* No event selected */}
         {!registrationsLoading && !selectedEventId && !eventsLoading && (
-          <div className="flex items-center justify-center rounded-xl border border-white/5 py-12">
-            <span className="text-sm text-slate-500">{t('registrationsList.selectEvent')}</span>
+          <div className="flex items-center justify-center rounded-xl border border-primary/10 py-12">
+            <span className="text-sm text-primary/60">{t('registrationsList.selectEvent')}</span>
           </div>
         )}
 
@@ -448,27 +448,27 @@ export default function RegistrationsList() {
         {!registrationsLoading && selectedEventId && (
           <>
             {paginated.length === 0 ? (
-              <div className="flex items-center justify-center rounded-xl border border-white/5 py-12">
-                <span className="text-sm text-slate-500">
+              <div className="flex items-center justify-center rounded-xl border border-primary/10 py-12">
+                <span className="text-sm text-primary/60">
                   {t('registrationsList.noRegistrations')}
                 </span>
               </div>
             ) : (
-              <div className="w-full min-w-0 max-w-full overflow-x-auto rounded-xl border border-white/5">
+              <div className="w-full min-w-0 max-w-full overflow-x-auto rounded-xl border border-primary/10">
                 <table className="w-full min-w-max text-sm">
                   <thead>
-                  <tr className="border-b border-white/5 bg-white/[0.02] text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    <th className="w-10 px-4 py-3">
+                  <tr className="border-b border-primary/10 bg-primary/[0.02] text-left text-xs font-semibold uppercase tracking-wide text-primary/70">
+                    <th className="w-10 px-3 sm:px-4 py-3">
                       <input
                         type="checkbox"
-                        className="bulk-checkbox disabled:cursor-not-allowed disabled:opacity-40"
+                        className="bulk-checkbox disabled:cursor-not-allowed"
                         checked={allOnPageSelected}
                         onChange={toggleSelectAll}
                         disabled={selectableOnPage.length === 0}
                       />
                     </th>
                     <th
-                      className="cursor-pointer whitespace-nowrap px-4 py-3 hover:text-white"
+                      className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
                       onClick={() => handleSort('createdAt')}
                     >
                       {t('registrationsList.columns.date')}
@@ -477,7 +477,7 @@ export default function RegistrationsList() {
                     {Object.keys(selectedEvent?.formConfig ?? {}).map((col) => (
                       <th
                         key={col}
-                        className="cursor-pointer whitespace-nowrap px-4 py-3 hover:text-white"
+                        className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
                         onClick={() => handleSort(col)}
                       >
                         {formatColumnName(col)}
@@ -485,13 +485,13 @@ export default function RegistrationsList() {
                       </th>
                     ))}
                     <th
-                      className="cursor-pointer whitespace-nowrap px-4 py-3 hover:text-white"
+                      className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
                       onClick={() => handleSort('status')}
                     >
                       {t('registrationsList.columns.status')}
                       <SortIcon field="status" sortField={sortField} sortDir={sortDir} />
                     </th>
-                    <th className="whitespace-nowrap px-4 py-3 text-center">
+                    <th className="whitespace-nowrap px-3 sm:px-4 py-3 text-center">
                       {t('registrationsList.columns.actions')}
                     </th>
                   </tr>
@@ -500,39 +500,39 @@ export default function RegistrationsList() {
                   {paginated.map((reg, idx) => (
                     <tr
                       key={reg.objectId}
-                      className={`border-b border-white/5 text-slate-300 transition hover:bg-white/[0.02] ${
-                        idx % 2 === 0 ? '' : 'bg-white/[0.01]'
+                      className={`border-b border-primary/10 text-primary transition hover:bg-primary/[0.03] ${
+                        idx % 2 === 0 ? '' : 'bg-primary/[0.01]'
                       }`}
                     >
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-3">
                         <input
                           type="checkbox"
-                          className="bulk-checkbox disabled:cursor-not-allowed disabled:opacity-40"
+                          className="bulk-checkbox disabled:cursor-not-allowed"
                           checked={selectedIds.has(reg.objectId)}
                           onChange={() => toggleSelect(reg.objectId)}
                           disabled={reg.status === 'approved'}
                         />
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-400">
+                      <td className="whitespace-nowrap px-3 sm:px-4 py-3 text-xs text-primary/70">
                         {formatDate(reg.createdAt)}
                       </td>
                       {Object.keys(selectedEvent?.formConfig ?? {}).map((col) => (
-                        <td key={col} className="px-4 py-3">
+                        <td key={col} className="px-3 sm:px-4 py-3">
                           {formatCellValue(String(reg.formData?.[col] ?? 'N/A'), t)}
                         </td>
                       ))}
-                      <td className="px-4 py-3">{renderStatusBadge(reg.status)}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-3">{renderStatusBadge(reg.status)}</td>
+                      <td className="px-3 sm:px-4 py-3">
                         <div className="relative flex items-center justify-center gap-1.5">
                           <button
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-transparent text-slate-400 transition hover:border-white/20 hover:text-white active:scale-95 cursor-pointer"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary active:scale-95 cursor-pointer"
                             onClick={() => setSelectedRegistration(reg)}
                           >
                             <Icon icon={LuEye} size={14} />
                           </button>
 
                           <button
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-transparent text-slate-400 transition hover:border-white/20 hover:text-white active:scale-95 cursor-pointer"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary active:scale-95 cursor-pointer"
                             onClick={() =>
                               history.push(
                                 `/admin/registrations/${selectedEventId}/${reg.objectId}/edit`,
@@ -544,8 +544,8 @@ export default function RegistrationsList() {
 
                           <button
                             disabled={reg.status === 'approved'}
-                            className={`flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-transparent text-slate-400 transition hover:border-white/20 hover:text-white active:scale-95 ${
-                              reg.status === 'approved' ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'
+                            className={`flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface transition active:scale-95 ${
+                              reg.status === 'approved' ? 'cursor-not-allowed opacity-40 text-primary/30' : 'cursor-pointer text-primary/70 hover:bg-background hover:text-primary'
                             }`}
                             onClick={() =>
                               reg.status !== 'approved' &&
@@ -558,16 +558,16 @@ export default function RegistrationsList() {
                           </button>
 
                           {openedActionId === reg.objectId && (
-                            <div className="absolute right-0 top-10 z-50 w-44 rounded-xl border border-white/10 bg-slate-900 shadow-xl">
+                            <div className="absolute right-0 top-10 z-50 w-44 rounded-xl border border-primary/15 bg-surface shadow-xl">
                               <button
-                                className="flex w-full items-center gap-2 rounded-t-xl px-3 py-2 bg-transparent text-xs text-slate-300 hover:bg-white/5 cursor-pointer"
+                                className="flex w-full items-center gap-2 rounded-t-xl px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
                                 onClick={() => updateStatus(reg.objectId, 'approved')}
                               >
                                 <Icon icon={LuCircleCheck} size={13} />
                                 {t('registrationsList.approve')}
                               </button>
                               <button
-                                className="flex w-full items-center gap-2 rounded-b-xl px-3 py-2 bg-transparent text-xs text-slate-300 hover:bg-white/5 cursor-pointer"
+                                className="flex w-full items-center gap-2 rounded-b-xl px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
                                 onClick={() => updateStatus(reg.objectId, 'rejected')}
                               >
                                 <Icon icon={LuCircleX} size={13} />
@@ -585,23 +585,23 @@ export default function RegistrationsList() {
             )}
 
             {/* Pagination */}
-            <div className="flex items-center justify-between pt-1">
-              <span className="text-xs text-slate-500">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3">
+              <span className="text-xs text-primary/60 text-center sm:text-left">
                 {t('registrationsList.pagination.current')} {page}{' '}
                 {t('registrationsList.pagination.total')} {totalPages}
               </span>
-              <div className="flex gap-2">
+              <div className="flex justify-center sm:justify-end gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-slate-400 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <Icon icon={LuChevronLeft} size={14} />
                 </button>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-slate-400 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <Icon icon={LuChevronRight} size={14} />
                 </button>
@@ -614,41 +614,41 @@ export default function RegistrationsList() {
       {/* Details modal */}
       {selectedRegistration && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
           onClick={() => setSelectedRegistration(null)}
         >
           <div
-            className="w-[90vw] max-w-sm rounded-2xl border border-white/10 bg-[#0f172a] px-6 py-5 shadow-2xl"
+            className="w-full max-w-sm rounded-2xl border border-primary/15 bg-surface px-6 py-5 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-white">
+              <h2 className="text-base font-semibold text-primary">
                 {t('registrationsList.details.title')}
               </h2>
               <button
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-slate-400 hover:text-white"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 text-primary/60 hover:text-primary hover:bg-background"
                 onClick={() => setSelectedRegistration(null)}
               >
                 <Icon icon={LuX} size={14} />
               </button>
             </div>
-            <div className="space-y-2 text-sm text-slate-300">
+            <div className="space-y-2 text-sm text-primary/80 max-h-[70vh] overflow-y-auto">
               <div className="flex gap-2">
-                <span className="font-semibold text-slate-400">
+                <span className="font-semibold text-primary/60">
                   {t('registrationsList.details.status')}:
                 </span>
                 {renderStatusBadge(selectedRegistration.status)}
               </div>
               <div className="flex gap-2">
-                <span className="font-semibold text-slate-400">
+                <span className="font-semibold text-primary/60">
                   {t('registrationsList.details.date')}:
                 </span>
                 {formatDate(selectedRegistration.createdAt)}
               </div>
               {Object.entries(selectedRegistration.formData ?? {}).map(([key, value]) => (
-                <div key={key} className="flex gap-2">
-                  <span className="font-semibold text-slate-400">{formatColumnName(key)}:</span>
-                  {formatCellValue(String(value), t)}
+                <div key={key} className="flex gap-2 break-all">
+                  <span className="font-semibold text-primary/60">{formatColumnName(key)}:</span>
+                  <span>{formatCellValue(String(value), t)}</span>
                 </div>
               ))}
             </div>
