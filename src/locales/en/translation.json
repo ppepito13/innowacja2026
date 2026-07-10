@@ -12,6 +12,14 @@
     "events": "Events",
     "account": "Account"
   },
+  "admin": {
+    "greeting": {
+      "morning": "Good morning",
+      "evening": "Good evening"
+    },
+    "homepage": "Homepage",
+    "logout": "Log out"
+  },
   "theme": {
     "toggleToDark": "Switch to dark mode",
     "toggleToLight": "Switch to light mode"
