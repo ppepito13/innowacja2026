@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router';
 import {
   LuChevronLeft,
@@ -20,6 +20,7 @@ import { formatDate, formatColumnName, formatCellValue } from '../../utils/forma
 import { useTranslation } from 'react-i18next';
 import parseClient from '../../services/parseClient';
 import Icon from '../../components/Icon';
+import '../../components/BulkActionBar.css';
 
 const EVENT_CLASS = 'TestEvent';
 const ROWS_PER_PAGE = 10;
@@ -73,6 +74,10 @@ export default function RegistrationsList() {
   const [openedActionId, setOpenedActionId] = useState<string | null>(null);
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
 
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkConfirm, setBulkConfirm] = useState<{ action: 'approved' | 'rejected'; count: number } | null>(null);
+  const [bulkLoading, setBulkLoading] = useState(false);
+
   // ── Load events ──────────────────────────────────────────────────────
   useEffect(() => {
     setEventsLoading(true);
@@ -124,6 +129,10 @@ export default function RegistrationsList() {
       .catch((e: any) => setError(e.message))
       .finally(() => setRegistrationsLoading(false));
   }, [selectedEventId]);
+
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [selectedEventId, search, statusFilter]);
 
   // ── Columns (derived from formConfig) ────────────────────────────────
   const columns = useMemo(() => {
@@ -240,6 +249,45 @@ export default function RegistrationsList() {
       setOpenedActionId(null);
     }
   };
+
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const toggleSelectAll = useCallback(() => {
+    setSelectedIds((prev) => {
+      const pageIds = paginated.map((r) => r.objectId);
+      const allSelected = pageIds.every((id) => prev.has(id));
+      if (allSelected) return new Set();
+      return new Set(pageIds);
+    });
+  }, [paginated]);
+
+  const handleBulkUpdate = async () => {
+    if (!bulkConfirm) return;
+    setBulkLoading(true);
+    try {
+      const ids = Array.from(selectedIds);
+      const updates = ids.map((id) => ({ objectId: id, payload: { status: bulkConfirm.action } }));
+      await parseService.batchUpdate<Registration>('Registration', updates);
+      setRegistrations((prev) =>
+        prev.map((r) => (selectedIds.has(r.objectId) ? { ...r, status: bulkConfirm.action } : r)),
+      );
+      setSelectedIds(new Set());
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBulkLoading(false);
+      setBulkConfirm(null);
+    }
+  };
+
+  const allOnPageSelected = paginated.length > 0 && paginated.every((r) => selectedIds.has(r.objectId));
 
   const renderStatusBadge = (status: Registration['status']) => {
     if (status === 'approved') {
@@ -392,6 +440,14 @@ export default function RegistrationsList() {
                 <table className="w-full min-w-max text-sm">
                   <thead>
                   <tr className="border-b border-white/5 bg-white/[0.02] text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <th className="w-10 px-4 py-3">
+                      <input
+                        type="checkbox"
+                        className="bulk-checkbox"
+                        checked={allOnPageSelected}
+                        onChange={toggleSelectAll}
+                      />
+                    </th>
                     <th
                       className="cursor-pointer whitespace-nowrap px-4 py-3 hover:text-white"
                       onClick={() => handleSort('createdAt')}
@@ -429,6 +485,14 @@ export default function RegistrationsList() {
                         idx % 2 === 0 ? '' : 'bg-white/[0.01]'
                       }`}
                     >
+                      <td className="px-4 py-3">
+                        <input
+                          type="checkbox"
+                          className="bulk-checkbox"
+                          checked={selectedIds.has(reg.objectId)}
+                          onChange={() => toggleSelect(reg.objectId)}
+                        />
+                      </td>
                       <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-400">
                         {formatDate(reg.createdAt)}
                       </td>
@@ -567,6 +631,61 @@ export default function RegistrationsList() {
                   {formatCellValue(String(value), t)}
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedIds.size > 0 && (
+        <div className="bulk-action-bar">
+          <span className="bulk-action-bar__count">
+            {t('registrationsList.bulk.selected', { count: selectedIds.size })}
+          </span>
+          <button
+            className="bulk-action-bar__btn bulk-action-bar__btn--approve"
+            onClick={() => setBulkConfirm({ action: 'approved', count: selectedIds.size })}
+          >
+            <Icon icon={LuCircleCheck} size={14} />
+            {t('registrationsList.bulk.approve')}
+          </button>
+          <button
+            className="bulk-action-bar__btn bulk-action-bar__btn--reject"
+            onClick={() => setBulkConfirm({ action: 'rejected', count: selectedIds.size })}
+          >
+            <Icon icon={LuCircleX} size={14} />
+            {t('registrationsList.bulk.reject')}
+          </button>
+        </div>
+      )}
+
+      {bulkConfirm && (
+        <div className="bulk-confirm-overlay" onClick={() => !bulkLoading && setBulkConfirm(null)}>
+          <div className="bulk-confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <h3 className="bulk-confirm-modal__title">
+              {bulkConfirm.action === 'approved'
+                ? t('registrationsList.bulk.approve')
+                : t('registrationsList.bulk.reject')}
+            </h3>
+            <p className="bulk-confirm-modal__message">
+              {bulkConfirm.action === 'approved'
+                ? t('registrationsList.bulk.confirmApprove', { count: bulkConfirm.count })
+                : t('registrationsList.bulk.confirmReject', { count: bulkConfirm.count })}
+            </p>
+            <div className="bulk-confirm-modal__actions">
+              <button
+                className="bulk-confirm-modal__btn bulk-confirm-modal__btn--cancel"
+                onClick={() => setBulkConfirm(null)}
+                disabled={bulkLoading}
+              >
+                {t('registrationsList.bulk.cancel')}
+              </button>
+              <button
+                className="bulk-confirm-modal__btn bulk-confirm-modal__btn--confirm"
+                onClick={handleBulkUpdate}
+                disabled={bulkLoading}
+              >
+                {bulkLoading ? '...' : t('registrationsList.bulk.confirm')}
+              </button>
             </div>
           </div>
         </div>

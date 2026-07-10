@@ -406,6 +406,15 @@
       "title": "Szczegóły rejestracji",
       "status": "Status",
       "date": "Data"
+    },
+    "bulk": {
+      "selected": "Zaznaczono: {{count}}",
+      "approve": "Zatwierdź zaznaczone",
+      "reject": "Odrzuć zaznaczone",
+      "confirmApprove": "Czy na pewno chcesz zatwierdzić {{count}} osób?",
+      "confirmReject": "Czy na pewno chcesz odrzucić {{count}} osób?",
+      "confirm": "Potwierdź",
+      "cancel": "Anuluj"
     }
   }
 }

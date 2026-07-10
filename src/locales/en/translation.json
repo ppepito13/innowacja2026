@@ -406,6 +406,15 @@
       "title": "Registration details",
       "status": "Status",
       "date": "Date"
+    },
+    "bulk": {
+      "selected": "Selected: {{count}}",
+      "approve": "Approve selected",
+      "reject": "Reject selected",
+      "confirmApprove": "Are you sure you want to approve {{count}} people?",
+      "confirmReject": "Are you sure you want to reject {{count}} people?",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
     }
   }
 }
