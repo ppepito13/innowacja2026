@@ -217,9 +217,9 @@ export default function FormConfig() {
         </div>
       </div>
 
-      <div className="flex gap-6 items-start flex-wrap mt-2">
+      <div className="flex flex-col gap-6 mt-2 w-full">
         {/* Field cards */}
-        <div className="flex-[1_1_460px] flex flex-col gap-4 min-w-0">
+        <div className="flex flex-col gap-4 w-full min-w-0">
           {fields.map((field, i) => (
             <FieldCard
               key={field.id}
@@ -244,14 +244,14 @@ export default function FormConfig() {
 
         {/* JSON Preview */}
         {jsonPreview && (
-          <div className="flex-[0_0_340px] bg-surface-2 rounded-lg border border-primary/10 overflow-auto sticky top-6 max-h-[80vh]">
+          <div className="w-full bg-surface-2 rounded-lg border border-primary/10 overflow-hidden">
             <div className="flex justify-between items-center px-4 py-3 border-b border-primary/10">
               <span className="text-xs tracking-wider text-primary/70">formConfig</span>
               <span className="bg-secondary text-brand rounded px-2 py-0.5 text-[10px] font-bold tracking-wider">
                 JSON
               </span>
             </div>
-            <pre className="m-0 p-4 text-xs font-mono leading-relaxed text-primary/80 overflow-x-auto whitespace-pre-wrap break-words">
+            <pre className="m-0 p-4 text-xs font-mono leading-relaxed text-primary/80 overflow-auto max-h-96 whitespace-pre-wrap break-words">
               {JSON.stringify(formConfig, null, 2)}
             </pre>
           </div>
