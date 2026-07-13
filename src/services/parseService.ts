@@ -76,6 +76,19 @@ export const parseService = {
     return data;
   },
 
+  async batchUpdate<T extends ParseObject>(
+    className: string,
+    updates: { objectId: string; payload: Partial<T> }[],
+  ): Promise<void> {
+    const requests = updates.map(({ objectId, payload }) => ({
+      method: 'PUT' as const,
+      path: `/parse/classes/${className}/${objectId}`,
+      body: payload,
+    }));
+
+    await parseClient.post('/batch', { requests });
+  },
+
   /** Usuń obiekt */
   async remove(className: string, objectId: string): Promise<void> {
     await parseClient.delete(`/classes/${className}/${objectId}`);

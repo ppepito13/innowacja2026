@@ -402,7 +402,8 @@
       "search": "Search attendees...",
       "allStatuses": "All Approval",
       "pending": "Pending",
-      "approved": "Approved"
+      "approved": "Approved",
+      "rejected": "Rejected"
     },
     "columns": {
       "date": "Registration Date",
@@ -411,7 +412,8 @@
     },
     "status": {
       "approved": "Approved",
-      "pending": "Pending"
+      "pending": "Pending",
+      "rejected": "Rejected"
     },
     "pagination": {
       "current": "Page",
@@ -421,6 +423,15 @@
       "title": "Registration details",
       "status": "Status",
       "date": "Date"
+    },
+    "bulk": {
+      "selected": "Selected: {{count}}",
+      "approve": "Approve selected",
+      "reject": "Reject selected",
+      "confirmApprove": "Are you sure you want to approve {{count}} people?",
+      "confirmReject": "Are you sure you want to reject {{count}} people?",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
     }
   }
 }
