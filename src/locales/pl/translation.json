@@ -220,6 +220,13 @@
     "requiredField": "Pole wymagane.",
     "register": "Zarejestruj",
     "joinOnline": "Dołącz online",
+    "success": "Rejestracja przebiegła pomyślnie",
+    "errorTitle": "Wystąpił błąd",
+    "showCodeAtEntrance": "Pokaż ten kod przy wejściu na wydarzenie.",
+    "waitForApproval": "Twoje zgłoszenie oczekuje na weryfikację.",
+    "qrLoading": "Generowanie kodu QR...",
+    "qrError": "Nie udało się wygenerować kodu QR.",
+    "registerAgain": "Zarejestruj kolejną osobę",
     "validation": {
       "required": "To pole jest wymagane.",
       "email": "Podaj poprawny adres e-mail.",
