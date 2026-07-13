@@ -53,7 +53,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       return p === '/admin' || p.startsWith('/admin/events');
     }
     if (item.path === '/admin/registrations') {
-      return p === '/admin/registrations' || p.startsWith('/admin/registrations/');
+      return p === '/admin/registrations';
     }
     return p === item.path || p.startsWith(item.path + '/');
   };
@@ -77,6 +77,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     setMobileOpen(false);
   };
 
+  const getGreeting = () => {
+    const currentHour = new Date().getHours();
+
+    if (currentHour >= 5 && currentHour < 16) {
+      return t("admin.greeting.morning");
+    }
+
+    return t("admin.greeting.evening");
+  }
+
   const displayName = user?.fullName || user?.username || '';
   const collapsedClass = collapsed ? 'collapsed' : 'expanded';
 
@@ -92,7 +102,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
       {/* ── SIDEBAR ── */}
       <aside className={`admin-sidebar admin-sidebar-${collapsedClass} ${mobileOpen ? 'admin-sidebar-mobile-open' : ''}`}>
-        
+
         {/* Brand */}
         <div className={`admin-brand-section ${collapsedClass}`}>
           <div className="admin-brand-logo">
@@ -146,7 +156,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
       {/* ── CONTENT WRAPPER ── */}
       <div className="admin-content-wrapper">
-        
+
         {/* TOP BAR */}
         <header className="admin-topbar">
           {/* Mobile hamburger */}
@@ -160,16 +170,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
           <div className="admin-topbar-content">
             <div className="admin-welcome-text">
-              <span className="admin-welcome-prefix">Welcome,</span> <span className="admin-welcome-name">{displayName}!</span>
+              <span className="admin-welcome-prefix">{getGreeting()},</span> <span className="admin-welcome-name">{displayName}!</span>
             </div>
             <div className="admin-topbar-buttons">
               <button onClick={handleGoHome} className="admin-topbar-btn">
                 <HomeIcon width="16" height="16" />
-                <span className="admin-topbar-btn-label">Homepage</span>
+                <span className="admin-topbar-btn-label">{t("admin.homepage")}</span>
               </button>
               <button onClick={handleLogout} className="admin-topbar-btn">
                 <LogoutIcon width="16" height="16" />
-                <span className="admin-topbar-btn-label">Log out</span>
+                <span className="admin-topbar-btn-label">{t("admin.logout")}</span>
               </button>
             </div>
           </div>

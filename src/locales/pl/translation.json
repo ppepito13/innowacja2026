@@ -12,6 +12,14 @@
     "events": "Wydarzenia",
     "account": "Konto"
   },
+  "admin": {
+    "greeting": {
+      "morning": "Dzień dobry",
+      "evening": "Dobry wieczór"
+    },
+    "homepage": "Strona główna",
+    "logout": "Wyloguj się"
+  },
   "theme": {
     "toggleToDark": "Przełącz na tryb ciemny",
     "toggleToLight": "Przełącz na tryb jasny"
