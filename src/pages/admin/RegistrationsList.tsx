@@ -78,6 +78,17 @@ export default function RegistrationsList() {
   const [bulkConfirm, setBulkConfirm] = useState<{ action: 'approved' | 'rejected'; count: number } | null>(null);
   const [bulkLoading, setBulkLoading] = useState(false);
 
+  useEffect(() => {
+    if (!openedActionId) return;
+    const onPointerDown = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest('[data-action-menu]')) {
+        setOpenedActionId(null);
+      }
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    return () => document.removeEventListener('mousedown', onPointerDown);
+  }, [openedActionId]);
+
   // ── Load events ──────────────────────────────────────────────────────
   useEffect(() => {
     setEventsLoading(true);
@@ -523,7 +534,10 @@ export default function RegistrationsList() {
                       ))}
                       <td className="px-3 sm:px-4 py-3">{renderStatusBadge(reg.status)}</td>
                       <td className="px-3 sm:px-4 py-3">
-                        <div className="relative flex items-center justify-center gap-1.5">
+                        <div
+                          className="relative flex items-center justify-center gap-1.5"
+                          data-action-menu={openedActionId === reg.objectId ? '' : undefined}
+                        >
                           <button
                             className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary active:scale-95 cursor-pointer"
                             onClick={() => setSelectedRegistration(reg)}
