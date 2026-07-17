@@ -41,7 +41,13 @@ export default function EventDetails() {
       .get(`/classes/TestEvent/${eventId}`, {
         headers: { 'X-Parse-Master-Key': process.env.REACT_APP_PARSE_MASTER_KEY },
       })
-      .then(({ data }) => setEvent(data));
+      .then(async ({ data }) => {
+        const count = await parseService.count('Registration', {
+          event: { __type: 'Pointer', className: 'TestEvent', objectId: eventId },
+          status: 'approved',
+        });
+        setEvent({ ...data, registeredCount: count });
+      });
   }, [eventId]);
 
   const validateField = (value: string, field: any) => {
@@ -94,6 +100,10 @@ export default function EventDetails() {
       setFormErrors({});
       setSuccess(true);
 
+      if (!event.requiresApproval) {
+        setEvent(prev => prev ? { ...prev, registeredCount: (prev.registeredCount ?? 0) + 1 } : prev);
+      }
+
       setQrLoading(true);
       parseService
         .runFunction<{ token: string }>('generateQrToken', {
@@ -105,7 +115,13 @@ export default function EventDetails() {
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (e: any) {
-      setError(e.message || 'Error');
+      const serverMsg = e?.response?.data?.error || e?.message || 'Error';
+      if (serverMsg.includes('full')) {
+        setError(t('eventDetails.capacityFullDescription'));
+        setEvent(prev => prev ? { ...prev, registeredCount: prev.capacity ?? prev.registeredCount } : prev);
+      } else {
+        setError(serverMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -256,12 +272,73 @@ export default function EventDetails() {
 
           <section className="col-span-1 lg:col-span-5 bg-surface rounded-xl shadow-2xl lg:sticky lg:top-8 overflow-hidden min-w-0">
             <div className="p-5 sm:p-8">
-              {!success ? (
-                <>
-                  <h2 className="text-xl font-bold mb-1 text-primary">
-                    {t('eventDetails.registerNow')}
-                  </h2>
-                  <p className="text-sm text-primary/60 mb-8">{t('eventDetails.fillForm')}</p>
+              {(() => {
+                const hasCapacity = event.capacity != null && event.capacity > 0;
+                const registered = event.registeredCount ?? 0;
+                const isFull = hasCapacity && registered >= event.capacity!;
+                const spotsLeft = hasCapacity ? event.capacity! - registered : null;
+
+                if (isFull && !success) {
+                  return (
+                    <div className="flex flex-col items-center gap-4 py-8 text-center">
+                      <div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-error">
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="15" y1="9" x2="9" y2="15"/>
+                          <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                      </div>
+                      <h2 className="text-xl font-bold text-primary">
+                        {t('eventDetails.capacityFull')}
+                      </h2>
+                      <p className="text-sm text-primary/60 max-w-xs">
+                        {t('eventDetails.capacityFullDescription')}
+                      </p>
+                      <div className="w-full bg-error/5 border border-error/20 rounded-lg px-4 py-3 mt-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-primary/70 font-medium">{t('dashboard.col.capacity')}</span>
+                          <span className="font-bold text-error">{registered} / {event.capacity}</span>
+                        </div>
+                        <div className="w-full bg-error/10 rounded-full h-2 mt-2">
+                          <div className="bg-error rounded-full h-2 w-full transition-all" />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return !success ? (
+                  <>
+                    <h2 className="text-xl font-bold mb-1 text-primary">
+                      {t('eventDetails.registerNow')}
+                    </h2>
+                    <p className="text-sm text-primary/60 mb-4">{t('eventDetails.fillForm')}</p>
+
+                    {hasCapacity && spotsLeft != null && (
+                      <div className={`w-full box-border rounded-lg px-4 py-3 mb-6 border ${
+                        spotsLeft <= 5
+                          ? 'bg-amber-50 border-amber-300 dark:bg-amber-900/20 dark:border-amber-600/40'
+                          : 'bg-emerald-50 border-emerald-300 dark:bg-emerald-900/20 dark:border-emerald-600/40'
+                      }`}>
+                        <div className="flex items-center justify-between text-sm mb-2">
+                          <span className="text-primary/70 font-medium">{t('dashboard.col.capacity')}</span>
+                          <span className={`font-bold ${spotsLeft <= 5 ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
+                            {registered} / {event.capacity}
+                          </span>
+                        </div>
+                        <div className={`w-full rounded-full h-2 ${spotsLeft <= 5 ? 'bg-amber-200 dark:bg-amber-800/40' : 'bg-emerald-200 dark:bg-emerald-800/40'}`}>
+                          <div
+                            className={`rounded-full h-2 transition-all ${spotsLeft <= 5 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                            style={{ width: `${Math.min(100, (registered / event.capacity!) * 100)}%` }}
+                          />
+                        </div>
+                        <p className={`text-xs font-semibold mt-2 mb-0 ${spotsLeft <= 5 ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
+                          {spotsLeft === 1
+                            ? t('eventDetails.spotsLeftOne')
+                            : t('eventDetails.spotsLeft', { count: spotsLeft })}
+                        </p>
+                      </div>
+                    )}
 
                   <form className="flex flex-col gap-6 w-full min-w-0">
                     {Object.entries(event.formConfig ?? {}).map(([key, config]) => {
@@ -486,7 +563,8 @@ export default function EventDetails() {
                     {t('eventDetails.registerAgain')}
                   </button>
                 </div>
-              )}
+              );
+              })()}
             </div>
           </section>
         </div>

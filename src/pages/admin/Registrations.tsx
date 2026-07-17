@@ -239,7 +239,8 @@ export default function Registrations() {
         }
       }
     } catch (error: any) {
-      setError(error.message);
+      const msg = error?.response?.data?.error || error?.message || 'Error';
+      setError(msg);
     } finally {
       setOpenedActionId(null);
       setSelectedRegistration(null);

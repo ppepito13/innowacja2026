@@ -86,7 +86,21 @@ export default function Dashboard() {
 
     parseService
       .query<Event>(EVENT_CLASS, where)
-      .then(setEvents)
+      .then(async (events) => {
+        const withCounts = await Promise.all(
+          events.map(async (ev) => {
+            if (ev.capacity && ev.capacity > 0) {
+              const count = await parseService.count('Registration', {
+                event: { __type: 'Pointer', className: EVENT_CLASS, objectId: ev.objectId },
+                status: 'approved',
+              });
+              return { ...ev, registeredCount: count };
+            }
+            return ev;
+          })
+        );
+        setEvents(withCounts);
+      })
       .catch((e: any) => setError(e.message))
       .finally(() => setLoading(false));
   }, [user]);
@@ -239,6 +253,7 @@ export default function Dashboard() {
                 >
                   {t('dashboard.col.location')} <SortIcon field="location" />
                 </th>
+                <th className="pb-3 font-medium text-primary/70 w-36">{t('dashboard.col.capacity')}</th>
                 <th className="pb-3 font-medium text-primary/70">{t('dashboard.col.actions')}</th>
               </tr>
             </thead>
@@ -263,6 +278,14 @@ export default function Dashboard() {
                     {event.eventFormat === 'virtual'
                       ? t('dashboard.virtual')
                       : event.location || t('dashboard.onSite')}
+                  </td>
+                  <td className="py-3 text-primary/70 font-mono text-xs">
+                    {event.capacity
+                      ? t('dashboard.capacityDisplay', {
+                          current: event.registeredCount ?? 0,
+                          max: event.capacity,
+                        })
+                      : t('dashboard.capacityUnlimited')}
                   </td>
                   <td className="py-3">
                     <div className="flex items-center gap-2">
@@ -307,7 +330,7 @@ export default function Dashboard() {
               ))}
               {paginated.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-primary/60">
+                  <td colSpan={6} className="py-8 text-center text-primary/60">
                     {t('dashboard.empty')}
                   </td>
                 </tr>

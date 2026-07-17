@@ -126,8 +126,11 @@
       "name": "Event Name",
       "date": "Date",
       "location": "Location",
-      "actions": "Actions"
+      "actions": "Actions",
+      "capacity": "Capacity"
     },
+    "capacityUnlimited": "∞",
+    "capacityDisplay": "{{current}} / {{max}}",
     "virtual": "Virtual",
     "onSite": "On-site",
     "rowsPerPage": "Rows per page",
@@ -166,6 +169,7 @@
       "heroImage": "Hero Image",
       "registration": "Registration Confirmation"
     },
+    "capacitySection": "Capacity Limit",
     "fields": {
       "title": "Event Name",
       "requiresApproval": "Require Organizer Confirmation",
@@ -192,7 +196,10 @@
       "heroImagePreview": "Hero image preview",
       "dataProcessingAgreement": "Data Processing Agreement URL",
       "upload": "Upload",
-      "uploading": "Uploading..."
+      "uploading": "Uploading...",
+      "capacity": "Capacity Limit",
+      "capacityPlaceholder": "e.g. 150",
+      "capacityHint": "Leave empty for unlimited participants."
     },
     "validation": {
       "fillRequired": "Please fill in all required fields",
@@ -235,6 +242,10 @@
     "qrLoading": "Generating QR code...",
     "qrError": "Could not generate QR code.",
     "registerAgain": "Register another person",
+    "capacityFull": "No spots available",
+    "capacityFullDescription": "All spots for this event have been taken. Registration is currently closed.",
+    "spotsLeft": "{{count}} spots remaining",
+    "spotsLeftOne": "Last spot remaining!",
     "validation": {
       "required": "This field is required.",
       "email": "Please enter a valid email address.",
