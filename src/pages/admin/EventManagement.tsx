@@ -78,13 +78,17 @@ export default function EventManagement({ mode }: Props) {
           history.replace('/admin');
           return;
         }
+        const eventFormat = rawEvent.eventFormat ?? 'on-site';
+        const legacyUrlInLocation =
+          eventFormat === 'virtual' && !rawEvent.meetingLink && !!rawEvent.location;
+
         setEvent({
           ...rawEvent,
           dateType: rawEvent.dateType ?? 'single',
-          eventFormat: rawEvent.eventFormat ?? 'on-site',
+          eventFormat,
           requiresApproval: rawEvent.requiresApproval ?? false,
-          location: rawEvent.location ?? '',
-          meetingLink: rawEvent.meetingLink ?? '',
+          location: legacyUrlInLocation ? '' : (rawEvent.location ?? ''),
+          meetingLink: legacyUrlInLocation ? rawEvent.location : (rawEvent.meetingLink ?? ''),
           primaryColor: rawEvent.primaryColor ?? DEFAULT_PRIMARY_COLOR,
           accentColor: rawEvent.accentColor ?? DEFAULT_ACCENT_COLOR,
           heroImageUrl: rawEvent.heroImageUrl ?? '',
@@ -288,21 +292,16 @@ export default function EventManagement({ mode }: Props) {
             { value: 'hybrid', label: tt('fields.formatHybrid') },
           ]}
         />
-        <InputTextfieldStateful
-          label={
-            event?.eventFormat === 'virtual'
-              ? tt('fields.locationVirtual')
-              : tt('fields.locationOnSite')
-          }
-          placeholder={
-            event?.eventFormat === 'virtual'
-              ? tt('fields.locationVirtualPlaceholder')
-              : tt('fields.locationOnSitePlaceholder')
-          }
-          defaultValue={event?.location ?? ''}
-          onChange={(v) => handleFieldChange('location', String(v))}
-        />
-        {event?.eventFormat === 'hybrid' && (
+        {/* Physical address — on-site and hybrid only; always stored in `location`. */}
+        {event?.eventFormat !== 'virtual' && (
+          <InputTextfieldStateful
+            label={tt('fields.locationOnSite')}
+            placeholder={tt('fields.locationOnSitePlaceholder')}
+            defaultValue={event?.location ?? ''}
+            onChange={(v) => handleFieldChange('location', String(v))}
+          />
+        )}
+        {event?.eventFormat !== 'on-site' && (
           <InputTextfieldStateful
             label={tt('fields.locationVirtual')}
             placeholder={tt('fields.locationVirtualPlaceholder')}
