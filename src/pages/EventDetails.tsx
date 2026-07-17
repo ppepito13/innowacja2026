@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { Event } from '../types/types';
 import { formatColumnName, formatDate } from '../utils/formatters';
 import { parseService, createPointer } from '../services/parseService';
@@ -137,6 +138,7 @@ export default function EventDetails() {
     setQrError(false);
     setQrLoading(false);
   };
+  useDocumentTitle(event ? `${event.title} - ${t('common.brand')}` : undefined);
 
   if (!event) {
     return (
