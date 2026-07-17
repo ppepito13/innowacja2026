@@ -160,13 +160,15 @@ export default function Dashboard() {
           <h1 className="text-3xl mb-0">{t('dashboard.title')}</h1>
           <p className="text-lg mt-0 text-primary/75">{t('dashboard.subtitle')}</p>
         </div>
-        <button
-          onClick={() => history.push('/admin/events/new')}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
-        >
-          <Icon icon={LuPlus} />
-          <span>{t('dashboard.addEvent')}</span>
-        </button>
+        {user?.role === 'Admin' && (
+          <button
+            onClick={() => history.push('/admin/events/new')}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
+          >
+            <Icon icon={LuPlus} />
+            <span>{t('dashboard.addEvent')}</span>
+          </button>
+        )}
       </div>
 
       {/* SUBHEADER */}

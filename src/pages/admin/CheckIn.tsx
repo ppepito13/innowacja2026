@@ -8,6 +8,8 @@ import { ReactComponent as ChevronDownIcon } from '../../assets/chevron-down-ico
 import { ReactComponent as ZapIcon } from '../../assets/zap-icon.svg';
 import { ReactComponent as ZapOffIcon } from '../../assets/zap-off-icon.svg';
 
+import { useAuth } from '../../auth/AuthProvider';
+import { EVENT_CLASS } from '../../constants/eventDefaults';
 import { useScanner } from '../../hooks/useScanner';
 
 type CheckInParams = { eventId?: string };
@@ -25,6 +27,7 @@ const triggerVibration = (type: 'success' | 'error') => {
 
 export default function CheckIn() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { eventId: routeEventId } = useParams<CheckInParams>();
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
@@ -142,12 +145,25 @@ export default function CheckIn() {
   } = useScanner(handleScan);
 
   useEffect(() => {
+    if (!user) return;
+
+    const isAdmin = user.role === 'Admin';
+    const where = isAdmin
+      ? {}
+      : {
+          organizer: {
+            __type: 'Pointer',
+            className: '_User',
+            objectId: user.objectId,
+          },
+        };
+
     parseService
-      .getAll<Event>('TestEvent')
+      .query<Event>(EVENT_CLASS, where)
       .then(setEvents)
       // eslint-disable-next-line no-console
       .catch(console.error);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (events.length === 0) return;
