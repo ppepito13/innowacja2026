@@ -29,7 +29,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { icon: CalendarIcon, labelKey: 'nav.events', path: '/admin' },
   { icon: RegistrationsIcon, labelKey: 'nav.registrations', path: '/admin/registrations' },
-  { icon: QrCodeIcon, labelKey: 'nav.checkIn', path: '/admin/check-in', adminOnly: true },
+  { icon: QrCodeIcon, labelKey: 'nav.checkIn', path: '/admin/check-in' },
   { icon: UsersIcon, labelKey: 'nav.users', path: '/admin/users', adminOnly: true },
   { icon: SettingsIcon, labelKey: 'nav.account', path: '/admin/account' },
 ];
