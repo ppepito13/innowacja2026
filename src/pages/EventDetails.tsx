@@ -148,6 +148,9 @@ export default function EventDetails() {
 
   const showMapEmbed = event.eventFormat === 'on-site' || event.eventFormat === 'hybrid';
 
+  const meetingUrl =
+    event.meetingLink || (event.eventFormat === 'virtual' ? event.location : '');
+
   return (
     <div className="min-h-screen bg-background text-primary font-sans relative pb-16 overflow-x-hidden">
       <header className="bg-surface p-4 flex items-center justify-between shadow-md relative z-20">
@@ -228,16 +231,16 @@ export default function EventDetails() {
                   )}
                 </div>
 
-                {event.location && (
+                {event.eventFormat !== 'virtual' && event.location && (
                   <div className="flex items-center gap-2">
                     <Icon icon={LuMapPin} size={16} />
                     <span>{event.location}</span>
                   </div>
                 )}
 
-                {event.eventFormat === 'hybrid' && event.meetingLink && (
+                {event.eventFormat !== 'on-site' && meetingUrl && (
                   <a
-                    href={event.meetingLink}
+                    href={meetingUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-primary/60 hover:text-primary transition-colors"
