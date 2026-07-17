@@ -99,6 +99,13 @@ export const parseService = {
     const { data } = await parseClient.post<{ result: T }>(`/functions/${name}`, params);
     return data.result;
   },
+
+  async count(className: string, where: Record<string, unknown> = {}): Promise<number> {
+    const { data } = await parseClient.get(`/classes/${className}`, {
+      params: { where: JSON.stringify(where), count: 1, limit: 0 },
+    });
+    return (data as any).count ?? 0;
+  },
 };
 
 //  Auth

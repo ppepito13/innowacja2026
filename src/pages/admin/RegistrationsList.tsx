@@ -255,7 +255,8 @@ export default function RegistrationsList() {
         prev.map((r) => (r.objectId === registrationId ? { ...r, status } : r)),
       );
     } catch (e: any) {
-      setError(e.message);
+      const msg = e?.response?.data?.error || e?.message || 'Error';
+      setError(msg);
     } finally {
       setOpenedActionId(null);
     }
@@ -299,7 +300,8 @@ export default function RegistrationsList() {
       );
       setSelectedIds(new Set());
     } catch (e: any) {
-      setError(e.message);
+      const msg = e?.response?.data?.error || e?.message || 'Error';
+      setError(msg);
     } finally {
       setBulkLoading(false);
       setBulkConfirm(null);

@@ -79,6 +79,8 @@ export interface Event {
   eventFormat: 'virtual' | 'on-site' | 'hybrid';
   meetingLink?: string;
   requiresApproval?: boolean;
+  capacity?: number;
+  registeredCount?: number;
   primaryColor: string;
   accentColor?: string;
   heroImageUrl?: string;

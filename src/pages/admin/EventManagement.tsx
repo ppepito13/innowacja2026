@@ -170,6 +170,9 @@ export default function EventManagement({ mode }: Props) {
       accentColor: event.accentColor,
       heroImageUrl: event.heroImageUrl,
       isActive: event.isActive,
+      ...(event.capacity != null && event.capacity > 0
+        ? { capacity: event.capacity }
+        : isEdit ? { capacity: { __op: 'Delete' } as any } : undefined),
       dataProcessingAgreement: event.dataProcessingAgreement,
       formConfig: event.formConfig,
       organizer: event.organizer,
@@ -340,6 +343,24 @@ export default function EventManagement({ mode }: Props) {
             checked={event?.requiresApproval ?? false}
             onChange={(v) => handleFieldChange('requiresApproval', v)}
           />
+        </div>
+        <p className="text-sm font-semibold text-primary mt-3">{tt('capacitySection')}</p>
+        <div className="flex flex-col gap-1">
+          <label className="block text-xs font-medium text-primary/70">
+            {tt('fields.capacity')}
+          </label>
+          <input
+            type="number"
+            min="1"
+            value={event?.capacity ?? ''}
+            onChange={(e) => {
+              const val = e.target.value;
+              handleFieldChange('capacity', val ? Number(val) : undefined);
+            }}
+            placeholder={tt('fields.capacityPlaceholder')}
+            className="border border-primary/20 rounded-lg px-3 py-2 text-sm text-primary focus:outline-none focus:border-primary/60 w-full sm:w-48"
+          />
+          <p className="text-xs text-primary/60 mt-0">{tt('fields.capacityHint')}</p>
         </div>
         <p className="text-sm font-semibold text-primary mt-3">{tt('sections.colors')}</p>
         <div className="flex flex-col sm:flex-row gap-4">
