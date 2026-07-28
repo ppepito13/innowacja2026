@@ -444,5 +444,14 @@
       "confirm": "Confirm",
       "cancel": "Cancel"
     }
+  },
+  "unregister": {
+    "loading": "Checking your registration...",
+    "confirmQuestion": "Are you sure you want to unregister from \"{{eventTitle}}\"?",
+    "confirmButton": "Yes, I want to unregister from the event",
+    "submitting": "Processing your request...",
+    "success": "You have been successfully unregistered from the event.",
+    "alreadyCancelled": "This registration has already been cancelled.",
+    "invalidToken": "This link is invalid or has expired."
   }
 }
