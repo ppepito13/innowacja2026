@@ -5,7 +5,7 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { Event } from '../types/types';
 import { formatColumnName, formatDate } from '../utils/formatters';
 import { parseService, createPointer } from '../services/parseService';
-import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle, LuLink, LuTriangleAlert } from 'react-icons/lu';
+import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle, LuLink, LuTriangleAlert, LuDownload, LuCalendarPlus } from 'react-icons/lu';
 import DOMPurify from 'dompurify';
 import Icon from '../components/Icon';
 import { EMAIL_REGEX, PHONE_REGEX } from '../utils/regex';
@@ -14,6 +14,8 @@ import { MAP_IFRAME_WIDTH, MAP_IFRAME_HEIGHT } from '../constants/eventDefaults'
 import { useTheme } from '../theme/ThemeProvider';
 import ThemeToggle from '../components/ThemeToggle';
 import { QRCodeSVG } from 'qrcode.react';
+import { generateConfirmationPdf } from '../utils/confirmationPdf';
+import { downloadIcsFile } from '../utils/calendarIcs';
 
 const LANGUAGES = [
   { code: 'en', label: 'EN' },
@@ -110,7 +112,16 @@ export default function EventDetails() {
         .runFunction<{ token: string }>('generateQrToken', {
           registrationId: registration.objectId,
         })
-        .then((res) => setQrToken(res.token))
+        .then(async (res) => {
+          setQrToken(res.token);
+          setTimeout(async () => {
+            try {
+              await generateConfirmationPdf(event, t);
+            } catch (err) {
+              console.error('PDF generation error:', err);
+            }
+          }, 300);
+        })
         .catch(() => setQrError(true))
         .finally(() => setQrLoading(false));
 
@@ -549,7 +560,7 @@ export default function EventDetails() {
                   )}
 
                   {!event.requiresApproval && !qrLoading && qrToken && (
-                    <div className="rounded-lg border border-primary/10 bg-white p-3">
+                    <div id="qr-confirmation" className="rounded-lg border border-primary/10 bg-white p-3">
                       <QRCodeSVG value={qrToken} size={180} level="M" />
                     </div>
                   )}
@@ -558,6 +569,33 @@ export default function EventDetails() {
                     <span className="text-xs text-error">
                       {t('eventDetails.qrError')}
                     </span>
+                  )}
+
+                  {!event.requiresApproval && !qrLoading && (
+                    <div className="flex flex-col sm:flex-row gap-2 w-full mt-2">
+                      <button
+                        type="button"
+                        className="flex-1 box-border flex items-center justify-center gap-2 py-3 px-4 rounded-md bg-brand text-white font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                        onClick={async () => {
+                          try {
+                            await generateConfirmationPdf(event, t);
+                          } catch (err) {
+                            console.error('PDF generation error:', err);
+                          }
+                        }}
+                      >
+                        <Icon icon={LuDownload} size={16} />
+                        {t('eventDetails.downloadPdf')}
+                      </button>
+                      <button
+                        type="button"
+                        className="flex-1 box-border flex items-center justify-center gap-2 py-3 px-4 rounded-md border border-primary/20 bg-surface text-primary font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                        onClick={() => downloadIcsFile(event)}
+                      >
+                        <Icon icon={LuCalendarPlus} size={16} />
+                        {t('eventDetails.addToCalendar')}
+                      </button>
+                    </div>
                   )}
 
                   <button
