@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useHistory } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import {
   LuChevronLeft,
   LuChevronRight,
@@ -20,20 +20,20 @@ import { formatDate, formatColumnName, formatCellValue } from '../../utils/forma
 import { useTranslation } from 'react-i18next';
 import parseClient from '../../services/parseClient';
 import Icon from '../../components/Icon';
+import Pagination from '../../components/Pagination';
 import '../../components/BulkActionBar.css';
 
 const EVENT_CLASS = 'TestEvent';
-const ROWS_PER_PAGE = 10;
 
 type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
 type SortField = string;
 type SortDir = 'asc' | 'desc';
 
 function SortIcon({
-                    field,
-                    sortField,
-                    sortDir,
-                  }: {
+  field,
+  sortField,
+  sortDir,
+}: {
   field: string;
   sortField: string;
   sortDir: SortDir;
@@ -49,6 +49,7 @@ export default function RegistrationsList() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const history = useHistory();
+  const { eventId: eventIdParam } = useParams<{ eventId?: string }>();
 
   // ── Events ──────────────────────────────────────────────────────────
   const [events, setEvents] = useState<Event[]>([]);
@@ -66,6 +67,7 @@ export default function RegistrationsList() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   // ── Pagination ───────────────────────────────────────────────────────
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
 
   // ── Table ────────────────────────────────────────────────────────────
@@ -101,7 +103,9 @@ export default function RegistrationsList() {
       .query<Event>(EVENT_CLASS, where)
       .then((data) => {
         setEvents(data);
-        if (data.length > 0) {
+        if (eventIdParam) {
+          setSelectedEventId(eventIdParam);
+        } else if (data.length > 0) {
           setSelectedEventId(data[0].objectId ?? '');
         }
       })
@@ -189,8 +193,8 @@ export default function RegistrationsList() {
     });
   }, [filtered, sortField, sortDir]);
 
-  const totalPages = Math.max(1, Math.ceil(sorted.length / ROWS_PER_PAGE));
-  const paginated = sorted.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(sorted.length / rowsPerPage));
+  const paginated = sorted.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
   // ── Helpers ───────────────────────────────────────────────────────────
   const handleSort = (field: SortField) => {
@@ -309,7 +313,8 @@ export default function RegistrationsList() {
   };
 
   const selectableOnPage = paginated.filter((r) => r.status !== 'approved');
-  const allOnPageSelected = selectableOnPage.length > 0 && selectableOnPage.every((r) => selectedIds.has(r.objectId));
+  const allOnPageSelected =
+    selectableOnPage.length > 0 && selectableOnPage.every((r) => selectedIds.has(r.objectId));
 
   const renderStatusBadge = (status: Registration['status']) => {
     if (status === 'approved') {
@@ -358,7 +363,10 @@ export default function RegistrationsList() {
             ) : (
               <select
                 value={selectedEventId}
-                onChange={(e) => setSelectedEventId(e.target.value)}
+                onChange={(e) => {
+                  setSelectedEventId(e.target.value);
+                  history.push(`/admin/registrations/${e.target.value}`);
+                }}
                 className="h-10 w-full !min-w-0 rounded-lg border border-primary/20 bg-surface px-3 text-sm text-primary outline-none focus:border-primary sm:max-w-xs"
               >
                 {events.length === 0 && (
@@ -470,159 +478,155 @@ export default function RegistrationsList() {
               <div className="w-full min-w-0 max-w-full overflow-x-auto rounded-xl border border-primary/10">
                 <table className="w-full min-w-max text-sm">
                   <thead>
-                  <tr className="border-b border-primary/10 bg-primary/[0.02] text-left text-xs font-semibold uppercase tracking-wide text-primary/70">
-                    <th className="w-10 px-3 sm:px-4 py-3">
-                      <input
-                        type="checkbox"
-                        className="bulk-checkbox disabled:cursor-not-allowed"
-                        checked={allOnPageSelected}
-                        onChange={toggleSelectAll}
-                        disabled={selectableOnPage.length === 0}
-                      />
-                    </th>
-                    <th
-                      className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
-                      onClick={() => handleSort('createdAt')}
-                    >
-                      {t('registrationsList.columns.date')}
-                      <SortIcon field="createdAt" sortField={sortField} sortDir={sortDir} />
-                    </th>
-                    {Object.keys(selectedEvent?.formConfig ?? {}).map((col) => (
-                      <th
-                        key={col}
-                        className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
-                        onClick={() => handleSort(col)}
-                      >
-                        {formatColumnName(col)}
-                        <SortIcon field={col} sortField={sortField} sortDir={sortDir} />
-                      </th>
-                    ))}
-                    <th
-                      className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
-                      onClick={() => handleSort('status')}
-                    >
-                      {t('registrationsList.columns.status')}
-                      <SortIcon field="status" sortField={sortField} sortDir={sortDir} />
-                    </th>
-                    <th className="whitespace-nowrap px-3 sm:px-4 py-3 text-center">
-                      {t('registrationsList.columns.actions')}
-                    </th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {paginated.map((reg, idx) => (
-                    <tr
-                      key={reg.objectId}
-                      className={`border-b border-primary/10 text-primary transition hover:bg-primary/[0.03] ${
-                        idx % 2 === 0 ? '' : 'bg-primary/[0.01]'
-                      }`}
-                    >
-                      <td className="px-3 sm:px-4 py-3">
+                    <tr className="border-b border-primary/10 bg-primary/[0.02] text-left text-xs font-semibold uppercase tracking-wide text-primary/70">
+                      <th className="w-10 px-3 sm:px-4 py-3">
                         <input
                           type="checkbox"
                           className="bulk-checkbox disabled:cursor-not-allowed"
-                          checked={selectedIds.has(reg.objectId)}
-                          onChange={() => toggleSelect(reg.objectId)}
-                          disabled={reg.status === 'approved'}
+                          checked={allOnPageSelected}
+                          onChange={toggleSelectAll}
+                          disabled={selectableOnPage.length === 0}
                         />
-                      </td>
-                      <td className="whitespace-nowrap px-3 sm:px-4 py-3 text-xs text-primary/70">
-                        {formatDate(reg.createdAt)}
-                      </td>
+                      </th>
+                      <th
+                        className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
+                        onClick={() => handleSort('createdAt')}
+                      >
+                        {t('registrationsList.columns.date')}
+                        <SortIcon field="createdAt" sortField={sortField} sortDir={sortDir} />
+                      </th>
                       {Object.keys(selectedEvent?.formConfig ?? {}).map((col) => (
-                        <td key={col} className="px-3 sm:px-4 py-3">
-                          {formatCellValue(String(reg.formData?.[col] ?? 'N/A'), t)}
-                        </td>
-                      ))}
-                      <td className="px-3 sm:px-4 py-3">{renderStatusBadge(reg.status)}</td>
-                      <td className="px-3 sm:px-4 py-3">
-                        <div
-                          className="relative flex items-center justify-center gap-1.5"
-                          data-action-menu={openedActionId === reg.objectId ? '' : undefined}
+                        <th
+                          key={col}
+                          className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
+                          onClick={() => handleSort(col)}
                         >
-                          <button
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary active:scale-95 cursor-pointer"
-                            onClick={() => setSelectedRegistration(reg)}
-                          >
-                            <Icon icon={LuEye} size={14} />
-                          </button>
-
-                          <button
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary active:scale-95 cursor-pointer"
-                            onClick={() =>
-                              history.push(
-                                `/admin/registrations/${selectedEventId}/${reg.objectId}/edit`,
-                              )
-                            }
-                          >
-                            <Icon icon={LuPencil} size={14} />
-                          </button>
-
-                          <button
-                            disabled={reg.status === 'approved'}
-                            className={`flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface transition active:scale-95 ${
-                              reg.status === 'approved' ? 'cursor-not-allowed opacity-40 text-primary/30' : 'cursor-pointer text-primary/70 hover:bg-background hover:text-primary'
-                            }`}
-                            onClick={() =>
-                              reg.status !== 'approved' &&
-                              setOpenedActionId((id) =>
-                                id === reg.objectId ? null : reg.objectId,
-                              )
-                            }
-                          >
-                            <Icon icon={LuEllipsis} size={14} />
-                          </button>
-
-                          {openedActionId === reg.objectId && (
-                            <div className="absolute right-0 top-10 z-50 w-44 rounded-xl border border-primary/15 bg-surface shadow-xl">
-                              <button
-                                className="flex w-full items-center gap-2 rounded-t-xl px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
-                                onClick={() => updateStatus(reg.objectId, 'approved')}
-                              >
-                                <Icon icon={LuCircleCheck} size={13} />
-                                {t('registrationsList.approve')}
-                              </button>
-                              <button
-                                className="flex w-full items-center gap-2 rounded-b-xl px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
-                                onClick={() => updateStatus(reg.objectId, 'rejected')}
-                              >
-                                <Icon icon={LuCircleX} size={13} />
-                                {t('registrationsList.reject')}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </td>
+                          {formatColumnName(col)}
+                          <SortIcon field={col} sortField={sortField} sortDir={sortDir} />
+                        </th>
+                      ))}
+                      <th
+                        className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
+                        onClick={() => handleSort('status')}
+                      >
+                        {t('registrationsList.columns.status')}
+                        <SortIcon field="status" sortField={sortField} sortDir={sortDir} />
+                      </th>
+                      <th className="whitespace-nowrap px-3 sm:px-4 py-3 text-center">
+                        {t('registrationsList.columns.actions')}
+                      </th>
                     </tr>
-                  ))}
+                  </thead>
+                  <tbody>
+                    {paginated.map((reg, idx) => (
+                      <tr
+                        key={reg.objectId}
+                        className={`border-b border-primary/10 text-primary transition hover:bg-primary/[0.03] ${
+                          idx % 2 === 0 ? '' : 'bg-primary/[0.01]'
+                        }`}
+                      >
+                        <td className="px-3 sm:px-4 py-3">
+                          <input
+                            type="checkbox"
+                            className="bulk-checkbox disabled:cursor-not-allowed"
+                            checked={selectedIds.has(reg.objectId)}
+                            onChange={() => toggleSelect(reg.objectId)}
+                            disabled={reg.status === 'approved'}
+                          />
+                        </td>
+                        <td className="whitespace-nowrap px-3 sm:px-4 py-3 text-xs text-primary/70">
+                          {formatDate(reg.createdAt)}
+                        </td>
+                        {Object.keys(selectedEvent?.formConfig ?? {}).map((col) => (
+                          <td key={col} className="px-3 sm:px-4 py-3">
+                            {formatCellValue(String(reg.formData?.[col] ?? 'N/A'), t)}
+                          </td>
+                        ))}
+                        <td className="px-3 sm:px-4 py-3">{renderStatusBadge(reg.status)}</td>
+                        <td className="px-3 sm:px-4 py-3">
+                          <div
+                            className="relative flex items-center justify-center gap-1.5"
+                            data-action-menu={openedActionId === reg.objectId ? '' : undefined}
+                          >
+                            <button
+                              className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary active:scale-95 cursor-pointer"
+                              onClick={() => setSelectedRegistration(reg)}
+                            >
+                              <Icon icon={LuEye} size={14} />
+                            </button>
+
+                            <button
+                              className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary active:scale-95 cursor-pointer"
+                              onClick={() =>
+                                history.push(
+                                  `/admin/registrations/${selectedEventId}/${reg.objectId}/edit`,
+                                )
+                              }
+                            >
+                              <Icon icon={LuPencil} size={14} />
+                            </button>
+
+                            <button
+                              disabled={reg.status === 'approved'}
+                              className={`flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface transition active:scale-95 ${
+                                reg.status === 'approved'
+                                  ? 'cursor-not-allowed opacity-40 text-primary/30'
+                                  : 'cursor-pointer text-primary/70 hover:bg-background hover:text-primary'
+                              }`}
+                              onClick={() =>
+                                reg.status !== 'approved' &&
+                                setOpenedActionId((id) =>
+                                  id === reg.objectId ? null : reg.objectId,
+                                )
+                              }
+                            >
+                              <Icon icon={LuEllipsis} size={14} />
+                            </button>
+
+                            {openedActionId === reg.objectId && (
+                              <div className="absolute right-0 top-10 z-50 w-44 rounded-xl border border-primary/15 bg-surface shadow-xl">
+                                <button
+                                  className="flex w-full items-center gap-2 rounded-t-xl px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
+                                  onClick={() => updateStatus(reg.objectId, 'approved')}
+                                >
+                                  <Icon icon={LuCircleCheck} size={13} />
+                                  {t('registrationsList.approve')}
+                                </button>
+                                <button
+                                  className="flex w-full items-center gap-2 rounded-b-xl px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
+                                  onClick={() => updateStatus(reg.objectId, 'rejected')}
+                                >
+                                  <Icon icon={LuCircleX} size={13} />
+                                  {t('registrationsList.reject')}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
             )}
 
             {/* Pagination */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3">
-              <span className="text-xs text-primary/60 text-center sm:text-left">
-                {t('registrationsList.pagination.current')} {page}{' '}
-                {t('registrationsList.pagination.total')} {totalPages}
-              </span>
-              <div className="flex justify-center sm:justify-end gap-2">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <Icon icon={LuChevronLeft} size={14} />
-                </button>
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <Icon icon={LuChevronRight} size={14} />
-                </button>
-              </div>
-            </div>
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={setRowsPerPage}
+              labels={{
+                rowsPerPage: t('dashboard.rowsPerPage'),
+                pageText: (
+                  <>
+                    {t('registrationsList.pagination.current')} {page}{' '}
+                    {t('registrationsList.pagination.total')} {totalPages}
+                  </>
+                ),
+              }}
+            />
           </>
         )}
       </div>
