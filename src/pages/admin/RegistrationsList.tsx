@@ -203,9 +203,15 @@ export default function RegistrationsList() {
     setPage(1);
   };
 
-  const canExport =
-    user?.role === 'Admin' ||
-    (user?.objectId != null && selectedEvent?.ACL?.[user.objectId]?.read === true);
+  const canExport = () => {
+    if (!user) return false;
+    if (user.role === 'Admin') return true;
+    if (!selectedEvent || !user.objectId) return false;
+    return (
+      (!!selectedEvent.organizer?.objectId && selectedEvent.organizer.objectId === user.objectId) ||
+      selectedEvent.ACL?.[user.objectId]?.read === true
+    );
+  }
 
   const exportCSV = () => {
     if (registrations.length === 0) return;
@@ -374,7 +380,7 @@ export default function RegistrationsList() {
           </div>
 
           {/* Export buttons */}
-          {canExport && (
+          {canExport() && (
             <div className="flex shrink-0 gap-2">
               <button
                 onClick={exportCSV}
