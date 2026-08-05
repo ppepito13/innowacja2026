@@ -58,7 +58,7 @@ export default function FieldCard({
       {/* Label + Placeholder */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
-          <label className="block text-xs font-medium text-primary/70 mb-1.5">
+          <label className="block text-xs font-book text-primary/70 mb-1.5">
             {t("formConfig.label")}
           </label>
           <input
@@ -72,7 +72,7 @@ export default function FieldCard({
           {error && <div className="text-error text-xs mt-1">{error}</div>}
         </div>
         <div>
-          <label className="block text-xs font-medium text-primary/70 mb-1.5">
+          <label className="block text-xs font-book text-primary/70 mb-1.5">
             {t("formConfig.placeholder")}
           </label>
           <input
@@ -87,7 +87,7 @@ export default function FieldCard({
       {/* Type + Required */}
       <div className="flex gap-4 mb-3 flex-wrap items-end">
         <div>
-          <label className="block text-xs font-medium text-primary/70 mb-1.5">
+          <label className="block text-xs font-book text-primary/70 mb-1.5">
             {t("formConfig.type")}
           </label>
           <TypeDropdown
@@ -110,7 +110,7 @@ export default function FieldCard({
         </div>
 
         <label className="flex flex-col items-start gap-1.5 cursor-pointer pb-1">
-          <span className="block text-xs font-medium text-primary/70">
+          <span className="block text-xs font-book text-primary/70">
             {t("formConfig.required")}
           </span>
           <Toggle

@@ -18,7 +18,7 @@ export default function ColorField({ label, value, onChange }: ColorFieldProps) 
 
     return (
         <div className="flex flex-col gap-1 flex-1">
-            <label className="block text-xs font-medium text-primary/70 mb-1">{label}</label>
+            <label className="block text-xs font-book text-primary/70 mb-1">{label}</label>
             <div className="flex items-center gap-2">
                 <input
                     type="color"

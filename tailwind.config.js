@@ -52,9 +52,13 @@ module.exports = {
         warning: "rgb(var(--color-warning) / <alpha-value>)",
       },
       fontFamily: {
-        headline: ["Space Grotesk", "sans-serif"],
-        body: ["Inter", "sans-serif"],
+        headline: ["Gotham", "sans-serif"],
+        body: ["Gotham", "sans-serif"],
       },
+    },
+    fontWeight: {
+      book: "400",
+      bold: "700",
     },
   },
   plugins: [],

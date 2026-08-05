@@ -32,11 +32,11 @@ export default function Home() {
         <div className="absolute -bottom-32 -right-16 w-[28rem] h-[28rem] rounded-full bg-secondary/15 blur-3xl" />
         <div className="absolute top-1/4 right-1/3 w-56 h-56 rounded-full bg-cb-sand/5 blur-2xl" />
 
-        <span className="relative mb-8 inline-flex items-center gap-2 rounded-full bg-cb-sand/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-secondary backdrop-blur-sm">
+        <span className="relative mb-8 inline-flex items-center gap-2 rounded-full bg-cb-sand/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-secondary backdrop-blur-sm">
           Commerzbank Łódź
         </span>
 
-        <h1 className="relative max-w-4xl text-5xl font-extrabold leading-tight sm:text-6xl md:text-7xl bg-gradient-to-r from-cb-sand via-cb-sand to-secondary bg-clip-text text-transparent">
+        <h1 className="relative max-w-4xl text-5xl font-bold leading-tight sm:text-6xl md:text-7xl bg-gradient-to-r from-cb-sand via-cb-sand to-secondary bg-clip-text text-transparent">
           {t('home.heroTitle')}
         </h1>
 
@@ -54,14 +54,14 @@ export default function Home() {
           {loading && (
             <div className="flex flex-col items-center justify-center py-16 text-primary/70">
               <div className="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-primary/15 border-t-secondary" />
-              <p className="font-medium">{t('home.loading')}</p>
+              <p className="font-book">{t('home.loading')}</p>
             </div>
           )}
 
           {!loading && error && (
             <div className="flex flex-col items-center justify-center py-16 text-center text-error">
               <Icon icon={LuCircleAlert} size={40} />
-              <p className="font-medium">{t('home.loadError')}</p>
+              <p className="font-book">{t('home.loadError')}</p>
             </div>
           )}
 

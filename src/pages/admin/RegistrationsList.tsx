@@ -314,7 +314,7 @@ export default function RegistrationsList() {
   const renderStatusBadge = (status: Registration['status']) => {
     if (status === 'approved') {
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold border-cb-success/40 bg-cb-success/15 text-success">
+        <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold border-cb-success/40 bg-cb-success/15 text-success">
           <Icon icon={LuCircleCheck} size={13} />
           {t('registrationsList.status.approved')}
         </span>
@@ -322,14 +322,14 @@ export default function RegistrationsList() {
     }
     if (status === 'rejected') {
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold border-cb-error/40 bg-cb-error/15 text-error">
+        <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold border-cb-error/40 bg-cb-error/15 text-error">
           <Icon icon={LuCircleX} size={13} />
           {t('registrationsList.status.rejected')}
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold border-cb-warning/40 bg-cb-warning/15 text-warning">
+      <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold border-cb-warning/40 bg-cb-warning/15 text-warning">
         <Icon icon={LuClock} size={13} />
         {t('registrationsList.status.pending')}
       </span>
@@ -379,7 +379,7 @@ export default function RegistrationsList() {
               <button
                 onClick={exportCSV}
                 disabled={registrations.length === 0}
-                className="flex h-10 items-center gap-2 rounded-lg border border-primary/20 bg-surface px-3 text-sm font-semibold text-primary transition hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-10 items-center gap-2 rounded-lg border border-primary/20 bg-surface px-3 text-sm font-bold text-primary transition hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Icon icon={LuDownload} size={14} />
                 CSV
@@ -387,7 +387,7 @@ export default function RegistrationsList() {
               <button
                 onClick={exportExcel}
                 disabled={registrations.length === 0}
-                className="flex h-10 items-center gap-2 rounded-lg border border-primary/20 bg-surface px-3 text-sm font-semibold text-primary transition hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-10 items-center gap-2 rounded-lg border border-primary/20 bg-surface px-3 text-sm font-bold text-primary transition hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Icon icon={LuDownload} size={14} />
                 Excel
@@ -470,7 +470,7 @@ export default function RegistrationsList() {
               <div className="w-full min-w-0 max-w-full overflow-x-auto rounded-xl border border-primary/10">
                 <table className="w-full min-w-max text-sm">
                   <thead>
-                  <tr className="border-b border-primary/10 bg-primary/[0.02] text-left text-xs font-semibold uppercase tracking-wide text-primary/70">
+                  <tr className="border-b border-primary/10 bg-primary/[0.02] text-left text-xs font-bold uppercase tracking-wide text-primary/70">
                     <th className="w-10 px-3 sm:px-4 py-3">
                       <input
                         type="checkbox"
@@ -638,7 +638,7 @@ export default function RegistrationsList() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-primary">
+              <h2 className="text-base font-bold text-primary">
                 {t('registrationsList.details.title')}
               </h2>
               <button
@@ -650,20 +650,20 @@ export default function RegistrationsList() {
             </div>
             <div className="space-y-2 text-sm text-primary/80 max-h-[70vh] overflow-y-auto">
               <div className="flex gap-2">
-                <span className="font-semibold text-primary/60">
+                <span className="font-bold text-primary/60">
                   {t('registrationsList.details.status')}:
                 </span>
                 {renderStatusBadge(selectedRegistration.status)}
               </div>
               <div className="flex gap-2">
-                <span className="font-semibold text-primary/60">
+                <span className="font-bold text-primary/60">
                   {t('registrationsList.details.date')}:
                 </span>
                 {formatDate(selectedRegistration.createdAt)}
               </div>
               {Object.entries(selectedRegistration.formData ?? {}).map(([key, value]) => (
                 <div key={key} className="flex gap-2 break-all">
-                  <span className="font-semibold text-primary/60">{formatColumnName(key)}:</span>
+                  <span className="font-bold text-primary/60">{formatColumnName(key)}:</span>
                   <span>{formatCellValue(String(value), t)}</span>
                 </div>
               ))}

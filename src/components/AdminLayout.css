@@ -58,7 +58,7 @@
 
 .admin-brand-logo-text {
   color: rgb(var(--cb-petrol));
-  font-weight: 800;
+  font-weight: 700;
   font-size: 11px;
   letter-spacing: 0.5px;
   user-select: none;
@@ -105,7 +105,7 @@
   border-radius: 8px;
   border: none !important;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 13px;
   transition: background-color 0.15s, color 0.15s;
   width: 100%;
@@ -169,7 +169,7 @@
   border: none !important;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
   background-color: transparent !important;
   color: rgb(var(--admin-muted)) !important;
   width: 100%;
@@ -227,7 +227,7 @@
 
 .admin-welcome-text {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .admin-welcome-prefix {
@@ -254,7 +254,7 @@
   color: rgb(var(--admin-text)) !important;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   outline: none;
   box-shadow: none;
   transition: border-color 0.15s, background-color 0.15s;

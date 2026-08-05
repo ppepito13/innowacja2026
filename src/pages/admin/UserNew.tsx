@@ -122,7 +122,7 @@ export default function UserNew() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-primary">{t('users.new.role')}</label>
+          <label className="text-sm font-book text-primary">{t('users.new.role')}</label>
           <select
             value={user.role}
             onChange={(e) => handleChange('role', e.target.value)}
@@ -134,7 +134,7 @@ export default function UserNew() {
         </div>
 
         <div className="flex flex-col gap-1 mt-1">
-          <label className="text-sm font-medium text-primary">{t('users.new.events')}</label>
+          <label className="text-sm font-book text-primary">{t('users.new.events')}</label>
           <div className="flex flex-col gap-1 border border-primary/20 rounded-lg p-3 max-h-48 overflow-y-auto">
             {events.map((ev) => (
               <label key={ev.objectId} className="flex items-center gap-2 text-sm text-primary">
@@ -167,7 +167,7 @@ export default function UserNew() {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none disabled:opacity-50"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-book cursor-pointer outline-none border-none disabled:opacity-50"
         >
           <Icon icon={LuUserPlus} />
           <span>{loading ? `${t('users.new.pending')}...` : t('users.new.submit')}</span>

@@ -174,7 +174,7 @@ export default function EventDetails() {
                     i18n.changeLanguage(code);
                     currentLabel = i18n.language;
                   }}
-                  className={`cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide ${
+                  className={`cursor-pointer px-2 py-1 text-sm font-book transition-all duration-200 bg-transparent border-none tracking-wide ${
                     i18n.language === code ? 'text-primary' : 'text-primary/50 hover:text-primary/70'
                   }`}
                 >
@@ -301,7 +301,7 @@ export default function EventDetails() {
                       </p>
                       <div className="w-full bg-error/5 border border-error/20 rounded-lg px-4 py-3 mt-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-primary/70 font-medium">{t('dashboard.col.capacity')}</span>
+                          <span className="text-primary/70 font-book">{t('dashboard.col.capacity')}</span>
                           <span className="font-bold text-error">{registered} / {event.capacity}</span>
                         </div>
                         <div className="w-full bg-error/10 rounded-full h-2 mt-2">
@@ -326,7 +326,7 @@ export default function EventDetails() {
                           : 'bg-cb-success/10 border-cb-success/30'
                       }`}>
                         <div className="flex items-center justify-between text-sm mb-2">
-                          <span className="text-primary/70 font-medium">{t('dashboard.col.capacity')}</span>
+                          <span className="text-primary/70 font-book">{t('dashboard.col.capacity')}</span>
                           <span className={`font-bold ${spotsLeft <= 5 ? 'text-warning' : 'text-success'}`}>
                             {registered} / {event.capacity}
                           </span>
@@ -337,7 +337,7 @@ export default function EventDetails() {
                             style={{ width: `${Math.min(100, (registered / event.capacity!) * 100)}%` }}
                           />
                         </div>
-                        <p className={`text-xs font-semibold mt-2 mb-0 ${spotsLeft <= 5 ? 'text-warning' : 'text-success'}`}>
+                        <p className={`text-xs font-bold mt-2 mb-0 ${spotsLeft <= 5 ? 'text-warning' : 'text-success'}`}>
                           {spotsLeft === 1
                             ? t('eventDetails.spotsLeftOne')
                             : t('eventDetails.spotsLeft', { count: spotsLeft })}
@@ -490,7 +490,7 @@ export default function EventDetails() {
                         <div>
                           <label
                             htmlFor="consent"
-                            className="text-sm font-medium text-primary cursor-pointer block mb-1 break-words"
+                            className="text-sm font-book text-primary cursor-pointer block mb-1 break-words"
                           >
                             {t('eventDetails.dataConsent')} <span className="text-error">*</span>
                           </label>
@@ -530,7 +530,7 @@ export default function EventDetails() {
                 </>
               ) : (
                 <div className="flex flex-col items-center gap-3">
-                  <p className="text-success text-xl font-semibold mt-2 mb-0">
+                  <p className="text-success text-xl font-bold mt-2 mb-0">
                     {t('eventDetails.success')}
                   </p>
 

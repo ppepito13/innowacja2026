@@ -177,7 +177,7 @@ export default function Dashboard() {
         {user?.role === 'Admin' && (
           <button
             onClick={() => history.push('/admin/events/new')}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-book cursor-pointer outline-none border-none"
           >
             <Icon icon={LuPlus} />
             <span>{t('dashboard.addEvent')}</span>
@@ -232,31 +232,31 @@ export default function Dashboard() {
             <thead>
               <tr className="border-b border-primary/10 text-left">
                 <th
-                  className="pb-3 font-medium text-primary/70 w-28 cursor-pointer select-none"
+                  className="pb-3 font-book text-primary/70 w-28 cursor-pointer select-none"
                   onClick={() => handleSort('isActive')}
                 >
                   {t('dashboard.col.active')} <SortIcon field="isActive" />
                 </th>
                 <th
-                  className="pb-3 font-medium text-primary/70 cursor-pointer select-none"
+                  className="pb-3 font-book text-primary/70 cursor-pointer select-none"
                   onClick={() => handleSort('title')}
                 >
                   {t('dashboard.col.name')} <SortIcon field="title" />
                 </th>
                 <th
-                  className="pb-3 font-medium text-primary/70 w-32 cursor-pointer select-none"
+                  className="pb-3 font-book text-primary/70 w-32 cursor-pointer select-none"
                   onClick={() => handleSort('startDate')}
                 >
                   {t('dashboard.col.date')} <SortIcon field="startDate" />
                 </th>
                 <th
-                  className="pb-3 font-medium text-primary/70 cursor-pointer select-none"
+                  className="pb-3 font-book text-primary/70 cursor-pointer select-none"
                   onClick={() => handleSort('location')}
                 >
                   {t('dashboard.col.location')} <SortIcon field="location" />
                 </th>
-                <th className="pb-3 font-medium text-primary/70 w-36">{t('dashboard.col.capacity')}</th>
-                <th className="pb-3 font-medium text-primary/70">{t('dashboard.col.actions')}</th>
+                <th className="pb-3 font-book text-primary/70 w-36">{t('dashboard.col.capacity')}</th>
+                <th className="pb-3 font-book text-primary/70">{t('dashboard.col.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -273,7 +273,7 @@ export default function Dashboard() {
                     </button>
                   </td>
                   <td className="py-3">
-                    <p className="font-medium text-primary">{event.title ?? '—'}</p>
+                    <p className="font-book text-primary">{event.title ?? '—'}</p>
                   </td>
                   <td className="py-3 text-primary/70">{formatDate(event.startDate)}</td>
                   <td className="py-3 text-primary/70">

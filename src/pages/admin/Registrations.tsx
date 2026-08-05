@@ -503,7 +503,7 @@ export default function Registrations() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">{t('registrations.details.title')}</h2>
+                <h2 className="text-xl font-bold">{t('registrations.details.title')}</h2>
 
                 <button
                   className="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/10 bg-surface text-primary/60 transition-colors hover:bg-background hover:text-primary cursor-pointer"
@@ -514,24 +514,24 @@ export default function Registrations() {
               </div>
 
               <div className="space-y-3 text-sm">
-                <span className="font-semibold">Status:</span>{' '}
+                <span className="font-bold">Status:</span>{' '}
                 {selectedRegistration.status === 'approved'
                   ? t('registrations.details.status.approved')
                   : selectedRegistration.status === 'rejected'
                     ? t('registrations.details.status.rejected')
                     : t('registrations.details.status.pending')}
                 <div className="flex gap-2 items-center">
-                  <span className="font-semibold">{t('registrations.details.date')}:</span>
+                  <span className="font-bold">{t('registrations.details.date')}:</span>
                   {formatDate(selectedRegistration.createdAt)}
                 </div>
                 {Object.entries(selectedRegistration.formData ?? {}).map(([key, value]) => (
                   <div key={key} className="flex gap-2 items-center">
-                    <span className="font-semibold">{formatColumnName(key)}:</span>
+                    <span className="font-bold">{formatColumnName(key)}:</span>
                     {formatCellValue(String(value), t)}
                   </div>
                 ))}
                 <div className="flex flex-col items-center gap-2 border-t border-primary/10 pt-3">
-                  <span className="self-start font-semibold">
+                  <span className="self-start font-bold">
                     {t('registrations.details.qrCode')}:
                   </span>
                   {qrToken ? (
