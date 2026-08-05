@@ -322,22 +322,22 @@ export default function EventDetails() {
                     {hasCapacity && spotsLeft != null && (
                       <div className={`w-full box-border rounded-lg px-4 py-3 mb-6 border ${
                         spotsLeft <= 5
-                          ? 'bg-amber-50 border-amber-300 dark:bg-amber-900/20 dark:border-amber-600/40'
-                          : 'bg-emerald-50 border-emerald-300 dark:bg-emerald-900/20 dark:border-emerald-600/40'
+                          ? 'bg-cb-warning/10 border-cb-warning/30'
+                          : 'bg-cb-success/10 border-cb-success/30'
                       }`}>
                         <div className="flex items-center justify-between text-sm mb-2">
                           <span className="text-primary/70 font-medium">{t('dashboard.col.capacity')}</span>
-                          <span className={`font-bold ${spotsLeft <= 5 ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
+                          <span className={`font-bold ${spotsLeft <= 5 ? 'text-warning' : 'text-success'}`}>
                             {registered} / {event.capacity}
                           </span>
                         </div>
-                        <div className={`w-full rounded-full h-2 ${spotsLeft <= 5 ? 'bg-amber-200 dark:bg-amber-800/40' : 'bg-emerald-200 dark:bg-emerald-800/40'}`}>
+                        <div className={`w-full rounded-full h-2 ${spotsLeft <= 5 ? 'bg-cb-warning/20' : 'bg-cb-success/20'}`}>
                           <div
-                            className={`rounded-full h-2 transition-all ${spotsLeft <= 5 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                            className={`rounded-full h-2 transition-all ${spotsLeft <= 5 ? 'bg-cb-warning' : 'bg-cb-success'}`}
                             style={{ width: `${Math.min(100, (registered / event.capacity!) * 100)}%` }}
                           />
                         </div>
-                        <p className={`text-xs font-semibold mt-2 mb-0 ${spotsLeft <= 5 ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
+                        <p className={`text-xs font-semibold mt-2 mb-0 ${spotsLeft <= 5 ? 'text-warning' : 'text-success'}`}>
                           {spotsLeft === 1
                             ? t('eventDetails.spotsLeftOne')
                             : t('eventDetails.spotsLeft', { count: spotsLeft })}
@@ -358,7 +358,7 @@ export default function EventDetails() {
                             className="block text-xs font-bold text-primary mb-2 truncate"
                           >
                             {currentLabel === 'pl' ? field.i18n['pl'] : field.i18n['en']}{' '}
-                            {isRequired && <span className="text-red-500">*</span>}
+                            {isRequired && <span className="text-error">*</span>}
                           </label>
 
                           {(field.type === 'string' || field.type === 'text') && (
@@ -492,7 +492,7 @@ export default function EventDetails() {
                             htmlFor="consent"
                             className="text-sm font-medium text-primary cursor-pointer block mb-1 break-words"
                           >
-                            {t('eventDetails.dataConsent')} <span className="text-red-500">*</span>
+                            {t('eventDetails.dataConsent')} <span className="text-error">*</span>
                           </label>
                           <p className="text-xs text-primary/70">
                             {t('eventDetails.readMoreIn')}{' '}
@@ -549,7 +549,7 @@ export default function EventDetails() {
                   )}
 
                   {!event.requiresApproval && !qrLoading && qrToken && (
-                    <div className="rounded-lg border border-primary/10 bg-white p-3">
+                    <div className="rounded-lg border border-primary/10 bg-cb-white p-3">
                       <QRCodeSVG value={qrToken} size={180} level="M" />
                     </div>
                   )}

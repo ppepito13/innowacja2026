@@ -198,7 +198,7 @@ export default function UserEdit() {
             className={`w-10 h-6 rounded-full transition-colors cursor-pointer border-none relative ${user.isLocked ? 'bg-error' : 'bg-primary/20'}`}
           >
             <span
-              className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${user.isLocked ? 'left-5' : 'left-1'}`}
+              className={`absolute top-1 w-4 h-4 rounded-full bg-cb-white transition-all ${user.isLocked ? 'left-5' : 'left-1'}`}
             />
           </button>
         </div>

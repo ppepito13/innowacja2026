@@ -290,7 +290,7 @@ export default function Registrations() {
 
   if (error) {
     return (
-      <p className="p-8 text-red-600">
+      <p className="p-8 text-error">
         {t('registrations.error')}: {error}
       </p>
     );

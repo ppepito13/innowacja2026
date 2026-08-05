@@ -200,7 +200,7 @@ export default function EventManagement({ mode }: Props) {
 
   if (error && !loaded) {
     return (
-      <p className="p-8 text-red-600">
+      <p className="p-8 text-error">
         {t('eventManagement.error')}: {error}
       </p>
     );
@@ -229,7 +229,7 @@ export default function EventManagement({ mode }: Props) {
         </button>
       </div>
 
-      {error && <p className="mb-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-2 text-sm text-error">{error}</p>}
 
       <div className="flex flex-col gap-2 mt-2">
         <InputTextfieldStateful
@@ -238,7 +238,7 @@ export default function EventManagement({ mode }: Props) {
           defaultValue={event?.title ?? ''}
           onChange={(v) => handleFieldChange('title', String(v))}
         />
-        {fieldErrors.title && <p className="text-xs text-red-600 mt-0 mb-0">{fieldErrors.title}</p>}
+        {fieldErrors.title && <p className="text-xs text-error mt-0 mb-0">{fieldErrors.title}</p>}
         <div className="flex flex-col gap-1 mt-1">
           <label className="text-sm font-medium text-primary">{tt('fields.description')}</label>
           <RichTextEditor
@@ -267,7 +267,7 @@ export default function EventManagement({ mode }: Props) {
               }
             />
             {fieldErrors.startDate && (
-              <p className="text-xs text-red-600 mt-1 mb-0">{fieldErrors.startDate}</p>
+              <p className="text-xs text-error mt-1 mb-0">{fieldErrors.startDate}</p>
             )}
           </div>
           {event?.dateType === 'multi' && (
@@ -280,7 +280,7 @@ export default function EventManagement({ mode }: Props) {
                 }
               />
               {fieldErrors.endDate && (
-                <p className="text-xs text-red-600 mt-1 mb-0">{fieldErrors.endDate}</p>
+                <p className="text-xs text-error mt-1 mb-0">{fieldErrors.endDate}</p>
               )}
             </div>
           )}
@@ -438,7 +438,7 @@ export default function EventManagement({ mode }: Props) {
 
       <div className="flex flex-col items-end mt-6 pb-4 gap-2">
         {Object.values(fieldErrors).some(Boolean) && (
-          <p className="text-sm text-red-600 mt-0 mb-0">{tt('validation.fillRequired')}</p>
+          <p className="text-sm text-error mt-0 mb-0">{tt('validation.fillRequired')}</p>
         )}
         <div className="flex items-center gap-3">
           <button

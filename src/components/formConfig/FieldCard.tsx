@@ -30,7 +30,7 @@ export default function FieldCard({
   return (
     <div
       className={`rounded-lg border p-5 relative transition-colors duration-200 ${
-        error ? "border-red-500/60" : "border-primary/10"
+        error ? "border-error/60" : "border-primary/10"
       }`}
     >
       {/* Header: index badge + delete */}
@@ -40,7 +40,7 @@ export default function FieldCard({
         </span>
         <button
           onClick={onRemove}
-          className="bg-transparent border border-primary/10 rounded-lg w-[30px] h-[30px] flex items-center justify-center cursor-pointer text-red-500 hover:bg-background transition-colors"
+          className="bg-transparent border border-primary/10 rounded-lg w-[30px] h-[30px] flex items-center justify-center cursor-pointer text-error hover:bg-background transition-colors"
           title={t("formConfig.removeField")}
         >
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -65,11 +65,11 @@ export default function FieldCard({
             value={field.label}
             onChange={(e) => onUpdate({ label: e.target.value })}
             placeholder={t("formConfig.labelPlaceholder")}
-            className={`w-full bg-[#0b1120] border rounded-md px-1 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500 ${
-              error ? "border-red-500" : "border-slate-700"
+            className={`w-full bg-surface-2 border rounded-md px-1 py-2 text-primary text-sm font-mono outline-none transition-colors focus:border-cb-coast ${
+              error ? "border-error" : "border-primary/15"
             }`}
           />
-          {error && <div className="text-red-600 text-xs mt-1">{error}</div>}
+          {error && <div className="text-error text-xs mt-1">{error}</div>}
         </div>
         <div>
           <label className="block text-xs font-medium text-primary/70 mb-1.5">
@@ -79,7 +79,7 @@ export default function FieldCard({
             value={field.placeholder}
             onChange={(e) => onUpdate({ placeholder: e.target.value })}
             placeholder={t("formConfig.placeholderPlaceholder")}
-            className="w-full bg-[#0b1120] border border-slate-700 rounded-md px-1 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500"
+            className="w-full bg-surface-2 border border-primary/15 rounded-md px-1 py-2 text-primary text-sm font-mono outline-none transition-colors focus:border-cb-coast"
           />
         </div>
       </div>
@@ -119,23 +119,23 @@ export default function FieldCard({
           />
         </label>
         <div className="w-32">
-          <label className="block text-[11px] text-slate-500 tracking-wider uppercase mb-1">
+          <label className="block text-[11px] text-primary/60 tracking-wider uppercase mb-1">
             {t("formConfig.i18nPl")}
           </label>
           <input
               value={field.i18n.pl}
               onChange={(e) => onUpdate({ i18n: { ...field.i18n, pl: e.target.value } })}
-              className="w-full bg-[#0b1120] border border-slate-700 rounded-md px-1 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500"
+              className="w-full bg-surface-2 border border-primary/15 rounded-md px-1 py-2 text-primary text-sm font-mono outline-none transition-colors focus:border-cb-coast"
           />
         </div>
         <div className="w-32">
-          <label className="block text-[11px] text-slate-500 tracking-wider uppercase mb-1">
+          <label className="block text-[11px] text-primary/60 tracking-wider uppercase mb-1">
             {t("formConfig.i18nEn")}
           </label>
           <input
               value={field.i18n.en}
               onChange={(e) => onUpdate({ i18n: { ...field.i18n, en: e.target.value } })}
-              className="w-full bg-[#0b1120] border border-slate-700 rounded-md px-1 py-2 text-slate-200 text-sm font-mono outline-none transition-colors focus:border-slate-500"
+              className="w-full bg-surface-2 border border-primary/15 rounded-md px-1 py-2 text-primary text-sm font-mono outline-none transition-colors focus:border-cb-coast"
           />
         </div>
       </div>

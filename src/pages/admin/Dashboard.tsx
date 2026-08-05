@@ -221,7 +221,7 @@ export default function Dashboard() {
       </div>
 
       {/* ERROR */}
-      {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+      {error && <p className="text-error text-sm mb-2">{error}</p>}
 
       {/* TABLE */}
       {loading ? (
@@ -268,7 +268,7 @@ export default function Dashboard() {
                       className={`w-11 h-6 rounded-full transition-colors flex items-center px-0.5 border-none cursor-pointer flex-shrink-0 ${event.isActive ? 'bg-secondary' : 'bg-primary/20'}`}
                     >
                       <div
-                        className={`w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${event.isActive ? 'translate-x-5' : 'translate-x-0'}`}
+                        className={`w-5 h-5 rounded-full bg-cb-white shadow transition-transform duration-200 ${event.isActive ? 'translate-x-5' : 'translate-x-0'}`}
                       />
                     </button>
                   </td>

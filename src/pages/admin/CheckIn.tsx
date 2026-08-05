@@ -344,8 +344,8 @@ export default function CheckIn() {
 
             <div
               className={`w-full relative bg-primary/5 rounded-xl overflow-hidden flex flex-col items-center justify-center border aspect-square transition-all duration-300
-              ${scanStatus === 'success' ? 'border-success shadow-[0_0_0_3px_rgba(46,125,50,0.15)]' : ''}
-              ${scanStatus === 'warning' || scanStatus === 'error' ? 'border-error shadow-[0_0_0_3px_rgba(211,47,47,0.15)]' : ''}
+              ${scanStatus === 'success' ? 'border-success shadow-[0_0_0_3px_rgb(var(--cb-success)/0.15)]' : ''}
+              ${scanStatus === 'warning' || scanStatus === 'error' ? 'border-error shadow-[0_0_0_3px_rgb(var(--cb-error)/0.15)]' : ''}
               ${scanStatus === 'idle' ? 'border-primary/15' : ''}
             `}
             >
@@ -518,7 +518,7 @@ export default function CheckIn() {
 
                         <div className="w-40 flex justify-center">
                           {isCheckedIn ? (
-                            <span className="px-2.5 py-1 rounded-full bg-green-200 text-black text-xs font-bold whitespace-nowrap">
+                            <span className="px-2.5 py-1 rounded-full bg-cb-success/20 text-success text-xs font-bold whitespace-nowrap">
                               {t('checkIn.manual.checkedIn') ?? 'Checked-In'} ({timeStr})
                             </span>
                           ) : (
@@ -535,7 +535,7 @@ export default function CheckIn() {
                               ${
                                 isCheckedIn
                                   ? 'bg-transparent border-primary/20 text-primary hover:bg-background'
-                                  : 'bg-secondary border-secondary text-black hover:bg-secondary/75'
+                                  : 'bg-secondary border-secondary text-cb-petrol hover:bg-secondary/75'
                               }
                             `}
                           >

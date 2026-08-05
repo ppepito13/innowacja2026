@@ -314,7 +314,7 @@ export default function RegistrationsList() {
   const renderStatusBadge = (status: Registration['status']) => {
     if (status === 'approved') {
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-green-300 bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800 dark:border-green-700/60 dark:bg-green-900/50 dark:text-green-300">
+        <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold border-cb-success/40 bg-cb-success/15 text-success">
           <Icon icon={LuCircleCheck} size={13} />
           {t('registrationsList.status.approved')}
         </span>
@@ -322,14 +322,14 @@ export default function RegistrationsList() {
     }
     if (status === 'rejected') {
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-red-300 bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:border-red-700/60 dark:bg-red-900/50 dark:text-red-300">
+        <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold border-cb-error/40 bg-cb-error/15 text-error">
           <Icon icon={LuCircleX} size={13} />
           {t('registrationsList.status.rejected')}
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:border-amber-700/60 dark:bg-amber-900/50 dark:text-amber-300">
+      <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold border-cb-warning/40 bg-cb-warning/15 text-warning">
         <Icon icon={LuClock} size={13} />
         {t('registrationsList.status.pending')}
       </span>
@@ -440,7 +440,7 @@ export default function RegistrationsList() {
 
         {/* Error */}
         {error && (
-          <p className="rounded-lg bg-red-900/20 border border-red-500/20 px-4 py-2 text-sm text-red-500">{error}</p>
+          <p className="rounded-lg bg-cb-error/15 border border-cb-error/30 px-4 py-2 text-sm text-error">{error}</p>
         )}
 
         {/* Loading */}
@@ -630,7 +630,7 @@ export default function RegistrationsList() {
       {/* Details modal */}
       {selectedRegistration && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-cb-black/60 p-4"
           onClick={() => setSelectedRegistration(null)}
         >
           <div

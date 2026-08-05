@@ -261,7 +261,7 @@ export default function FormConfig() {
       {/* Footer: validation error + save */}
       <div className="flex flex-col items-end mt-6 pb-4 gap-2">
         {Object.keys(errors).length > 0 && (
-          <p className="text-sm text-red-600 mt-0 mb-0">
+          <p className="text-sm text-error mt-0 mb-0">
             ⚠ {t('formConfig.errors.validationFailed')}
           </p>
         )}
@@ -274,7 +274,7 @@ export default function FormConfig() {
       </div>
 
       {showLeaveModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-cb-black/40 px-4">
           <div className="bg-surface rounded-2xl p-6 max-w-sm w-full border border-primary/10">
             <h2 className="text-lg font-semibold mb-2">{t('formConfig.unsavedTitle')}</h2>
             <p className="text-sm text-primary/70 mb-6">{t('formConfig.unsavedDescription')}</p>

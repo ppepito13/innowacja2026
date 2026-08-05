@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Grotesk:wght@300..700&display=swap');
+@import './styles/cb-palette.css';
 
 @tailwind base;
 @tailwind components;
@@ -7,57 +8,72 @@
 :root,
 .dark {
   color-scheme: dark;
-  --color-primary: 226 232 240;
-  --color-background: 11 21 33;
-  --color-surface: 22 36 54;
-  --color-surface-2: 36 54 75;
+  --color-primary: var(--cb-sand);
+  --color-background: var(--cb-petrol);
+  --color-surface: var(--cb-grad-1);
+  --color-surface-2: var(--cb-grad-2);
 
-  --admin-chrome: 15 23 42;
-  --admin-bg: 11 21 33;
-  --admin-border: 255 255 255 / 0.05;
-  --admin-text: 226 232 240;
-  --admin-muted: 148 163 184;
-  --admin-hover: 255 255 255 / 0.05;
+  --color-success: var(--cb-success);
+  --color-error: var(--cb-error);
+  --color-warning: var(--cb-warning);
+
+  --admin-chrome: var(--cb-grad-1);
+  --admin-bg: var(--cb-petrol);
+  --admin-border: var(--cb-sand) / 0.08;
+  --admin-text: var(--cb-sand);
+  --admin-muted: var(--cb-grad-5);
+  --admin-hover: var(--cb-sand) / 0.08;
 }
 
 .dark {
-  --lsg-color-col-text-primary: #e2e8f0;
-  --lsg-color-col-text-highlight: #ffffff;
-  --lsg-color-col-action-inactive: #94a3b8;
-  --lsg-color-col-action-secondary-light: #e2e8f0;
-  --lsg-color-col-action-secondary-dark: #dce6e6;
-  --lsg-color-col-action-secondary-hover: #ffffff;
-  --lsg-color-col-action-tertiary-dark: #91afb4;
-  --lsg-color-col-fine-line-dark: #64748b;
-  --lsg-color-col-text-primary-light: #e2e8f0;
-  --lsg-color-col-text-primary-elevated-light: #e2e8f0;
-  --lsg-color-col-text-primary-contrast-light: #e2e8f0;
-  --lsg-color-col-text-highlight-light: #ffffff;
-  --lsg-color-col-text-highlight-elevated-light: #ffffff;
-  --lsg-color-col-text-highlight-contrast-light: #ffffff;
-  --lsg-color-col-action-tertiary-light: #cbd5e1;
-  --lsg-color-col-action-tertiary-elevated-light: #cbd5e1;
-  --lsg-color-col-action-tertiary-contrast-light: #cbd5e1;
-  --lsg-color-col-action-inactive-light: #94a3b8;
-  --lsg-color-col-action-inactive-elevated-light: #94a3b8;
-  --lsg-color-col-action-inactive-contrast-light: #94a3b8;
-  --lsg-color-col-fine-line-light: #64748b;
-  --lsg-color-col-fine-line-elevated-light: #64748b;
+  --lsg-color-col-text-primary: rgb(var(--cb-sand));
+  --lsg-color-col-text-highlight: rgb(var(--cb-white));
+  --lsg-color-col-action-inactive: rgb(var(--cb-grad-3));
+  --lsg-color-col-action-secondary-hover: rgb(var(--cb-white));
+
+  --lsg-color-col-text-primary-light: rgb(var(--cb-sand));
+  --lsg-color-col-text-primary-elevated-light: rgb(var(--cb-sand));
+  --lsg-color-col-text-primary-contrast-light: rgb(var(--cb-sand));
+  --lsg-color-col-text-highlight-light: rgb(var(--cb-white));
+  --lsg-color-col-text-highlight-elevated-light: rgb(var(--cb-white));
+  --lsg-color-col-text-highlight-contrast-light: rgb(var(--cb-white));
+  --lsg-color-col-text-supplementary-light: rgb(var(--cb-grad-5));
+  --lsg-color-col-text-supplementary-elevated-light: rgb(var(--cb-grad-5));
+  --lsg-color-col-text-supplementary-contrast-light: rgb(var(--cb-grad-5));
+  --lsg-color-col-action-secondary-light: rgb(var(--cb-sand));
+  --lsg-color-col-action-secondary-dark: rgb(var(--cb-sand));
+  --lsg-color-col-action-tertiary-light: rgb(var(--cb-grad-5));
+  --lsg-color-col-action-tertiary-elevated-light: rgb(var(--cb-grad-5));
+  --lsg-color-col-action-tertiary-contrast-light: rgb(var(--cb-grad-5));
+  --lsg-color-col-action-tertiary-dark: rgb(var(--cb-grad-5));
+  --lsg-color-col-action-inactive-light: rgb(var(--cb-grad-3));
+  --lsg-color-col-action-inactive-elevated-light: rgb(var(--cb-grad-3));
+  --lsg-color-col-action-inactive-contrast-light: rgb(var(--cb-grad-3));
+  --lsg-color-col-fine-line-light: rgb(var(--cb-grad-2));
+  --lsg-color-col-fine-line-elevated-light: rgb(var(--cb-grad-2));
+  --lsg-color-col-fine-line-dark: rgb(var(--cb-grad-2));
+  --lsg-color-col-separator-line-light: rgb(var(--cb-grad-3));
+  --lsg-color-col-separator-line-elevated-light: rgb(var(--cb-grad-3));
+  --lsg-color-col-separator-line-contrast-light: rgb(var(--cb-grad-3));
 }
 
 .light {
   color-scheme: light;
-  --color-primary: 0 46 60;
-  --color-background: 224 244 247;
-  --color-surface: 255 255 255;
-  --color-surface-2: 241 245 249;
+  --color-primary: var(--cb-petrol);
+  --color-background: var(--cb-sand);
+  --color-surface: var(--cb-white);
+  --color-surface-2: var(--cb-grad-6);
 
-  --admin-chrome: 255 255 255;
-  --admin-bg: 241 245 249;
-  --admin-border: 0 46 60 / 0.08;
-  --admin-text: 15 23 42;
-  --admin-muted: 100 116 139;
-  --admin-hover: 0 46 60 / 0.04;
+  --color-success: var(--cb-success);
+  --color-error: var(--cb-error);
+  --color-warning: var(--cb-warning);
+
+  --admin-chrome: var(--cb-white);
+  --admin-bg: var(--cb-sand);
+  --admin-border: var(--cb-petrol) / 0.08;
+  --admin-text: var(--cb-petrol);
+  --admin-muted: var(--cb-grad-2);
+  --admin-hover: var(--cb-petrol) / 0.04;
 }
 
 html {
