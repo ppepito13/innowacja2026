@@ -247,6 +247,12 @@
     "capacityFullDescription": "All spots for this event have been taken. Registration is currently closed.",
     "spotsLeft": "{{count}} spots remaining",
     "spotsLeftOne": "Last spot remaining!",
+    "downloadPdf": "Download confirmation (PDF)",
+    "addToCalendar": "Add to calendar",
+    "confirmationThankYou": "Thank you for registering!",
+    "confirmationUnregister": "To unregister, please contact the event organizer.",
+    "dateLabel": "Date",
+    "locationLabel": "Location",
     "validation": {
       "required": "This field is required.",
       "email": "Please enter a valid email address.",

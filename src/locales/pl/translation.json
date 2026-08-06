@@ -247,6 +247,12 @@
     "capacityFullDescription": "Wszystkie miejsca na to wydarzenie zostały zajęte. Rejestracja jest obecnie zamknięta.",
     "spotsLeft": "Pozostało {{count}} wolnych miejsc",
     "spotsLeftOne": "Pozostało ostatnie wolne miejsce!",
+    "downloadPdf": "Pobierz potwierdzenie (PDF)",
+    "addToCalendar": "Dodaj do kalendarza",
+    "confirmationThankYou": "Dziękujemy za rejestrację!",
+    "confirmationUnregister": "Aby się wyrejestrować, skontaktuj się z organizatorem wydarzenia.",
+    "dateLabel": "Data",
+    "locationLabel": "Lokalizacja",
     "validation": {
       "required": "To pole jest wymagane.",
       "email": "Podaj poprawny adres e-mail.",
