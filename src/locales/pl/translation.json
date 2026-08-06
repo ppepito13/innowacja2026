@@ -91,7 +91,8 @@
       "status": {
         "approved": "Zatwierdzona",
         "pending": "Oczekująca",
-        "rejected": "Odrzucona"
+        "rejected": "Odrzucona",
+        "cancelled": "Anulowana"
       },
       "date": "Data",
       "qrCode": "Kod QR do odprawy",
@@ -414,7 +415,8 @@
       "allStatuses": "Wszystkie statusy",
       "pending": "Oczekujące",
       "approved": "Zatwierdzone",
-      "rejected": "Odrzucone"
+      "rejected": "Odrzucone",
+      "cancelled": "Anulowane"
     },
     "columns": {
       "date": "Data rejestracji",
@@ -424,7 +426,8 @@
     "status": {
       "approved": "Zatwierdzona",
       "pending": "Oczekująca",
-      "rejected": "Odrzucona"
+      "rejected": "Odrzucona",
+      "cancelled": "Anulowana"
     },
     "pagination": {
       "current": "Strona",
