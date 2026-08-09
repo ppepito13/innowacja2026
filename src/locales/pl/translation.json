@@ -91,7 +91,8 @@
       "status": {
         "approved": "Zatwierdzona",
         "pending": "Oczekująca",
-        "rejected": "Odrzucona"
+        "rejected": "Odrzucona",
+        "cancelled": "Anulowana"
       },
       "date": "Data",
       "qrCode": "Kod QR do odprawy",
@@ -420,7 +421,8 @@
       "allStatuses": "Wszystkie statusy",
       "pending": "Oczekujące",
       "approved": "Zatwierdzone",
-      "rejected": "Odrzucone"
+      "rejected": "Odrzucone",
+      "cancelled": "Anulowane"
     },
     "columns": {
       "date": "Data rejestracji",
@@ -430,7 +432,8 @@
     "status": {
       "approved": "Zatwierdzona",
       "pending": "Oczekująca",
-      "rejected": "Odrzucona"
+      "rejected": "Odrzucona",
+      "cancelled": "Anulowana"
     },
     "pagination": {
       "current": "Strona",
@@ -450,5 +453,14 @@
       "confirm": "Potwierdź",
       "cancel": "Anuluj"
     }
+  },
+  "unregister": {
+    "loading": "Sprawdzanie rejestracji...",
+    "confirmQuestion": "Czy na pewno chcesz się wyrejestrować z wydarzenia \"{{eventTitle}}\"?",
+    "confirmButton": "Tak, chcę się wyrejestrować z wydarzenia",
+    "submitting": "Przetwarzanie...",
+    "success": "Zostałeś pomyślnie wyrejestrowany z wydarzenia.",
+    "alreadyCancelled": "Ta rejestracja została już wcześniej anulowana.",
+    "invalidToken": "Ten link jest nieprawidłowy lub wygasł."
   }
 }

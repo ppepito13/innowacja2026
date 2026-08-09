@@ -11,6 +11,7 @@ import AdminLayout from './components/AdminLayout';
 import Home from './pages/Home';
 import EventDetails from './pages/EventDetails';
 import AdminLogin from './pages/AdminLogin';
+import UnregisterConfirm from './pages/UnregisterConfirm';
 
 // Admin pages
 import Dashboard from './pages/admin/Dashboard';
@@ -39,6 +40,7 @@ function App() {
           <Switch>
             {/* Public Fullscreen Routes */}
             <Route exact path="/events/:eventId" component={EventDetails} />
+            <Route exact path="/unregister/:token" component={UnregisterConfirm} />
 
             {/* Admin routes — sidebar layout */}
             <Route path="/admin">

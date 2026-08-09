@@ -12,6 +12,7 @@ import {
   LuPencil,
   LuEllipsis,
   LuX,
+  LuBan
 } from 'react-icons/lu';
 import { useAuth } from '../../auth/AuthProvider';
 import { parseService, createPointer } from '../../services/parseService';
@@ -25,7 +26,7 @@ import '../../components/BulkActionBar.css';
 const EVENT_CLASS = 'TestEvent';
 const ROWS_PER_PAGE = 10;
 
-type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
+type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected' | 'cancelled';
 type SortField = string;
 type SortDir = 'asc' | 'desc';
 
@@ -274,7 +275,7 @@ export default function RegistrationsList() {
   const toggleSelectAll = useCallback(() => {
     setSelectedIds((prev) => {
       const selectableIds = paginated
-        .filter((r) => r.status !== 'approved')
+        .filter((r) => r.status !== 'approved' && r.status !== 'cancelled')
         .map((r) => r.objectId);
       if (selectableIds.length === 0) return prev;
       const allSelected = selectableIds.every((id) => prev.has(id));
@@ -308,31 +309,38 @@ export default function RegistrationsList() {
     }
   };
 
-  const selectableOnPage = paginated.filter((r) => r.status !== 'approved');
-  const allOnPageSelected = selectableOnPage.length > 0 && selectableOnPage.every((r) => selectedIds.has(r.objectId));
+  const selectableOnPage = paginated.filter((r) => r.status !== 'approved' && r.status !== 'cancelled');  const allOnPageSelected = selectableOnPage.length > 0 && selectableOnPage.every((r) => selectedIds.has(r.objectId));
 
   const renderStatusBadge = (status: Registration['status']) => {
     if (status === 'approved') {
       return (
         <span className="inline-flex items-center gap-1.5 rounded-full border border-green-300 bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800 dark:border-green-700/60 dark:bg-green-900/50 dark:text-green-300">
-          <Icon icon={LuCircleCheck} size={13} />
+        <Icon icon={LuCircleCheck} size={13} />
           {t('registrationsList.status.approved')}
-        </span>
+      </span>
       );
     }
     if (status === 'rejected') {
       return (
         <span className="inline-flex items-center gap-1.5 rounded-full border border-red-300 bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:border-red-700/60 dark:bg-red-900/50 dark:text-red-300">
-          <Icon icon={LuCircleX} size={13} />
+        <Icon icon={LuCircleX} size={13} />
           {t('registrationsList.status.rejected')}
-        </span>
+      </span>
+      );
+    }
+    if (status === 'cancelled') { // NOWE
+      return (
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:border-slate-600/60 dark:bg-slate-800/50 dark:text-slate-400">
+        <Icon icon={LuBan} size={13} />
+          {t('registrationsList.status.cancelled')}
+      </span>
       );
     }
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:border-amber-700/60 dark:bg-amber-900/50 dark:text-amber-300">
-        <Icon icon={LuClock} size={13} />
+      <Icon icon={LuClock} size={13} />
         {t('registrationsList.status.pending')}
-      </span>
+    </span>
     );
   };
 
@@ -428,6 +436,7 @@ export default function RegistrationsList() {
             <option value="pending">{t('registrationsList.filters.pending')}</option>
             <option value="approved">{t('registrationsList.filters.approved')}</option>
             <option value="rejected">{t('registrationsList.filters.rejected')}</option>
+            <option value="cancelled">{t('registrationsList.filters.cancelled')}</option> {/* NOWE */}
           </select>
         </div>
 
@@ -523,7 +532,7 @@ export default function RegistrationsList() {
                           className="bulk-checkbox disabled:cursor-not-allowed"
                           checked={selectedIds.has(reg.objectId)}
                           onChange={() => toggleSelect(reg.objectId)}
-                          disabled={reg.status === 'approved'}
+                          disabled={reg.status === 'approved' || reg.status === 'cancelled'}
                         />
                       </td>
                       <td className="whitespace-nowrap px-3 sm:px-4 py-3 text-xs text-primary/70">
@@ -559,12 +568,15 @@ export default function RegistrationsList() {
                           </button>
 
                           <button
-                            disabled={reg.status === 'approved'}
+                            disabled={reg.status === 'approved' || reg.status === 'cancelled'}
                             className={`flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface transition active:scale-95 ${
-                              reg.status === 'approved' ? 'cursor-not-allowed opacity-40 text-primary/30' : 'cursor-pointer text-primary/70 hover:bg-background hover:text-primary'
+                              reg.status === 'approved' || reg.status === 'cancelled'
+                                ? 'cursor-not-allowed opacity-40 text-primary/30'
+                                : 'cursor-pointer text-primary/70 hover:bg-background hover:text-primary'
                             }`}
                             onClick={() =>
                               reg.status !== 'approved' &&
+                              reg.status !== 'cancelled' &&
                               setOpenedActionId((id) =>
                                 id === reg.objectId ? null : reg.objectId,
                               )

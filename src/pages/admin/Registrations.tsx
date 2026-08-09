@@ -12,6 +12,7 @@ import {
   LuCircleX,
   LuClock,
   LuUserCheck,
+  LuUserX
 } from 'react-icons/lu';
 import { Button, InputDatepicker, InputTextfieldStateful, ComplexTable } from '@lsg/components';
 import { useAuth } from '../../auth/AuthProvider';
@@ -195,26 +196,31 @@ export default function Registrations() {
       case 'approved':
         return (
           <span className="text-success">
-            <Icon icon={LuCircleCheck} size={14} />
-          </span>
+          <Icon icon={LuCircleCheck} size={14} />
+        </span>
         );
       case 'pending':
         return (
           <span className="text-secondary">
-            <Icon icon={LuClock} size={14} />
-          </span>
+          <Icon icon={LuClock} size={14} />
+        </span>
         );
       case 'rejected':
         return (
           <span className="text-error">
-            <Icon icon={LuCircleX} size={14} />
-          </span>
+          <Icon icon={LuCircleX} size={14} />
+        </span>
+        );
+      case 'cancelled': // NOWE
+        return (
+          <span className="text-primary/40">
+          <Icon icon={LuUserX} size={14} />
+        </span>
         );
       default:
         return null;
     }
   };
-
   const updateStatus = async (registrationId: string, status: Registration['status']) => {
     try {
       await parseService.update<Registration>('Registration', registrationId, { status });
@@ -428,17 +434,17 @@ export default function Registrations() {
                       {openedActionId === objectId && (
                         <div className="absolute right-0 top-10 z-50 w-48 rounded-xl border shadow-lg">
                           <button
-                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border border-b-0 rounded-t-xl bg-surface hover:bg-background cursor-pointer ${status === 'approved' ? 'cursor-not-allowed' : ''}`}
+                            className="flex w-full items-center gap-2 px-3 py-2 text-xs border border-b-0 rounded-t-xl bg-surface hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:text-primary/35 disabled:hover:bg-surface"
                             onClick={() => updateStatus(objectId, 'approved')}
-                            disabled={status === 'approved'}
+                            disabled={status === 'approved' || status === 'cancelled'}
                           >
                             <Icon icon={LuCircleCheck} size={14} />
                             <span>{t('registrations.approve')}</span>
                           </button>
                           <button
-                            className={`flex w-full items-center gap-2 px-3 py-2 text-xs border rounded-b-xl bg-surface hover:bg-background cursor-pointer ${status === 'rejected' ? 'cursor-not-allowed' : ''}`}
+                            className="flex w-full items-center gap-2 px-3 py-2 text-xs border rounded-b-xl bg-surface hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:text-primary/35 disabled:hover:bg-surface"
                             onClick={() => updateStatus(objectId, 'rejected')}
-                            disabled={status === 'rejected'}
+                            disabled={status === 'rejected' || status === 'cancelled'}
                           >
                             <Icon icon={LuCircleX} size={14} />
                             <span>{t('registrations.reject')}</span>
@@ -519,7 +525,9 @@ export default function Registrations() {
                   ? t('registrations.details.status.approved')
                   : selectedRegistration.status === 'rejected'
                     ? t('registrations.details.status.rejected')
-                    : t('registrations.details.status.pending')}
+                    : selectedRegistration.status === 'cancelled'
+                      ? t('registrations.details.status.cancelled')
+                      : t('registrations.details.status.pending')}
                 <div className="flex gap-2 items-center">
                   <span className="font-semibold">{t('registrations.details.date')}:</span>
                   {formatDate(selectedRegistration.createdAt)}
