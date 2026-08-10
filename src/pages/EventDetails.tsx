@@ -553,8 +553,10 @@ export default function EventDetails() {
 
                   <p className="text-sm text-primary/85 text-center mt-0">
                     {event.requiresApproval
-                      ? t('eventDetails.waitForApproval')
-                      : !qrError ?? t('eventDetails.showCodeAtEntrance')
+                        ? t('eventDetails.waitForApproval')
+                        : !qrError
+                            ? t('eventDetails.showCodeAtEntrance')
+                            : ''
                     }
                   </p>
 
