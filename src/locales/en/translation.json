@@ -91,7 +91,8 @@
       "status": {
         "approved": "Approved",
         "pending": "Pending",
-        "rejected": "Rejected"
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
       },
       "date": "Date",
       "qrCode": "Check-in QR code",
@@ -235,18 +236,20 @@
     "requiredField": "Required field.",
     "register": "Register",
     "joinOnline": "Join online",
+    "error": "Unexpected error",
     "success": "You have been registered successfully",
     "errorTitle": "Unexpected error",
     "showCodeAtEntrance": "Show this code at the event entrance.",
     "waitForApproval": "Your registration is under review.",
     "qrLoading": "Generating QR code...",
     "qrError": "Could not generate QR code.",
+    "qrErrorHint": "Contact the organizer.",
     "registerAgain": "Register another person",
     "capacityFull": "No spots available",
     "capacityFullDescription": "All spots for this event have been taken. Registration is currently closed.",
     "spotsLeft": "{{count}} spots remaining",
     "spotsLeftOne": "Last spot remaining!",
-    "downloadPdf": "Download confirmation (PDF)",
+    "downloadPdf": "Download confirmation",
     "addToCalendar": "Add to calendar",
     "confirmationThankYou": "Thank you for registering!",
     "confirmationUnregister": "To unregister, please contact the event organizer.",
@@ -420,7 +423,8 @@
       "allStatuses": "All Approval",
       "pending": "Pending",
       "approved": "Approved",
-      "rejected": "Rejected"
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
     },
     "columns": {
       "date": "Registration Date",
@@ -430,7 +434,8 @@
     "status": {
       "approved": "Approved",
       "pending": "Pending",
-      "rejected": "Rejected"
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
     },
     "pagination": {
       "current": "Page",
@@ -450,5 +455,14 @@
       "confirm": "Confirm",
       "cancel": "Cancel"
     }
+  },
+  "unregister": {
+    "loading": "Checking your registration...",
+    "confirmQuestion": "Are you sure you want to unregister from \"{{eventTitle}}\"?",
+    "confirmButton": "Yes, I want to unregister from the event",
+    "submitting": "Processing your request...",
+    "success": "You have been successfully unregistered from the event.",
+    "alreadyCancelled": "This registration has already been cancelled.",
+    "invalidToken": "This link is invalid or has expired."
   }
 }

@@ -91,7 +91,8 @@
       "status": {
         "approved": "Zatwierdzona",
         "pending": "Oczekująca",
-        "rejected": "Odrzucona"
+        "rejected": "Odrzucona",
+        "cancelled": "Anulowana"
       },
       "date": "Data",
       "qrCode": "Kod QR do odprawy",
@@ -236,17 +237,19 @@
     "register": "Zarejestruj",
     "joinOnline": "Dołącz online",
     "success": "Rejestracja przebiegła pomyślnie",
+    "error": "Wystąpił błąd",
     "errorTitle": "Wystąpił błąd",
     "showCodeAtEntrance": "Pokaż ten kod przy wejściu na wydarzenie.",
     "waitForApproval": "Twoje zgłoszenie oczekuje na weryfikację.",
     "qrLoading": "Generowanie kodu QR...",
     "qrError": "Nie udało się wygenerować kodu QR.",
+    "qrErrorHint": "Skontaktuj się z organizatorem.",
     "registerAgain": "Zarejestruj kolejną osobę",
     "capacityFull": "Brak wolnych miejsc",
     "capacityFullDescription": "Wszystkie miejsca na to wydarzenie zostały zajęte. Rejestracja jest obecnie zamknięta.",
     "spotsLeft": "Pozostało {{count}} wolnych miejsc",
     "spotsLeftOne": "Pozostało ostatnie wolne miejsce!",
-    "downloadPdf": "Pobierz potwierdzenie (PDF)",
+    "downloadPdf": "Pobierz potwierdzenie",
     "addToCalendar": "Dodaj do kalendarza",
     "confirmationThankYou": "Dziękujemy za rejestrację!",
     "confirmationUnregister": "Aby się wyrejestrować, skontaktuj się z organizatorem wydarzenia.",
@@ -420,7 +423,8 @@
       "allStatuses": "Wszystkie statusy",
       "pending": "Oczekujące",
       "approved": "Zatwierdzone",
-      "rejected": "Odrzucone"
+      "rejected": "Odrzucone",
+      "cancelled": "Anulowane"
     },
     "columns": {
       "date": "Data rejestracji",
@@ -430,7 +434,8 @@
     "status": {
       "approved": "Zatwierdzona",
       "pending": "Oczekująca",
-      "rejected": "Odrzucona"
+      "rejected": "Odrzucona",
+      "cancelled": "Anulowana"
     },
     "pagination": {
       "current": "Strona",
@@ -450,5 +455,14 @@
       "confirm": "Potwierdź",
       "cancel": "Anuluj"
     }
+  },
+  "unregister": {
+    "loading": "Sprawdzanie rejestracji...",
+    "confirmQuestion": "Czy na pewno chcesz się wyrejestrować z wydarzenia \"{{eventTitle}}\"?",
+    "confirmButton": "Tak, chcę się wyrejestrować z wydarzenia",
+    "submitting": "Przetwarzanie...",
+    "success": "Zostałeś pomyślnie wyrejestrowany z wydarzenia.",
+    "alreadyCancelled": "Ta rejestracja została już wcześniej anulowana.",
+    "invalidToken": "Ten link jest nieprawidłowy lub wygasł."
   }
 }
