@@ -19,6 +19,7 @@ import { Event, EventOrganizer } from '../../types/types';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import { EVENT_CLASS } from '../../constants/eventDefaults';
+import Pagination from '../../components/Pagination';
 
 const ROWS_OPTIONS = [10, 25, 50];
 
@@ -344,58 +345,22 @@ export default function Dashboard() {
 
       {/* PAGINATION */}
       {!loading && !error && sorted.length > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-2 mt-4 pt-3 border-t border-primary/10">
-          <div className="flex items-center gap-2 text-sm text-primary/60">
-            <span>{t('dashboard.rowsPerPage')}</span>
-            <select
-              value={rowsPerPage}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setPage(1);
-              }}
-              className="border border-primary/20 rounded-lg px-2 py-1 text-sm text-primary bg-surface focus:outline-none"
-            >
-              {ROWS_OPTIONS.map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-center gap-1 text-sm text-primary/60">
-            <span>
-              {t('dashboard.page')} {page} {t('dashboard.of')} {totalPages}
-            </span>
-            <button
-              onClick={() => handlePageChange(1)}
-              disabled={page === 1}
-              className="w-7 h-7 flex items-center justify-center rounded-lg border border-primary/15 bg-surface-2 text-primary transition-colors hover:bg-primary/10 disabled:text-primary/35 disabled:cursor-not-allowed"
-            >
-              <Icon icon={LuChevronsLeft} size={14} />
-            </button>
-            <button
-              onClick={() => handlePageChange(page - 1)}
-              disabled={page === 1}
-              className="w-7 h-7 flex items-center justify-center rounded-lg border border-primary/15 bg-surface-2 text-primary transition-colors hover:bg-primary/10 disabled:text-primary/35 disabled:cursor-not-allowed"
-            >
-              <Icon icon={LuChevronLeft} size={14} />
-            </button>
-            <button
-              onClick={() => handlePageChange(page + 1)}
-              disabled={page === totalPages}
-              className="w-7 h-7 flex items-center justify-center rounded-lg border border-primary/15 bg-surface-2 text-primary transition-colors hover:bg-primary/10 disabled:text-primary/35 disabled:cursor-not-allowed"
-            >
-              <Icon icon={LuChevronRight} size={14} />
-            </button>
-            <button
-              onClick={() => handlePageChange(totalPages)}
-              disabled={page === totalPages}
-              className="w-7 h-7 flex items-center justify-center rounded-lg border border-primary/15 bg-surface-2 text-primary transition-colors hover:bg-primary/10 disabled:text-primary/35 disabled:cursor-not-allowed"
-            >
-              <Icon icon={LuChevronsRight} size={14} />
-            </button>
-          </div>
-        </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={setRowsPerPage}
+          rowsOptions={ROWS_OPTIONS}
+          labels={{
+            rowsPerPage: t('dashboard.rowsPerPage'),
+            pageText: (
+              <>
+                {t('dashboard.page')} {page} {t('dashboard.of')} {totalPages}
+              </>
+            ),
+          }}
+        />
       )}
 
       <div className="pb-4" />
