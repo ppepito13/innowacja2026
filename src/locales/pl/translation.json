@@ -418,6 +418,8 @@
     "found": "Znaleziono {{count}} rejestracji",
     "approve": "Zatwierdź",
     "reject": "Odrzuć",
+    "delete": "Usuń",
+    "confirmDeleteSingle": "Czy na pewno chcesz usunąć tę rejestację?",
     "filters": {
       "search": "Szukaj uczestników...",
       "allStatuses": "Wszystkie statusy",
@@ -450,8 +452,10 @@
       "selected": "Zaznaczono: {{count}}",
       "approve": "Zatwierdź zaznaczone",
       "reject": "Odrzuć zaznaczone",
-      "confirmApprove": "Czy na pewno chcesz zatwierdzić {{count}} osób?",
-      "confirmReject": "Czy na pewno chcesz odrzucić {{count}} osób?",
+      "delete": "Usuń zaznaczone",
+      "confirmApprove": "Czy na pewno chcesz zatwierdzić {{count}} rejestacji?",
+      "confirmReject": "Czy na pewno chcesz odrzucić {{count}} rejestacji?",
+      "confirmDelete": "Czy na pewno chcesz usunąć {{count}} rejestacji?",
       "confirm": "Potwierdź",
       "cancel": "Anuluj"
     }
