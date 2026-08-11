@@ -10,7 +10,8 @@ import {
   LuPencil,
   LuEllipsis,
   LuX,
-  LuBan
+  LuBan,
+  LuTrash2
 } from 'react-icons/lu';
 import { useAuth } from '../../auth/AuthProvider';
 import { parseService, createPointer } from '../../services/parseService';
@@ -27,6 +28,7 @@ const EVENT_CLASS = 'TestEvent';
 type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected' | 'cancelled';
 type SortField = string;
 type SortDir = 'asc' | 'desc';
+type BulkAction = 'approved' | 'rejected' | 'deleted';
 
 function SortIcon({
   field,
@@ -76,8 +78,12 @@ export default function RegistrationsList() {
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [bulkConfirm, setBulkConfirm] = useState<{ action: 'approved' | 'rejected'; count: number } | null>(null);
+  const [bulkConfirm, setBulkConfirm] = useState<{ action: BulkAction; count: number } | null>(null);
   const [bulkLoading, setBulkLoading] = useState(false);
+
+  // ── Single delete ────────────────────────────────────────────────────
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     if (!openedActionId) return;
@@ -110,7 +116,7 @@ export default function RegistrationsList() {
       })
       .catch((e: any) => setError(e.message))
       .finally(() => setEventsLoading(false));
-  }, [user]);
+  }, [user, eventIdParam]);
 
   // ── Load registrations when event changes ────────────────────────────
   useEffect(() => {
@@ -271,6 +277,27 @@ export default function RegistrationsList() {
     }
   };
 
+  const handleDeleteSingle = async () => {
+    if (!deleteConfirmId) return;
+    setDeleteLoading(true);
+    try {
+      await parseService.remove('Registration', deleteConfirmId);
+      setRegistrations((prev) => prev.filter((r) => r.objectId !== deleteConfirmId));
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(deleteConfirmId);
+        return next;
+      });
+    } catch (e: any) {
+      const msg = e?.response?.data?.error || e?.message || 'Error';
+      setError(msg);
+    } finally {
+      setDeleteLoading(false);
+      setDeleteConfirmId(null);
+      setOpenedActionId(null);
+    }
+  };
+
   const toggleSelect = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -297,16 +324,22 @@ export default function RegistrationsList() {
     });
   }, [paginated]);
 
-  const handleBulkUpdate = async () => {
+  const handleBulkAction = async () => {
     if (!bulkConfirm) return;
     setBulkLoading(true);
     try {
       const ids = Array.from(selectedIds);
-      const updates = ids.map((id) => ({ objectId: id, payload: { status: bulkConfirm.action } }));
-      await parseService.batchUpdate<Registration>('Registration', updates);
-      setRegistrations((prev) =>
-        prev.map((r) => (selectedIds.has(r.objectId) ? { ...r, status: bulkConfirm.action } : r)),
-      );
+      if (bulkConfirm.action === 'deleted') {
+        await parseService.batchDelete('Registration', ids);
+        setRegistrations((prev) => prev.filter((r) => !selectedIds.has(r.objectId)));
+      } else {
+        const status: Registration['status'] = bulkConfirm.action;
+        const updates = ids.map((id) => ({ objectId: id, payload: { status } }));
+        await parseService.batchUpdate<Registration>('Registration', updates);
+        setRegistrations((prev) =>
+          prev.map((r) => (selectedIds.has(r.objectId) ? { ...r, status } : r)),
+        );
+      }
       setSelectedIds(new Set());
     } catch (e: any) {
       const msg = e?.response?.data?.error || e?.message || 'Error';
@@ -600,20 +633,31 @@ export default function RegistrationsList() {
                             </button>
 
                             {openedActionId === reg.objectId && (
-                              <div className="absolute right-0 top-10 z-50 w-44 rounded-xl border border-primary/15 bg-surface shadow-xl">
+                              <div className="absolute right-0 top-10 z-50 w-44 rounded-xl border border-primary/15 bg-surface shadow-xl overflow-hidden">
+                                {reg.status !== 'approved' && (
+                                  <button
+                                    className="flex w-full items-center gap-2 px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
+                                    onClick={() => updateStatus(reg.objectId, 'approved')}
+                                  >
+                                    <Icon icon={LuCircleCheck} size={13} />
+                                    {t('registrationsList.approve')}
+                                  </button>
+                                )}
+                                {reg.status !== 'rejected' && (
+                                  <button
+                                    className="flex w-full items-center gap-2 px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
+                                    onClick={() => updateStatus(reg.objectId, 'rejected')}
+                                  >
+                                    <Icon icon={LuCircleX} size={13} />
+                                    {t('registrationsList.reject')}
+                                  </button>
+                                )}
                                 <button
-                                  className="flex w-full items-center gap-2 rounded-t-xl px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
-                                  onClick={() => updateStatus(reg.objectId, 'approved')}
+                                  className="flex w-full items-center gap-2 px-3 py-2 bg-transparent text-xs text-red-500 hover:bg-red-900/10 cursor-pointer"
+                                  onClick={() => setDeleteConfirmId(reg.objectId)}
                                 >
-                                  <Icon icon={LuCircleCheck} size={13} />
-                                  {t('registrationsList.approve')}
-                                </button>
-                                <button
-                                  className="flex w-full items-center gap-2 rounded-b-xl px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
-                                  onClick={() => updateStatus(reg.objectId, 'rejected')}
-                                >
-                                  <Icon icon={LuCircleX} size={13} />
-                                  {t('registrationsList.reject')}
+                                  <Icon icon={LuTrash2} size={13} />
+                                  {t('registrationsList.delete')}
                                 </button>
                               </div>
                             )}
@@ -711,6 +755,13 @@ export default function RegistrationsList() {
             <Icon icon={LuCircleX} size={14} />
             {t('registrationsList.bulk.reject')}
           </button>
+          <button
+            className="bulk-action-bar__btn bulk-action-bar__btn--delete"
+            onClick={() => setBulkConfirm({ action: 'deleted', count: selectedIds.size })}
+          >
+            <Icon icon={LuTrash2} size={14} />
+            {t('registrationsList.bulk.delete')}
+          </button>
         </div>
       )}
 
@@ -720,12 +771,16 @@ export default function RegistrationsList() {
             <h3 className="bulk-confirm-modal__title">
               {bulkConfirm.action === 'approved'
                 ? t('registrationsList.bulk.approve')
-                : t('registrationsList.bulk.reject')}
+                : bulkConfirm.action === 'rejected'
+                ? t('registrationsList.bulk.reject')
+                : t('registrationsList.bulk.delete')}
             </h3>
             <p className="bulk-confirm-modal__message">
               {bulkConfirm.action === 'approved'
                 ? t('registrationsList.bulk.confirmApprove', { count: bulkConfirm.count })
-                : t('registrationsList.bulk.confirmReject', { count: bulkConfirm.count })}
+                : bulkConfirm.action === 'rejected'
+                ? t('registrationsList.bulk.confirmReject', { count: bulkConfirm.count })
+                : t('registrationsList.bulk.confirmDelete', { count: bulkConfirm.count })}
             </p>
             <div className="bulk-confirm-modal__actions">
               <button
@@ -737,10 +792,37 @@ export default function RegistrationsList() {
               </button>
               <button
                 className="bulk-confirm-modal__btn bulk-confirm-modal__btn--confirm"
-                onClick={handleBulkUpdate}
+                onClick={handleBulkAction}
                 disabled={bulkLoading}
               >
                 {bulkLoading ? '...' : t('registrationsList.bulk.confirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirmId && (
+        <div className="bulk-confirm-overlay" onClick={() => !deleteLoading && setDeleteConfirmId(null)}>
+          <div className="bulk-confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <h3 className="bulk-confirm-modal__title">{t('registrationsList.delete')}</h3>
+            <p className="bulk-confirm-modal__message">
+              {t('registrationsList.confirmDeleteSingle')}
+            </p>
+            <div className="bulk-confirm-modal__actions">
+              <button
+                className="bulk-confirm-modal__btn bulk-confirm-modal__btn--cancel"
+                onClick={() => setDeleteConfirmId(null)}
+                disabled={deleteLoading}
+              >
+                {t('registrationsList.bulk.cancel')}
+              </button>
+              <button
+                className="bulk-confirm-modal__btn bulk-confirm-modal__btn--confirm"
+                onClick={handleDeleteSingle}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? '...' : t('registrationsList.bulk.confirm')}
               </button>
             </div>
           </div>

@@ -418,6 +418,8 @@
     "found": "Found {{count}} registrations",
     "approve": "Approve",
     "reject": "Reject",
+    "delete": "Delete",
+    "confirmDeleteSingle": "Are you sure you want to delete this registration?",
     "filters": {
       "search": "Search attendees...",
       "allStatuses": "All Approval",
@@ -450,8 +452,10 @@
       "selected": "Selected: {{count}}",
       "approve": "Approve selected",
       "reject": "Reject selected",
-      "confirmApprove": "Are you sure you want to approve {{count}} people?",
-      "confirmReject": "Are you sure you want to reject {{count}} people?",
+      "delete": "Delete selected",
+      "confirmApprove": "Are you sure you want to approve {{count}} registrations?",
+      "confirmReject": "Are you sure you want to reject {{count}} registrations?",
+      "confirmDelete": "Are you sure you want to delete {{count}} registrations?",
       "confirm": "Confirm",
       "cancel": "Cancel"
     }
