@@ -283,7 +283,7 @@ export default function RegistrationsList() {
   const toggleSelectAll = useCallback(() => {
     setSelectedIds((prev) => {
       const selectableIds = paginated
-        .filter((r) => r.status !== 'approved' && r.status !== 'cancelled')
+        .filter((r) => r.status !== 'cancelled')
         .map((r) => r.objectId);
       if (selectableIds.length === 0) return prev;
       const allSelected = selectableIds.every((id) => prev.has(id));
@@ -318,7 +318,7 @@ export default function RegistrationsList() {
   };
 
   const selectableOnPage = paginated.filter(
-    (r) => r.status !== 'approved' && r.status !== 'cancelled',
+    (r) => r.status !== 'cancelled',
   );
   const allOnPageSelected =
     selectableOnPage.length > 0 && selectableOnPage.every((r) => selectedIds.has(r.objectId));
@@ -547,7 +547,7 @@ export default function RegistrationsList() {
                             className="bulk-checkbox disabled:cursor-not-allowed"
                             checked={selectedIds.has(reg.objectId)}
                             onChange={() => toggleSelect(reg.objectId)}
-                            disabled={reg.status === 'approved' || reg.status === 'cancelled'}
+                            disabled={reg.status === 'cancelled'}
                           />
                         </td>
                         <td className="whitespace-nowrap px-3 sm:px-4 py-3 text-xs text-primary/70">
@@ -583,14 +583,13 @@ export default function RegistrationsList() {
                             </button>
 
                             <button
-                              disabled={reg.status === 'approved' || reg.status === 'cancelled'}
+                              disabled={reg.status === 'cancelled'}
                               className={`flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface transition active:scale-95 ${
-                                reg.status === 'approved' || reg.status === 'cancelled'
+                                reg.status === 'cancelled'
                                   ? 'cursor-not-allowed opacity-40 text-primary/30'
                                   : 'cursor-pointer text-primary/70 hover:bg-background hover:text-primary'
                               }`}
                               onClick={() =>
-                                reg.status !== 'approved' &&
                                 reg.status !== 'cancelled' &&
                                 setOpenedActionId((id) =>
                                   id === reg.objectId ? null : reg.objectId,
