@@ -11,12 +11,12 @@ import AdminLayout from './components/AdminLayout';
 import Home from './pages/Home';
 import EventDetails from './pages/EventDetails';
 import AdminLogin from './pages/AdminLogin';
+import UnregisterConfirm from './pages/UnregisterConfirm';
 
 // Admin pages
 import Dashboard from './pages/admin/Dashboard';
 import EventManagement from './pages/admin/EventManagement';
 import RegistrationsList from './pages/admin/RegistrationsList';
-import Registrations from './pages/admin/Registrations';
 import RegistrationEdit from './pages/admin/RegistrationEdit';
 import CheckIn from './pages/admin/CheckIn';
 import Users from './pages/admin/Users';
@@ -39,6 +39,7 @@ function App() {
           <Switch>
             {/* Public Fullscreen Routes */}
             <Route exact path="/events/:eventId" component={EventDetails} />
+            <Route exact path="/unregister/:token" component={UnregisterConfirm} />
 
             {/* Admin routes — sidebar layout */}
             <Route path="/admin">
@@ -65,20 +66,14 @@ function App() {
                   />
                   <ProtectedRoute
                     exact
-                    path="/admin/registrations"
-                    component={RegistrationsList}
-                    requiredRole={['Admin', 'Organizer']}
-                  />
-                  <ProtectedRoute
-                    exact
                     path="/admin/events/:id/formconfig"
                     component={FormConfig}
                     requiredRole={['Admin', 'Organizer']}
                   />
                   <ProtectedRoute
                     exact
-                    path="/admin/registrations/:eventId"
-                    component={Registrations}
+                    path="/admin/registrations/:eventId?"
+                    component={RegistrationsList}
                     requiredRole={['Admin', 'Organizer']}
                   />
                   <ProtectedRoute

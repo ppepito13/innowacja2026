@@ -125,3 +125,99 @@ Parse.Cloud.beforeSave('Registration', (request) => {
     registration.set('isCheckedIn', false);
   }
 });
+
+function signUnregisterId(objectId) {
+  return base64url(
+    crypto.createHmac('sha256', QR_SECRET).update(`unregister:${objectId}`).digest(),
+  );
+}
+
+function buildUnregisterToken(objectId) {
+  return `${TOKEN_VERSION}.${base64url(objectId)}.${signUnregisterId(objectId)}`;
+}
+
+function verifyUnregisterToken(token) {
+  if (typeof token !== 'string') return null;
+
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+
+  const [version, encodedId, signature] = parts;
+  if (version !== TOKEN_VERSION || !encodedId || !signature) return null;
+
+  let objectId;
+  try {
+    objectId = base64urlDecode(encodedId);
+  } catch (err) {
+    return null;
+  }
+  if (!objectId) return null;
+
+  const expected = signUnregisterId(objectId);
+  const given = Buffer.from(signature);
+  const want = Buffer.from(expected);
+  if (given.length !== want.length) return null;
+  if (!crypto.timingSafeEqual(given, want)) return null;
+
+  return objectId;
+}
+
+Parse.Cloud.define('generateUnregisterToken', async (request) => {
+  const { registrationId } = request.params;
+  if (!registrationId || typeof registrationId !== 'string') {
+    throw new Parse.Error(Parse.Error.INVALID_QUERY, 'registrationId is required.');
+  }
+
+  const query = new Parse.Query('Registration');
+  const registration = await query.get(registrationId, { useMasterKey: true });
+
+  return {
+    token: buildUnregisterToken(registration.id),
+    registrationId: registration.id,
+  };
+});
+
+Parse.Cloud.define('getUnregisterInfo', async (request) => {
+  const objectId = verifyUnregisterToken(request.params.token);
+  if (!objectId) {
+    throw new Parse.Error(Parse.Error.VALIDATION_ERROR, 'Invalid or forged link.');
+  }
+
+  const query = new Parse.Query('Registration');
+  query.include('event');
+
+  let registration;
+  try {
+    registration = await query.get(objectId, { useMasterKey: true });
+  } catch (err) {
+    throw new Parse.Error(Parse.Error.OBJECT_NOT_FOUND, 'Registration not found.');
+  }
+
+  return {
+    eventTitle: registration.get('event')?.get('title') ?? '',
+    status: registration.get('status'),
+  };
+});
+
+Parse.Cloud.define('unregisterParticipant', async (request) => {
+  const objectId = verifyUnregisterToken(request.params.token);
+  if (!objectId) {
+    throw new Parse.Error(Parse.Error.VALIDATION_ERROR, 'Invalid or forged link.');
+  }
+
+  const query = new Parse.Query('Registration');
+  let registration;
+  try {
+    registration = await query.get(objectId, { useMasterKey: true });
+  } catch (err) {
+    throw new Parse.Error(Parse.Error.OBJECT_NOT_FOUND, 'Registration not found.');
+  }
+
+  if (registration.get('status') === 'cancelled') {
+    return { alreadyCancelled: true };
+  }
+
+  registration.set('status', 'cancelled');
+  await registration.save(null, { useMasterKey: true });
+  return { success: true };
+});

@@ -94,6 +94,15 @@ export const parseService = {
     await parseClient.delete(`/classes/${className}/${objectId}`);
   },
 
+  async batchDelete(className: string, objectIds: string[]): Promise<void> {
+    const requests = objectIds.map((objectId) => ({
+      method: 'DELETE' as const,
+      path: `/parse/classes/${className}/${objectId}`,
+    }));
+
+    await parseClient.post('/batch', { requests });
+  },
+
   /** Wywołaj funkcję Parse Cloud Code */
   async runFunction<T>(name: string, params: Record<string, unknown> = {}): Promise<T> {
     const { data } = await parseClient.post<{ result: T }>(`/functions/${name}`, params);

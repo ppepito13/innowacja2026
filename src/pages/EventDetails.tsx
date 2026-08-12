@@ -541,20 +541,25 @@ export default function EventDetails() {
                 </>
               ) : (
                 <div className="flex flex-col items-center gap-3">
-                  <p className="text-success text-xl font-bold mt-2 mb-0">
-                    {t('eventDetails.success')}
-                  </p>
+                  {qrError ? (
+                    <p className="text-error text-xl font-semibold mt-2 mb-0">
+                      {t('eventDetails.error')}
+                    </p>
+                  ) : (
+                    <p className="text-success text-xl font-bold mt-2 mb-0">
+                      {t('eventDetails.success')}
+                    </p>
+                  )}
 
-                  <p className="text-sm text-primary/60 text-center mt-0">
-                    {event.requiresApproval ? (
-                      t('eventDetails.waitForApproval')
-                    ) : (
-                      t('eventDetails.showCodeAtEntrance')
-                    )}
+                  <p className="text-sm text-primary/85 text-center mt-0">
+                    {event.requiresApproval
+                      ? t('eventDetails.waitForApproval')
+                      : !qrError ?? t('eventDetails.showCodeAtEntrance')
+                    }
                   </p>
 
                   {!event.requiresApproval && qrLoading && (
-                    <span className="text-xs text-primary/60">
+                    <span className="text-xs text-primary/85">
                       {t('eventDetails.qrLoading')}
                     </span>
                   )}
@@ -566,8 +571,10 @@ export default function EventDetails() {
                   )}
 
                   {!event.requiresApproval && !qrLoading && qrError && (
-                    <span className="text-xs text-error">
-                      {t('eventDetails.qrError')}
+                    <span className="text-xs text-error font-medium pb-5 text-center">
+                        {t('eventDetails.qrError')}
+                        <br className="mb-2" />
+                        {t('eventDetails.qrErrorHint')}
                     </span>
                   )}
 

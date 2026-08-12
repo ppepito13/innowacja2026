@@ -53,7 +53,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       return p === '/admin' || p.startsWith('/admin/events');
     }
     if (item.path === '/admin/registrations') {
-      return p === '/admin/registrations';
+      return p.startsWith('/admin/registrations');
     }
     return p === item.path || p.startsWith(item.path + '/');
   };

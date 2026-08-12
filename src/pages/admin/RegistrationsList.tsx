@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useHistory } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import {
-  LuChevronLeft,
-  LuChevronRight,
   LuDownload,
   LuSearch,
   LuCircleCheck,
@@ -12,6 +10,8 @@ import {
   LuPencil,
   LuEllipsis,
   LuX,
+  LuBan,
+  LuTrash2
 } from 'react-icons/lu';
 import { useAuth } from '../../auth/AuthProvider';
 import { parseService, createPointer } from '../../services/parseService';
@@ -20,20 +20,21 @@ import { formatDate, formatColumnName, formatCellValue } from '../../utils/forma
 import { useTranslation } from 'react-i18next';
 import parseClient from '../../services/parseClient';
 import Icon from '../../components/Icon';
+import Pagination from '../../components/Pagination';
 import '../../components/BulkActionBar.css';
 
 const EVENT_CLASS = 'TestEvent';
-const ROWS_PER_PAGE = 10;
 
-type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
+type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected' | 'cancelled';
 type SortField = string;
 type SortDir = 'asc' | 'desc';
+type BulkAction = 'approved' | 'rejected' | 'deleted';
 
 function SortIcon({
-                    field,
-                    sortField,
-                    sortDir,
-                  }: {
+  field,
+  sortField,
+  sortDir,
+}: {
   field: string;
   sortField: string;
   sortDir: SortDir;
@@ -49,6 +50,7 @@ export default function RegistrationsList() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const history = useHistory();
+  const { eventId: eventIdParam } = useParams<{ eventId?: string }>();
 
   // ── Events ──────────────────────────────────────────────────────────
   const [events, setEvents] = useState<Event[]>([]);
@@ -66,6 +68,7 @@ export default function RegistrationsList() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   // ── Pagination ───────────────────────────────────────────────────────
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
 
   // ── Table ────────────────────────────────────────────────────────────
@@ -75,8 +78,12 @@ export default function RegistrationsList() {
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [bulkConfirm, setBulkConfirm] = useState<{ action: 'approved' | 'rejected'; count: number } | null>(null);
+  const [bulkConfirm, setBulkConfirm] = useState<{ action: BulkAction; count: number } | null>(null);
   const [bulkLoading, setBulkLoading] = useState(false);
+
+  // ── Single delete ────────────────────────────────────────────────────
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     if (!openedActionId) return;
@@ -101,13 +108,15 @@ export default function RegistrationsList() {
       .query<Event>(EVENT_CLASS, where)
       .then((data) => {
         setEvents(data);
-        if (data.length > 0) {
+        if (eventIdParam) {
+          setSelectedEventId(eventIdParam);
+        } else if (data.length > 0) {
           setSelectedEventId(data[0].objectId ?? '');
         }
       })
       .catch((e: any) => setError(e.message))
       .finally(() => setEventsLoading(false));
-  }, [user]);
+  }, [user, eventIdParam]);
 
   // ── Load registrations when event changes ────────────────────────────
   useEffect(() => {
@@ -189,8 +198,8 @@ export default function RegistrationsList() {
     });
   }, [filtered, sortField, sortDir]);
 
-  const totalPages = Math.max(1, Math.ceil(sorted.length / ROWS_PER_PAGE));
-  const paginated = sorted.slice((page - 1) * ROWS_PER_PAGE, page * ROWS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(sorted.length / rowsPerPage));
+  const paginated = sorted.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
   // ── Helpers ───────────────────────────────────────────────────────────
   const handleSort = (field: SortField) => {
@@ -203,9 +212,15 @@ export default function RegistrationsList() {
     setPage(1);
   };
 
-  const canExport =
-    user?.role === 'Admin' ||
-    (user?.objectId != null && selectedEvent?.ACL?.[user.objectId]?.read === true);
+  const canExport = () => {
+    if (!user) return false;
+    if (user.role === 'Admin') return true;
+    if (!selectedEvent || !user.objectId) return false;
+    return (
+      (!!selectedEvent.organizer?.objectId && selectedEvent.organizer.objectId === user.objectId) ||
+      selectedEvent.ACL?.[user.objectId]?.read === true
+    );
+  }
 
   const exportCSV = () => {
     if (registrations.length === 0) return;
@@ -262,6 +277,27 @@ export default function RegistrationsList() {
     }
   };
 
+  const handleDeleteSingle = async () => {
+    if (!deleteConfirmId) return;
+    setDeleteLoading(true);
+    try {
+      await parseService.remove('Registration', deleteConfirmId);
+      setRegistrations((prev) => prev.filter((r) => r.objectId !== deleteConfirmId));
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(deleteConfirmId);
+        return next;
+      });
+    } catch (e: any) {
+      const msg = e?.response?.data?.error || e?.message || 'Error';
+      setError(msg);
+    } finally {
+      setDeleteLoading(false);
+      setDeleteConfirmId(null);
+      setOpenedActionId(null);
+    }
+  };
+
   const toggleSelect = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -274,7 +310,7 @@ export default function RegistrationsList() {
   const toggleSelectAll = useCallback(() => {
     setSelectedIds((prev) => {
       const selectableIds = paginated
-        .filter((r) => r.status !== 'approved')
+        .filter((r) => r.status !== 'cancelled')
         .map((r) => r.objectId);
       if (selectableIds.length === 0) return prev;
       const allSelected = selectableIds.every((id) => prev.has(id));
@@ -288,16 +324,22 @@ export default function RegistrationsList() {
     });
   }, [paginated]);
 
-  const handleBulkUpdate = async () => {
+  const handleBulkAction = async () => {
     if (!bulkConfirm) return;
     setBulkLoading(true);
     try {
       const ids = Array.from(selectedIds);
-      const updates = ids.map((id) => ({ objectId: id, payload: { status: bulkConfirm.action } }));
-      await parseService.batchUpdate<Registration>('Registration', updates);
-      setRegistrations((prev) =>
-        prev.map((r) => (selectedIds.has(r.objectId) ? { ...r, status: bulkConfirm.action } : r)),
-      );
+      if (bulkConfirm.action === 'deleted') {
+        await parseService.batchDelete('Registration', ids);
+        setRegistrations((prev) => prev.filter((r) => !selectedIds.has(r.objectId)));
+      } else {
+        const status: Registration['status'] = bulkConfirm.action;
+        const updates = ids.map((id) => ({ objectId: id, payload: { status } }));
+        await parseService.batchUpdate<Registration>('Registration', updates);
+        setRegistrations((prev) =>
+          prev.map((r) => (selectedIds.has(r.objectId) ? { ...r, status } : r)),
+        );
+      }
       setSelectedIds(new Set());
     } catch (e: any) {
       const msg = e?.response?.data?.error || e?.message || 'Error';
@@ -308,8 +350,11 @@ export default function RegistrationsList() {
     }
   };
 
-  const selectableOnPage = paginated.filter((r) => r.status !== 'approved');
-  const allOnPageSelected = selectableOnPage.length > 0 && selectableOnPage.every((r) => selectedIds.has(r.objectId));
+  const selectableOnPage = paginated.filter(
+    (r) => r.status !== 'cancelled',
+  );
+  const allOnPageSelected =
+    selectableOnPage.length > 0 && selectableOnPage.every((r) => selectedIds.has(r.objectId));
 
   const renderStatusBadge = (status: Registration['status']) => {
     if (status === 'approved') {
@@ -317,7 +362,7 @@ export default function RegistrationsList() {
         <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold border-cb-success/40 bg-cb-success/15 text-success">
           <Icon icon={LuCircleCheck} size={13} />
           {t('registrationsList.status.approved')}
-        </span>
+      </span>
       );
     }
     if (status === 'rejected') {
@@ -325,14 +370,22 @@ export default function RegistrationsList() {
         <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold border-cb-error/40 bg-cb-error/15 text-error">
           <Icon icon={LuCircleX} size={13} />
           {t('registrationsList.status.rejected')}
-        </span>
+      </span>
+      );
+    }
+    if (status === 'cancelled') { // NOWE
+      return (
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:border-slate-600/60 dark:bg-slate-800/50 dark:text-slate-400">
+        <Icon icon={LuBan} size={13} />
+          {t('registrationsList.status.cancelled')}
+      </span>
       );
     }
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold border-cb-warning/40 bg-cb-warning/15 text-warning">
         <Icon icon={LuClock} size={13} />
         {t('registrationsList.status.pending')}
-      </span>
+    </span>
     );
   };
 
@@ -358,7 +411,10 @@ export default function RegistrationsList() {
             ) : (
               <select
                 value={selectedEventId}
-                onChange={(e) => setSelectedEventId(e.target.value)}
+                onChange={(e) => {
+                  setSelectedEventId(e.target.value);
+                  history.push(`/admin/registrations/${e.target.value}`);
+                }}
                 className="h-10 w-full !min-w-0 rounded-lg border border-primary/20 bg-surface px-3 text-sm text-primary outline-none focus:border-primary sm:max-w-xs"
               >
                 {events.length === 0 && (
@@ -374,7 +430,7 @@ export default function RegistrationsList() {
           </div>
 
           {/* Export buttons */}
-          {canExport && (
+          {canExport() && (
             <div className="flex shrink-0 gap-2">
               <button
                 onClick={exportCSV}
@@ -428,6 +484,7 @@ export default function RegistrationsList() {
             <option value="pending">{t('registrationsList.filters.pending')}</option>
             <option value="approved">{t('registrationsList.filters.approved')}</option>
             <option value="rejected">{t('registrationsList.filters.rejected')}</option>
+            <option value="cancelled">{t('registrationsList.filters.cancelled')}</option> {/* NOWE */}
           </select>
         </div>
 
@@ -510,119 +567,126 @@ export default function RegistrationsList() {
                   </tr>
                   </thead>
                   <tbody>
-                  {paginated.map((reg, idx) => (
-                    <tr
-                      key={reg.objectId}
-                      className={`border-b border-primary/10 text-primary transition hover:bg-primary/[0.03] ${
-                        idx % 2 === 0 ? '' : 'bg-primary/[0.01]'
-                      }`}
-                    >
-                      <td className="px-3 sm:px-4 py-3">
-                        <input
-                          type="checkbox"
-                          className="bulk-checkbox disabled:cursor-not-allowed"
-                          checked={selectedIds.has(reg.objectId)}
-                          onChange={() => toggleSelect(reg.objectId)}
-                          disabled={reg.status === 'approved'}
-                        />
-                      </td>
-                      <td className="whitespace-nowrap px-3 sm:px-4 py-3 text-xs text-primary/70">
-                        {formatDate(reg.createdAt)}
-                      </td>
-                      {Object.keys(selectedEvent?.formConfig ?? {}).map((col) => (
-                        <td key={col} className="px-3 sm:px-4 py-3">
-                          {formatCellValue(String(reg.formData?.[col] ?? 'N/A'), t)}
+                    {paginated.map((reg, idx) => (
+                      <tr
+                        key={reg.objectId}
+                        className={`border-b border-primary/10 text-primary transition hover:bg-primary/[0.03] ${
+                          idx % 2 === 0 ? '' : 'bg-primary/[0.01]'
+                        }`}
+                      >
+                        <td className="px-3 sm:px-4 py-3">
+                          <input
+                            type="checkbox"
+                            className="bulk-checkbox disabled:cursor-not-allowed"
+                            checked={selectedIds.has(reg.objectId)}
+                            onChange={() => toggleSelect(reg.objectId)}
+                            disabled={reg.status === 'cancelled'}
+                          />
                         </td>
-                      ))}
-                      <td className="px-3 sm:px-4 py-3">{renderStatusBadge(reg.status)}</td>
-                      <td className="px-3 sm:px-4 py-3">
-                        <div
-                          className="relative flex items-center justify-center gap-1.5"
-                          data-action-menu={openedActionId === reg.objectId ? '' : undefined}
-                        >
-                          <button
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary active:scale-95 cursor-pointer"
-                            onClick={() => setSelectedRegistration(reg)}
+                        <td className="whitespace-nowrap px-3 sm:px-4 py-3 text-xs text-primary/70">
+                          {formatDate(reg.createdAt)}
+                        </td>
+                        {Object.keys(selectedEvent?.formConfig ?? {}).map((col) => (
+                          <td key={col} className="px-3 sm:px-4 py-3">
+                            {formatCellValue(String(reg.formData?.[col] ?? 'N/A'), t)}
+                          </td>
+                        ))}
+                        <td className="px-3 sm:px-4 py-3">{renderStatusBadge(reg.status)}</td>
+                        <td className="px-3 sm:px-4 py-3">
+                          <div
+                            className="relative flex items-center justify-center gap-1.5"
+                            data-action-menu={openedActionId === reg.objectId ? '' : undefined}
                           >
-                            <Icon icon={LuEye} size={14} />
-                          </button>
+                            <button
+                              className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary active:scale-95 cursor-pointer"
+                              onClick={() => setSelectedRegistration(reg)}
+                            >
+                              <Icon icon={LuEye} size={14} />
+                            </button>
 
-                          <button
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary active:scale-95 cursor-pointer"
-                            onClick={() =>
-                              history.push(
-                                `/admin/registrations/${selectedEventId}/${reg.objectId}/edit`,
-                              )
-                            }
-                          >
-                            <Icon icon={LuPencil} size={14} />
-                          </button>
+                            <button
+                              className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary active:scale-95 cursor-pointer"
+                              onClick={() =>
+                                history.push(
+                                  `/admin/registrations/${selectedEventId}/${reg.objectId}/edit`,
+                                )
+                              }
+                            >
+                              <Icon icon={LuPencil} size={14} />
+                            </button>
 
-                          <button
-                            disabled={reg.status === 'approved'}
-                            className={`flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface transition active:scale-95 ${
-                              reg.status === 'approved' ? 'cursor-not-allowed opacity-40 text-primary/30' : 'cursor-pointer text-primary/70 hover:bg-background hover:text-primary'
-                            }`}
-                            onClick={() =>
-                              reg.status !== 'approved' &&
-                              setOpenedActionId((id) =>
-                                id === reg.objectId ? null : reg.objectId,
-                              )
-                            }
-                          >
-                            <Icon icon={LuEllipsis} size={14} />
-                          </button>
+                            <button
+                              disabled={reg.status === 'cancelled'}
+                              className={`flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface transition active:scale-95 ${
+                                reg.status === 'cancelled'
+                                  ? 'cursor-not-allowed opacity-40 text-primary/30'
+                                  : 'cursor-pointer text-primary/70 hover:bg-background hover:text-primary'
+                              }`}
+                              onClick={() =>
+                                reg.status !== 'cancelled' &&
+                                setOpenedActionId((id) =>
+                                  id === reg.objectId ? null : reg.objectId,
+                                )
+                              }
+                            >
+                              <Icon icon={LuEllipsis} size={14} />
+                            </button>
 
-                          {openedActionId === reg.objectId && (
-                            <div className="absolute right-0 top-10 z-50 w-44 rounded-xl border border-primary/15 bg-surface shadow-xl">
-                              <button
-                                className="flex w-full items-center gap-2 rounded-t-xl px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
-                                onClick={() => updateStatus(reg.objectId, 'approved')}
-                              >
-                                <Icon icon={LuCircleCheck} size={13} />
-                                {t('registrationsList.approve')}
-                              </button>
-                              <button
-                                className="flex w-full items-center gap-2 rounded-b-xl px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
-                                onClick={() => updateStatus(reg.objectId, 'rejected')}
-                              >
-                                <Icon icon={LuCircleX} size={13} />
-                                {t('registrationsList.reject')}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            {openedActionId === reg.objectId && (
+                              <div className="absolute right-0 top-10 z-50 w-44 rounded-xl border border-primary/15 bg-surface shadow-xl overflow-hidden">
+                                {reg.status !== 'approved' && (
+                                  <button
+                                    className="flex w-full items-center gap-2 px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
+                                    onClick={() => updateStatus(reg.objectId, 'approved')}
+                                  >
+                                    <Icon icon={LuCircleCheck} size={13} />
+                                    {t('registrationsList.approve')}
+                                  </button>
+                                )}
+                                {reg.status !== 'rejected' && (
+                                  <button
+                                    className="flex w-full items-center gap-2 px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
+                                    onClick={() => updateStatus(reg.objectId, 'rejected')}
+                                  >
+                                    <Icon icon={LuCircleX} size={13} />
+                                    {t('registrationsList.reject')}
+                                  </button>
+                                )}
+                                <button
+                                  className="flex w-full items-center gap-2 px-3 py-2 bg-transparent text-xs text-red-500 hover:bg-red-900/10 cursor-pointer"
+                                  onClick={() => setDeleteConfirmId(reg.objectId)}
+                                >
+                                  <Icon icon={LuTrash2} size={13} />
+                                  {t('registrationsList.delete')}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
             )}
 
             {/* Pagination */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3">
-              <span className="text-xs text-primary/60 text-center sm:text-left">
-                {t('registrationsList.pagination.current')} {page}{' '}
-                {t('registrationsList.pagination.total')} {totalPages}
-              </span>
-              <div className="flex justify-center sm:justify-end gap-2">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <Icon icon={LuChevronLeft} size={14} />
-                </button>
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <Icon icon={LuChevronRight} size={14} />
-                </button>
-              </div>
-            </div>
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={setRowsPerPage}
+              labels={{
+                rowsPerPage: t('dashboard.rowsPerPage'),
+                pageText: (
+                  <>
+                    {t('registrationsList.pagination.current')} {page}{' '}
+                    {t('registrationsList.pagination.total')} {totalPages}
+                  </>
+                ),
+              }}
+            />
           </>
         )}
       </div>
@@ -691,6 +755,13 @@ export default function RegistrationsList() {
             <Icon icon={LuCircleX} size={14} />
             {t('registrationsList.bulk.reject')}
           </button>
+          <button
+            className="bulk-action-bar__btn bulk-action-bar__btn--delete"
+            onClick={() => setBulkConfirm({ action: 'deleted', count: selectedIds.size })}
+          >
+            <Icon icon={LuTrash2} size={14} />
+            {t('registrationsList.bulk.delete')}
+          </button>
         </div>
       )}
 
@@ -700,12 +771,16 @@ export default function RegistrationsList() {
             <h3 className="bulk-confirm-modal__title">
               {bulkConfirm.action === 'approved'
                 ? t('registrationsList.bulk.approve')
-                : t('registrationsList.bulk.reject')}
+                : bulkConfirm.action === 'rejected'
+                ? t('registrationsList.bulk.reject')
+                : t('registrationsList.bulk.delete')}
             </h3>
             <p className="bulk-confirm-modal__message">
               {bulkConfirm.action === 'approved'
                 ? t('registrationsList.bulk.confirmApprove', { count: bulkConfirm.count })
-                : t('registrationsList.bulk.confirmReject', { count: bulkConfirm.count })}
+                : bulkConfirm.action === 'rejected'
+                ? t('registrationsList.bulk.confirmReject', { count: bulkConfirm.count })
+                : t('registrationsList.bulk.confirmDelete', { count: bulkConfirm.count })}
             </p>
             <div className="bulk-confirm-modal__actions">
               <button
@@ -717,10 +792,37 @@ export default function RegistrationsList() {
               </button>
               <button
                 className="bulk-confirm-modal__btn bulk-confirm-modal__btn--confirm"
-                onClick={handleBulkUpdate}
+                onClick={handleBulkAction}
                 disabled={bulkLoading}
               >
                 {bulkLoading ? '...' : t('registrationsList.bulk.confirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirmId && (
+        <div className="bulk-confirm-overlay" onClick={() => !deleteLoading && setDeleteConfirmId(null)}>
+          <div className="bulk-confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <h3 className="bulk-confirm-modal__title">{t('registrationsList.delete')}</h3>
+            <p className="bulk-confirm-modal__message">
+              {t('registrationsList.confirmDeleteSingle')}
+            </p>
+            <div className="bulk-confirm-modal__actions">
+              <button
+                className="bulk-confirm-modal__btn bulk-confirm-modal__btn--cancel"
+                onClick={() => setDeleteConfirmId(null)}
+                disabled={deleteLoading}
+              >
+                {t('registrationsList.bulk.cancel')}
+              </button>
+              <button
+                className="bulk-confirm-modal__btn bulk-confirm-modal__btn--confirm"
+                onClick={handleDeleteSingle}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? '...' : t('registrationsList.bulk.confirm')}
               </button>
             </div>
           </div>
