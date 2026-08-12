@@ -1,5 +1,7 @@
 import { jsPDF } from 'jspdf';
 import { Event } from '../types/types';
+import { localizedEventField } from './localizedEvent';
+import { dateLocaleTag } from './formatters';
 
 function stripDiacritics(str: string): string {
   if (!str) return str;
@@ -10,8 +12,8 @@ function stripDiacritics(str: string): string {
   return str.replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g, match => map[match] || match);
 }
 
-function formatDateForPdf(iso: string): string {
-  return new Intl.DateTimeFormat('pl-PL', { dateStyle: 'long', timeStyle: 'short' }).format(new Date(iso));
+function formatDateForPdf(iso: string, language?: string): string {
+  return new Intl.DateTimeFormat(dateLocaleTag(language), { dateStyle: 'long', timeStyle: 'short' }).format(new Date(iso));
 }
 
 function qrSvgToDataUrl(svgElement: SVGSVGElement): Promise<string> {
@@ -40,8 +42,11 @@ function qrSvgToDataUrl(svgElement: SVGSVGElement): Promise<string> {
 export async function generateConfirmationPdf(
   event: Event,
   t: (key: string) => string,
+  language?: string,
 ): Promise<void> {
   const qrSvg = document.querySelector('#qr-confirmation svg') as SVGSVGElement | null;
+  const eventTitle = localizedEventField(event, 'title', language);
+  const eventLocation = localizedEventField(event, 'location', language);
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -63,7 +68,7 @@ export async function generateConfirmationPdf(
   doc.setTextColor(0, 46, 60);
   doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
-  const titleLines = doc.splitTextToSize(stripDiacritics(event.title), contentWidth);
+  const titleLines = doc.splitTextToSize(stripDiacritics(eventTitle), contentWidth);
   doc.text(titleLines, margin, y);
   y += titleLines.length * 10 + 6;
 
@@ -89,23 +94,23 @@ export async function generateConfirmationPdf(
     doc.text(stripDiacritics(t('eventDetails.dateLabel') + ':'), margin, y);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(60, 60, 60);
-    let dateStr = formatDateForPdf(startIso);
+    let dateStr = formatDateForPdf(startIso, language);
     const endIso = event.endDate?.iso ?? event.endDate?.date?.toISOString();
     if (endIso) {
-      dateStr += '  —  ' + formatDateForPdf(endIso);
+      dateStr += '  —  ' + formatDateForPdf(endIso, language);
     }
     doc.text(stripDiacritics(dateStr), margin + 5, y + 6);
     y += 16;
   }
 
   // location
-  if (event.location && event.eventFormat !== 'virtual') {
+  if (eventLocation && event.eventFormat !== 'virtual') {
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(0, 46, 60);
     doc.text(stripDiacritics(t('eventDetails.locationLabel') + ':'), margin, y);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(60, 60, 60);
-    doc.text(stripDiacritics(event.location), margin + 5, y + 6);
+    doc.text(stripDiacritics(eventLocation), margin + 5, y + 6);
     y += 16;
   }
 
@@ -146,5 +151,5 @@ export async function generateConfirmationPdf(
   doc.setTextColor(180, 180, 180);
   doc.text(stripDiacritics(t('common.brand')), pageWidth / 2, footerY, { align: 'center' });
 
-  doc.save(`${stripDiacritics(event.title).replace(/[^a-zA-Z0-9]/g, '_')}_potwierdzenie.pdf`);
+  doc.save(`${stripDiacritics(eventTitle).replace(/[^a-zA-Z0-9]/g, '_')}_potwierdzenie.pdf`);
 }
