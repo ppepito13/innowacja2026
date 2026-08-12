@@ -6,9 +6,10 @@ import { Link } from '@lsg/components';
 import { useTranslation } from 'react-i18next';
 import { parseService } from '../services/parseService';
 import { Event } from '../types/types';
+import { localizedEventField } from '../utils/localizedEvent';
 
 export default function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -73,7 +74,10 @@ export default function Home() {
 
           {!loading && !error && events.length > 0 && (
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {events.map((event) => (
+              {events.map((event) => {
+                const title = localizedEventField(event, 'title', i18n.language);
+                const description = localizedEventField(event, 'description', i18n.language);
+                return (
                 <Link
                   key={event.objectId}
                   href={`/events/${event.objectId}`}
@@ -83,7 +87,7 @@ export default function Home() {
                     {event.heroImageUrl ? (
                       <img
                         src={event.heroImageUrl}
-                        alt={event.title}
+                        alt={title}
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
@@ -96,15 +100,16 @@ export default function Home() {
 
                   <div className="p-6 font-book">
                     <h3 className="mb-2 line-clamp-1 text-lg font-bold text-primary">
-                      {event.title}
+                      {title}
                     </h3>
                     <div
                       className="line-clamp-3 text-sm text-primary/60"
-                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.description || '') }}
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }}
                     />
                   </div>
                 </Link>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

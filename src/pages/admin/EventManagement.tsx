@@ -190,8 +190,6 @@ export default function EventManagement({ mode }: Props) {
     setSaving(true);
     setError(null);
 
-    // Translations live in `i18n`; the plain columns keep the primary-language
-    // value so admin lists, exports and pre-translation consumers keep working.
     const translations = buildEventI18n(event.i18n, {
       description: (html) => DOMPurify.sanitize(html),
     });
