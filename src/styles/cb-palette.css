@@ -1,0 +1,39 @@
+:root {
+  /* Primary colours */
+  --cb-yellow: 255 215 0; /* #FFD700  Gelb / Yellow - Brand Primary 1 */
+  --cb-petrol: 0 46 60; /* #002E3C  Ozean-Petrol - Brand Primary 2 */
+  --cb-sand: 241 239 237; /* #F1EFED  Sand - Brand Primary 3 */
+
+  /* Secondary colours */
+  --cb-coast: 58 126 138; /* #3A7E8A Coast - Brand Secondary 1 */
+  --cb-mint: 147 193 180; /* #93C1B4 Mint - Brand Secondary 2 */
+  --cb-pistachio: 213 219 182; /* #D5DBB6  Pistachio - Brand Secondary 3 */
+  --cb-harvest: 214 193 139; /* #D6C18B  Harvest - Brand Secondary 4 */
+  --cb-maple: 191 146 94; /* #BF925E  Maple - Brand Secondary 5 */
+  --cb-clay: 155 92 47; /* #9B5C2F  Clay - Brand Secondary 6 */
+
+  /* Secondary colours, 60 % gradations */
+  --cb-coast-60: 137 178 185; /* #89B2B9 Coast - Brand Secondary 1 */
+  --cb-mint-60: 190 218 210;  /* #BEDAD2 Mint - Brand Secondary 2 */
+  --cb-pistachio-60: 230 233 211; /* #E6E9D3 Pistachio - Brand Secondary 3 */
+  --cb-harvest-60: 230 218 185; /* #E6DAB9 Harvest - Brand Secondary 4 */
+  --cb-maple-60: 217 190 158; /* #D9BE9E Maple - Brand Secondary 5 */
+  --cb-clay-60: 195 157 130; /* #C39D82 Clay - Brand Secondary 6 */
+
+  /* Ozean-Petrol + Sand gradations */
+  --cb-grad-1: 48 77 74; /* #304D4A */
+  --cb-grad-2: 83 113 115; /* #537173 */
+  --cb-grad-3: 119 143 141; /* #778F8D */
+  --cb-grad-4: 160 174 172; /* #A0AEAC */
+  --cb-grad-5: 195 202 200; /* #C3CAC8 */
+  --cb-grad-6: 224 224 221; /* #E0E0DD */
+
+  /* Functional colours */
+  --cb-error: 197 0 14; /* #C5000E */
+  --cb-success: 0 137 50; /* #008932 */
+  --cb-warning: 232 111 0; /* #E86F00 */
+
+  /* Absolutes */
+  --cb-white: 255 255 255;
+  --cb-black: 0 0 0;
+}

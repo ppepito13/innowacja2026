@@ -54,10 +54,10 @@ const UnregisterConfirm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8 text-center">
+    <div className="min-h-screen w-full flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md bg-surface rounded-2xl shadow-md p-8 text-center">
         {state === 'loading' && (
-          <div className="flex flex-col items-center gap-3 text-gray-500">
+          <div className="flex flex-col items-center gap-3 text-primary/60">
             {LuLoader({ className: 'w-8 h-8 animate-spin' }) as React.ReactElement}
             <p>{t('unregister.loading')}</p>
           </div>
@@ -65,13 +65,13 @@ const UnregisterConfirm: React.FC = () => {
 
         {state === 'confirm' && (
           <div className="flex flex-col items-center gap-4">
-            {LuTriangleAlert({ className: 'w-10 h-10 text-amber-500' }) as React.ReactElement}
-            <h1 className="text-lg font-semibold text-gray-900">
+            {LuTriangleAlert({ className: 'w-10 h-10 text-warning' }) as React.ReactElement}
+            <h1 className="text-lg font-bold text-primary">
               {t('unregister.confirmQuestion', { eventTitle })}
             </h1>
             <button
               onClick={handleConfirm}
-              className="w-full rounded-lg bg-red-600 text-white py-2.5 font-medium hover:bg-red-700 transition-colors mt-2"
+              className="w-full rounded-lg bg-cb-error text-cb-white py-2.5 font-book hover:bg-cb-error/85 transition-colors mt-2"
             >
               {t('unregister.confirmButton')}
             </button>
@@ -79,7 +79,7 @@ const UnregisterConfirm: React.FC = () => {
         )}
 
         {state === 'submitting' && (
-          <div className="flex flex-col items-center gap-3 text-gray-500">
+          <div className="flex flex-col items-center gap-3 text-primary/60">
             {LuLoader({ className: 'w-8 h-8 animate-spin' }) as React.ReactElement}
             <p>{t('unregister.submitting')}</p>
           </div>
@@ -87,15 +87,15 @@ const UnregisterConfirm: React.FC = () => {
 
         {state === 'success' && (
           <div className="flex flex-col items-center gap-3">
-            {LuCircleCheck({ className: 'w-10 h-10 text-green-600' }) as React.ReactElement}
-            <h1 className="text-lg font-semibold text-gray-900">{t('unregister.success')}</h1>
+            {LuCircleCheck({ className: 'w-10 h-10 text-success' }) as React.ReactElement}
+            <h1 className="text-lg font-bold text-primary">{t('unregister.success')}</h1>
           </div>
         )}
 
         {state === 'alreadyCancelled' && (
           <div className="flex flex-col items-center gap-3">
-            {LuCircleCheck({ className: 'w-10 h-10 text-gray-400'}) as React.ReactElement}
-            <h1 className="text-lg font-semibold text-gray-900">
+            {LuCircleCheck({ className: 'w-10 h-10 text-primary/40'}) as React.ReactElement}
+            <h1 className="text-lg font-bold text-primary">
               {t('unregister.alreadyCancelled')}
             </h1>
           </div>
@@ -103,8 +103,8 @@ const UnregisterConfirm: React.FC = () => {
 
         {state === 'error' && (
           <div className="flex flex-col items-center gap-3">
-            {LuCircleX({ className: 'w-10 h-10 text-red-600' }) as React.ReactElement}
-            <h1 className="text-lg font-semibold text-gray-900">{t('unregister.invalidToken')}</h1>
+            {LuCircleX({ className: 'w-10 h-10 text-error' }) as React.ReactElement}
+            <h1 className="text-lg font-bold text-primary">{t('unregister.invalidToken')}</h1>
           </div>
         )}
       </div>

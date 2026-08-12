@@ -63,7 +63,7 @@ export default function AdminLogin() {
         </div>
 
         {/* ERROR */}
-        {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+        {error && <p className="text-error text-sm mt-2">{error}</p>}
 
         {/* ACTIONS */}
         <div className="flex items-center justify-end mt-4 pb-4">

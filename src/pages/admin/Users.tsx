@@ -81,7 +81,7 @@ export default function Users() {
         </div>
         <button
           onClick={() => history.push('/admin/users/new')}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-book cursor-pointer outline-none border-none"
         >
           <Icon icon={LuUserPlus} />
           <span>{t('users.addUser')}</span>
@@ -129,31 +129,31 @@ export default function Users() {
 <thead>
               <tr className="border-b border-primary/10 text-left">
                 <th
-                  className="pb-3 font-medium text-primary/70 cursor-pointer select-none"
+                  className="pb-3 font-book text-primary/70 cursor-pointer select-none"
                   onClick={() => handleSort('username')}
                 >
                   {t('users.columns.user')} <SortIcon field="username" />
                 </th>
                 <th
-                  className="pb-3 font-medium text-primary/70 cursor-pointer select-none"
+                  className="pb-3 font-book text-primary/70 cursor-pointer select-none"
                   onClick={() => handleSort('role')}
                 >
                   {t('users.columns.role')} <SortIcon field="role" />
                 </th>
-                <th className="pb-3 font-medium text-primary/70">{t('users.columns.lastLogin')}</th>
-                <th className="pb-3 font-medium text-primary/70">{t('users.columns.actions')}</th>
+                <th className="pb-3 font-book text-primary/70">{t('users.columns.lastLogin')}</th>
+                <th className="pb-3 font-book text-primary/70">{t('users.columns.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {sorted.map((user) => (
                 <tr key={user.objectId} className="border-b border-primary/5 transition-colors">
                   <td className="py-3">
-                    <p className="font-medium text-primary">{user.fullName || user.username}</p>
+                    <p className="font-book text-primary">{user.fullName || user.username}</p>
                     <p className="text-primary/70 text-xs">{user.email}</p>
                   </td>
                   <td className="py-3">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      className={`px-3 py-1 rounded-full text-xs font-book ${
                         user.role === 'Admin'
                           ? 'bg-secondary text-brand'
                           : 'bg-primary/10 text-primary'

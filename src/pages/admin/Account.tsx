@@ -71,7 +71,7 @@ export default function Account() {
                 type="button"
                 onClick={() => setTheme(mode)}
                 aria-pressed={active}
-                className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors cursor-pointer ${
+                className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-bold transition-colors cursor-pointer ${
                   active
                     ? 'bg-secondary border-secondary text-brand'
                     : 'bg-surface-2 border-primary/15 text-primary/80 hover:text-primary hover:border-primary/30'
@@ -98,7 +98,7 @@ export default function Account() {
                 type="button"
                 onClick={() => i18n.changeLanguage(code)}
                 aria-pressed={active}
-                className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition-colors cursor-pointer ${
+                className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-bold transition-colors cursor-pointer ${
                   active
                     ? 'bg-secondary border-secondary text-brand'
                     : 'bg-surface-2 border-primary/15 text-primary/80 hover:text-primary hover:border-primary/30'
@@ -118,7 +118,7 @@ export default function Account() {
           onClick={handleLogout}
           disabled={loggingOut}
           data-testid="logout-button"
-          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/20 text-primary text-sm font-semibold transition-colors cursor-pointer hover:bg-primary/5 disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/20 text-primary text-sm font-bold transition-colors cursor-pointer hover:bg-primary/5 disabled:opacity-50"
         >
           <Icon icon={LuLogOut} size={16} />
           <span>{loggingOut ? `${t('account.logout.pending')}...` : t('account.logout.idle')}</span>

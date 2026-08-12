@@ -266,7 +266,7 @@ export default function CheckIn() {
             <select
               value={selectedEventId}
               onChange={(e) => setSelectedEventId(e.target.value)}
-              className="border border-primary/20 rounded-lg px-3 py-2 pr-8 text-sm text-primary focus:outline-none focus:border-primary appearance-none bg-surface font-medium w-full sm:w-auto"
+              className="border border-primary/20 rounded-lg px-3 py-2 pr-8 text-sm text-primary focus:outline-none focus:border-primary appearance-none bg-surface font-book w-full sm:w-auto"
             >
               {events.map((ev) => (
                 <option key={ev.objectId} value={ev.objectId}>
@@ -281,7 +281,7 @@ export default function CheckIn() {
 
           <button
             type="button"
-            className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-medium cursor-pointer outline-none border-none"
+            className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-book cursor-pointer outline-none border-none"
           >
             <DownloadIcon width="14" height="14" />
             {t('checkIn.export')}
@@ -295,7 +295,7 @@ export default function CheckIn() {
         <div className="flex border border-primary/10 rounded-xl mb-6 p-1 bg-background/50">
           <button
             onClick={() => setActiveTab('qr')}
-            className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all
+            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all
               ${
                 activeTab === 'qr'
                   ? 'bg-secondary text-brand shadow-sm border border-primary/10'
@@ -306,7 +306,7 @@ export default function CheckIn() {
           </button>
           <button
             onClick={() => setActiveTab('manual')}
-            className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all
+            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all
               ${
                 activeTab === 'manual'
                   ? 'bg-secondary text-brand shadow-sm border border-primary/10'
@@ -330,7 +330,7 @@ export default function CheckIn() {
             <div className="flex justify-center">
               <button
                 onClick={toggleScanner}
-                className={`py-2.5 px-10 rounded-lg font-semibold text-sm transition-all cursor-pointer border-none
+                className={`py-2.5 px-10 rounded-lg font-bold text-sm transition-all cursor-pointer border-none
                   ${
                     isScanning
                       ? 'bg-error/10 text-error hover:bg-error/15'
@@ -344,8 +344,8 @@ export default function CheckIn() {
 
             <div
               className={`w-full relative bg-primary/5 rounded-xl overflow-hidden flex flex-col items-center justify-center border aspect-square transition-all duration-300
-              ${scanStatus === 'success' ? 'border-success shadow-[0_0_0_3px_rgba(46,125,50,0.15)]' : ''}
-              ${scanStatus === 'warning' || scanStatus === 'error' ? 'border-error shadow-[0_0_0_3px_rgba(211,47,47,0.15)]' : ''}
+              ${scanStatus === 'success' ? 'border-success shadow-[0_0_0_3px_rgb(var(--cb-success)/0.15)]' : ''}
+              ${scanStatus === 'warning' || scanStatus === 'error' ? 'border-error shadow-[0_0_0_3px_rgb(var(--cb-error)/0.15)]' : ''}
               ${scanStatus === 'idle' ? 'border-primary/15' : ''}
             `}
             >
@@ -366,7 +366,7 @@ export default function CheckIn() {
                     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                     <circle cx="12" cy="13" r="4" />
                   </svg>
-                  <p className="text-xs font-medium">{t('checkIn.scanner.start')}</p>
+                  <p className="text-xs font-book">{t('checkIn.scanner.start')}</p>
                 </div>
               )}
 
@@ -435,7 +435,7 @@ export default function CheckIn() {
                           ${scan.status === 'success' ? 'bg-success' : 'bg-error'}
                         `}
                         />
-                        <span className="text-sm font-medium text-primary truncate max-w-[200px]">
+                        <span className="text-sm font-book text-primary truncate max-w-[200px]">
                           {scan.name}
                         </span>
                       </div>
@@ -470,7 +470,7 @@ export default function CheckIn() {
             />
 
             <div className="flex flex-col border border-primary/10 rounded-xl overflow-hidden">
-              <div className="flex items-center justify-between gap-3 bg-background/50 px-4 py-3 border-b border-primary/10 text-xs font-semibold text-primary/60">
+              <div className="flex items-center justify-between gap-3 bg-background/50 px-4 py-3 border-b border-primary/10 text-xs font-bold text-primary/60">
                 <div className="flex-1">{t('checkIn.manual.attendee') ?? 'Attendee'}</div>
                 <div className="w-40 text-center">{t('checkIn.manual.status') ?? 'Status'}</div>
                 <div className="w-32 text-right">{t('checkIn.manual.action') ?? 'Action'}</div>
@@ -510,7 +510,7 @@ export default function CheckIn() {
                         className="flex items-center justify-between gap-3 px-4 py-3 bg-surface hover:bg-background/30 transition-colors"
                       >
                         <div className="flex-1 flex flex-col truncate pr-4">
-                          <span className="font-semibold text-sm text-primary truncate">
+                          <span className="font-bold text-sm text-primary truncate">
                             {name}
                           </span>
                           <span className="text-sm text-primary/60 truncate">{email}</span>
@@ -518,11 +518,11 @@ export default function CheckIn() {
 
                         <div className="w-40 flex justify-center">
                           {isCheckedIn ? (
-                            <span className="px-2.5 py-1 rounded-full bg-green-200 text-black text-xs font-bold whitespace-nowrap">
+                            <span className="px-2.5 py-1 rounded-full bg-cb-success/20 text-success text-xs font-bold whitespace-nowrap">
                               {t('checkIn.manual.checkedIn') ?? 'Checked-In'} ({timeStr})
                             </span>
                           ) : (
-                            <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary/70 text-xs font-medium whitespace-nowrap">
+                            <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary/70 text-xs font-book whitespace-nowrap">
                               {t('checkIn.manual.notPresent') ?? 'Not Present'}
                             </span>
                           )}
@@ -531,11 +531,11 @@ export default function CheckIn() {
                         <div className="w-32 flex justify-end">
                           <button
                             onClick={() => handleManualCheckInToggle(reg)}
-                            className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all border outline-none
+                            className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all border outline-none
                               ${
                                 isCheckedIn
                                   ? 'bg-transparent border-primary/20 text-primary hover:bg-background'
-                                  : 'bg-secondary border-secondary text-black hover:bg-secondary/75'
+                                  : 'bg-secondary border-secondary text-cb-petrol hover:bg-secondary/75'
                               }
                             `}
                           >

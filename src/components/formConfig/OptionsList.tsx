@@ -22,16 +22,16 @@ export default function OptionsList({
     const { t } = useTranslation();
 
     return (
-        <div className="mt-1 p-3 bg-[#0b1120] rounded-lg border border-slate-800">
+        <div className="mt-1 p-3 bg-background rounded-lg border border-primary/15">
             {/* Nagłówki kolumn */}
             <div className="flex gap-2 mb-1.5 items-center">
-                <div className="flex-1 text-xs text-slate-400 tracking-wider uppercase">
+                <div className="flex-1 text-xs text-primary/60 tracking-wider uppercase">
                     {t("formConfig.options")}
                 </div>
-                <div className="flex-1 text-xs text-slate-400 tracking-wider uppercase">
+                <div className="flex-1 text-xs text-primary/60 tracking-wider uppercase">
                     {t("formConfig.i18nPl")}
                 </div>
-                <div className="flex-1 text-xs text-slate-400 tracking-wider uppercase">
+                <div className="flex-1 text-xs text-primary/60 tracking-wider uppercase">
                     {t("formConfig.i18nEn")}
                 </div>
                 <div className="w-8" />
@@ -48,7 +48,7 @@ export default function OptionsList({
                             onChange(next);
                         }}
                         placeholder={`${t("formConfig.option")} ${i + 1}`}
-                        className="flex-1 bg-gray-900 border border-slate-700 rounded-[5px] px-2.5 py-[7px] text-slate-200 text-sm font-mono outline-none focus:border-slate-500"
+                        className="flex-1 bg-surface-2 border border-primary/15 rounded-[5px] px-2.5 py-[7px] text-primary text-sm font-mono outline-none focus:border-cb-coast"
                     />
                     <input
                         value={optionsTranslation[i]?.i18n?.pl ?? ""}
@@ -59,7 +59,7 @@ export default function OptionsList({
                             onChangeTranslation(next);
                         }}
                         placeholder={`PL ${i + 1}`}
-                        className="flex-1 bg-gray-900 border border-slate-700 rounded-[5px] px-2.5 py-[7px] text-slate-200 text-sm font-mono outline-none focus:border-slate-500"
+                        className="flex-1 bg-surface-2 border border-primary/15 rounded-[5px] px-2.5 py-[7px] text-primary text-sm font-mono outline-none focus:border-cb-coast"
                     />
                     <input
                         value={optionsTranslation[i]?.i18n?.en ?? ""}
@@ -70,11 +70,11 @@ export default function OptionsList({
                             onChangeTranslation(next);
                         }}
                         placeholder={`EN ${i + 1}`}
-                        className="flex-1 bg-gray-900 border border-slate-700 rounded-[5px] px-2.5 py-[7px] text-slate-200 text-sm font-mono outline-none focus:border-slate-500"
+                        className="flex-1 bg-surface-2 border border-primary/15 rounded-[5px] px-2.5 py-[7px] text-primary text-sm font-mono outline-none focus:border-cb-coast"
                     />
                     <button
                         onClick={() => onRemove(i)}
-                        className="bg-transparent border-none text-red-500 cursor-pointer p-1 hover:text-red-400 transition-colors"
+                        className="bg-transparent border-none text-error cursor-pointer p-1 hover:text-error/80 transition-colors"
                         title={t("formConfig.removeOption")}
                     >
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -87,7 +87,7 @@ export default function OptionsList({
             {/* Dodaj opcję */}
             <button
                 onClick={onAdd}
-                className="flex items-center mt-1 bg-transparent border border-dashed border-slate-700 rounded-[5px] text-slate-500 px-3 py-1.5 text-xs font-mono cursor-pointer hover:border-slate-500 hover:text-slate-400 transition-colors"
+                className="flex items-center mt-1 bg-transparent border border-dashed border-primary/15 rounded-[5px] text-primary/60 px-3 py-1.5 text-xs font-mono cursor-pointer hover:border-cb-coast hover:text-primary transition-colors"
             >
                 <span className="text-base mr-1.5">⊕</span>
                 {t("formConfig.addOption")}

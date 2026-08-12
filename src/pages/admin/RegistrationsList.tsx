@@ -359,31 +359,31 @@ export default function RegistrationsList() {
   const renderStatusBadge = (status: Registration['status']) => {
     if (status === 'approved') {
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-green-300 bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800 dark:border-green-700/60 dark:bg-green-900/50 dark:text-green-300">
-        <Icon icon={LuCircleCheck} size={13} />
+        <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold border-cb-success/40 bg-cb-success/15 text-success">
+          <Icon icon={LuCircleCheck} size={13} />
           {t('registrationsList.status.approved')}
       </span>
       );
     }
     if (status === 'rejected') {
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-red-300 bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:border-red-700/60 dark:bg-red-900/50 dark:text-red-300">
-        <Icon icon={LuCircleX} size={13} />
+        <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold border-cb-error/40 bg-cb-error/15 text-error">
+          <Icon icon={LuCircleX} size={13} />
           {t('registrationsList.status.rejected')}
       </span>
       );
     }
     if (status === 'cancelled') { // NOWE
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:border-slate-600/60 dark:bg-slate-800/50 dark:text-slate-400">
+        <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold border-cb-grad-4/40 bg-cb-grad-4/15 text-primary/60">
         <Icon icon={LuBan} size={13} />
           {t('registrationsList.status.cancelled')}
       </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:border-amber-700/60 dark:bg-amber-900/50 dark:text-amber-300">
-      <Icon icon={LuClock} size={13} />
+      <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold border-cb-warning/40 bg-cb-warning/15 text-warning">
+        <Icon icon={LuClock} size={13} />
         {t('registrationsList.status.pending')}
     </span>
     );
@@ -435,7 +435,7 @@ export default function RegistrationsList() {
               <button
                 onClick={exportCSV}
                 disabled={registrations.length === 0}
-                className="flex h-10 items-center gap-2 rounded-lg border border-primary/20 bg-surface px-3 text-sm font-semibold text-primary transition hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-10 items-center gap-2 rounded-lg border border-primary/20 bg-surface px-3 text-sm font-bold text-primary transition hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Icon icon={LuDownload} size={14} />
                 CSV
@@ -443,7 +443,7 @@ export default function RegistrationsList() {
               <button
                 onClick={exportExcel}
                 disabled={registrations.length === 0}
-                className="flex h-10 items-center gap-2 rounded-lg border border-primary/20 bg-surface px-3 text-sm font-semibold text-primary transition hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-10 items-center gap-2 rounded-lg border border-primary/20 bg-surface px-3 text-sm font-bold text-primary transition hover:bg-background cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Icon icon={LuDownload} size={14} />
                 Excel
@@ -497,7 +497,7 @@ export default function RegistrationsList() {
 
         {/* Error */}
         {error && (
-          <p className="rounded-lg bg-red-900/20 border border-red-500/20 px-4 py-2 text-sm text-red-500">{error}</p>
+          <p className="rounded-lg bg-cb-error/15 border border-cb-error/30 px-4 py-2 text-sm text-error">{error}</p>
         )}
 
         {/* Loading */}
@@ -527,44 +527,44 @@ export default function RegistrationsList() {
               <div className="w-full min-w-0 max-w-full overflow-x-auto rounded-xl border border-primary/10">
                 <table className="w-full min-w-max text-sm">
                   <thead>
-                    <tr className="border-b border-primary/10 bg-primary/[0.02] text-left text-xs font-semibold uppercase tracking-wide text-primary/70">
-                      <th className="w-10 px-3 sm:px-4 py-3">
-                        <input
-                          type="checkbox"
-                          className="bulk-checkbox disabled:cursor-not-allowed"
-                          checked={allOnPageSelected}
-                          onChange={toggleSelectAll}
-                          disabled={selectableOnPage.length === 0}
-                        />
-                      </th>
+                  <tr className="border-b border-primary/10 bg-primary/[0.02] text-left text-xs font-bold uppercase tracking-wide text-primary/70">
+                    <th className="w-10 px-3 sm:px-4 py-3">
+                      <input
+                        type="checkbox"
+                        className="bulk-checkbox disabled:cursor-not-allowed"
+                        checked={allOnPageSelected}
+                        onChange={toggleSelectAll}
+                        disabled={selectableOnPage.length === 0}
+                      />
+                    </th>
+                    <th
+                      className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
+                      onClick={() => handleSort('createdAt')}
+                    >
+                      {t('registrationsList.columns.date')}
+                      <SortIcon field="createdAt" sortField={sortField} sortDir={sortDir} />
+                    </th>
+                    {Object.keys(selectedEvent?.formConfig ?? {}).map((col) => (
                       <th
+                        key={col}
                         className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
-                        onClick={() => handleSort('createdAt')}
+                        onClick={() => handleSort(col)}
                       >
-                        {t('registrationsList.columns.date')}
-                        <SortIcon field="createdAt" sortField={sortField} sortDir={sortDir} />
+                        {formatColumnName(col)}
+                        <SortIcon field={col} sortField={sortField} sortDir={sortDir} />
                       </th>
-                      {Object.keys(selectedEvent?.formConfig ?? {}).map((col) => (
-                        <th
-                          key={col}
-                          className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
-                          onClick={() => handleSort(col)}
-                        >
-                          {formatColumnName(col)}
-                          <SortIcon field={col} sortField={sortField} sortDir={sortDir} />
-                        </th>
-                      ))}
-                      <th
-                        className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
-                        onClick={() => handleSort('status')}
-                      >
-                        {t('registrationsList.columns.status')}
-                        <SortIcon field="status" sortField={sortField} sortDir={sortDir} />
-                      </th>
-                      <th className="whitespace-nowrap px-3 sm:px-4 py-3 text-center">
-                        {t('registrationsList.columns.actions')}
-                      </th>
-                    </tr>
+                    ))}
+                    <th
+                      className="cursor-pointer whitespace-nowrap px-3 sm:px-4 py-3 hover:text-primary"
+                      onClick={() => handleSort('status')}
+                    >
+                      {t('registrationsList.columns.status')}
+                      <SortIcon field="status" sortField={sortField} sortDir={sortDir} />
+                    </th>
+                    <th className="whitespace-nowrap px-3 sm:px-4 py-3 text-center">
+                      {t('registrationsList.columns.actions')}
+                    </th>
+                  </tr>
                   </thead>
                   <tbody>
                     {paginated.map((reg, idx) => (
@@ -653,7 +653,7 @@ export default function RegistrationsList() {
                                   </button>
                                 )}
                                 <button
-                                  className="flex w-full items-center gap-2 px-3 py-2 bg-transparent text-xs text-red-500 hover:bg-red-900/10 cursor-pointer"
+                                  className="flex w-full items-center gap-2 px-3 py-2 bg-transparent text-xs text-error hover:bg-cb-error/10 cursor-pointer"
                                   onClick={() => setDeleteConfirmId(reg.objectId)}
                                 >
                                   <Icon icon={LuTrash2} size={13} />
@@ -694,7 +694,7 @@ export default function RegistrationsList() {
       {/* Details modal */}
       {selectedRegistration && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-cb-black/60 p-4"
           onClick={() => setSelectedRegistration(null)}
         >
           <div
@@ -702,7 +702,7 @@ export default function RegistrationsList() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-primary">
+              <h2 className="text-base font-bold text-primary">
                 {t('registrationsList.details.title')}
               </h2>
               <button
@@ -714,20 +714,20 @@ export default function RegistrationsList() {
             </div>
             <div className="space-y-2 text-sm text-primary/80 max-h-[70vh] overflow-y-auto">
               <div className="flex gap-2">
-                <span className="font-semibold text-primary/60">
+                <span className="font-bold text-primary/60">
                   {t('registrationsList.details.status')}:
                 </span>
                 {renderStatusBadge(selectedRegistration.status)}
               </div>
               <div className="flex gap-2">
-                <span className="font-semibold text-primary/60">
+                <span className="font-bold text-primary/60">
                   {t('registrationsList.details.date')}:
                 </span>
                 {formatDate(selectedRegistration.createdAt)}
               </div>
               {Object.entries(selectedRegistration.formData ?? {}).map(([key, value]) => (
                 <div key={key} className="flex gap-2 break-all">
-                  <span className="font-semibold text-primary/60">{formatColumnName(key)}:</span>
+                  <span className="font-bold text-primary/60">{formatColumnName(key)}:</span>
                   <span>{formatCellValue(String(value), t)}</span>
                 </div>
               ))}

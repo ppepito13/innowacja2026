@@ -200,7 +200,7 @@ export default function EventManagement({ mode }: Props) {
 
   if (error && !loaded) {
     return (
-      <p className="p-8 text-red-600">
+      <p className="p-8 text-error">
         {t('eventManagement.error')}: {error}
       </p>
     );
@@ -229,7 +229,7 @@ export default function EventManagement({ mode }: Props) {
         </button>
       </div>
 
-      {error && <p className="mb-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mb-2 text-sm text-error">{error}</p>}
 
       <div className="flex flex-col gap-2 mt-2">
         <InputTextfieldStateful
@@ -238,9 +238,9 @@ export default function EventManagement({ mode }: Props) {
           defaultValue={event?.title ?? ''}
           onChange={(v) => handleFieldChange('title', String(v))}
         />
-        {fieldErrors.title && <p className="text-xs text-red-600 mt-0 mb-0">{fieldErrors.title}</p>}
+        {fieldErrors.title && <p className="text-xs text-error mt-0 mb-0">{fieldErrors.title}</p>}
         <div className="flex flex-col gap-1 mt-1">
-          <label className="text-sm font-medium text-primary">{tt('fields.description')}</label>
+          <label className="text-sm font-book text-primary">{tt('fields.description')}</label>
           <RichTextEditor
             value={event?.description ?? ''}
             placeholder={tt('fields.descriptionPlaceholder')}
@@ -267,7 +267,7 @@ export default function EventManagement({ mode }: Props) {
               }
             />
             {fieldErrors.startDate && (
-              <p className="text-xs text-red-600 mt-1 mb-0">{fieldErrors.startDate}</p>
+              <p className="text-xs text-error mt-1 mb-0">{fieldErrors.startDate}</p>
             )}
           </div>
           {event?.dateType === 'multi' && (
@@ -280,7 +280,7 @@ export default function EventManagement({ mode }: Props) {
                 }
               />
               {fieldErrors.endDate && (
-                <p className="text-xs text-red-600 mt-1 mb-0">{fieldErrors.endDate}</p>
+                <p className="text-xs text-error mt-1 mb-0">{fieldErrors.endDate}</p>
               )}
             </div>
           )}
@@ -314,7 +314,7 @@ export default function EventManagement({ mode }: Props) {
         )}
         {showMapEmbed && event?.location && (
           <div className="flex flex-col gap-1 mb-6">
-            <label className="block text-xs font-medium text-primary/70">
+            <label className="block text-xs font-book text-primary/70">
               {tt('fields.locationPreview')}
             </label>
             <iframe
@@ -329,10 +329,10 @@ export default function EventManagement({ mode }: Props) {
             />
           </div>
         )}
-        <p className="text-sm font-semibold text-primary mt-3">{tt('sections.registration')}</p>
+        <p className="text-sm font-bold text-primary mt-3">{tt('sections.registration')}</p>
         <div className="flex items-start justify-between gap-4 rounded-lg border border-primary/10 p-4">
           <div className="flex flex-col">
-            <label htmlFor="requiresApproval" className="text-sm font-medium text-primary">
+            <label htmlFor="requiresApproval" className="text-sm font-book text-primary">
               {tt('fields.requiresApproval')}
             </label>
             <p className="text-xs text-primary/60 mt-1">{tt('fields.requiresApprovalHint')}</p>
@@ -343,9 +343,9 @@ export default function EventManagement({ mode }: Props) {
             onChange={(v) => handleFieldChange('requiresApproval', v)}
           />
         </div>
-        <p className="text-sm font-semibold text-primary mt-3">{tt('capacitySection')}</p>
+        <p className="text-sm font-bold text-primary mt-3">{tt('capacitySection')}</p>
         <div className="flex flex-col gap-1">
-          <label className="block text-xs font-medium text-primary/70">
+          <label className="block text-xs font-book text-primary/70">
             {tt('fields.capacity')}
           </label>
           <input
@@ -361,7 +361,7 @@ export default function EventManagement({ mode }: Props) {
           />
           <p className="text-xs text-primary/60 mt-0">{tt('fields.capacityHint')}</p>
         </div>
-        <p className="text-sm font-semibold text-primary mt-3">{tt('sections.colors')}</p>
+        <p className="text-sm font-bold text-primary mt-3">{tt('sections.colors')}</p>
         <div className="flex flex-col sm:flex-row gap-4">
           <ColorField
             label={tt('fields.primaryColor')}
@@ -384,9 +384,9 @@ export default function EventManagement({ mode }: Props) {
             style={{ backgroundColor: event?.accentColor ?? DEFAULT_ACCENT_COLOR }}
           />
         </div>
-        <p className="text-sm font-semibold text-primary mt-3">{tt('sections.heroImage')}</p>
+        <p className="text-sm font-bold text-primary mt-3">{tt('sections.heroImage')}</p>
         <div className="flex flex-col gap-1">
-          <label className="block text-xs font-medium text-primary/70">
+          <label className="block text-xs font-book text-primary/70">
             {tt('fields.heroImageUrl')}
           </label>
           <div className="flex gap-2">
@@ -438,20 +438,20 @@ export default function EventManagement({ mode }: Props) {
 
       <div className="flex flex-col items-end mt-6 pb-4 gap-2">
         {Object.values(fieldErrors).some(Boolean) && (
-          <p className="text-sm text-red-600 mt-0 mb-0">{tt('validation.fillRequired')}</p>
+          <p className="text-sm text-error mt-0 mb-0">{tt('validation.fillRequired')}</p>
         )}
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => history.goBack()}
-            className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
+            className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-bold hover:bg-background transition-colors"
           >
             {t('eventManagement.cancel')}
           </button>
           <button
             type="button"
             onClick={() => history.push(`/admin/events/${id}/formconfig`)}
-            className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
+            className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-bold hover:bg-background transition-colors"
           >
             {t('eventManagement.editFormConfig')}
           </button>
@@ -459,7 +459,7 @@ export default function EventManagement({ mode }: Props) {
             type="button"
             onClick={handleSubmit}
             disabled={saving || uploading}
-            className="flex items-center gap-2 px-8 py-3 rounded-full bg-secondary text-brand text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="flex items-center gap-2 px-8 py-3 rounded-full bg-secondary text-brand text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             <Icon icon={isEdit ? LuSave : LuPlus} size={16} />
             <span>{saving ? `${ttm('submit.pending')}...` : ttm('submit.idle')}</span>

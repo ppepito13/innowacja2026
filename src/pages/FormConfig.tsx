@@ -235,7 +235,7 @@ export default function FormConfig() {
 
           <button
             onClick={addField}
-            className="bg-transparent border-2 border-dashed border-primary/20 rounded-lg text-primary/70 px-5 py-4 text-sm font-semibold cursor-pointer flex items-center justify-center hover:border-primary/40 hover:bg-background transition-colors"
+            className="bg-transparent border-2 border-dashed border-primary/20 rounded-lg text-primary/70 px-5 py-4 text-sm font-bold cursor-pointer flex items-center justify-center hover:border-primary/40 hover:bg-background transition-colors"
           >
             <span className="text-xl mr-2">＋</span>
             {t('formConfig.addField')}
@@ -261,33 +261,33 @@ export default function FormConfig() {
       {/* Footer: validation error + save */}
       <div className="flex flex-col items-end mt-6 pb-4 gap-2">
         {Object.keys(errors).length > 0 && (
-          <p className="text-sm text-red-600 mt-0 mb-0">
+          <p className="text-sm text-error mt-0 mb-0">
             ⚠ {t('formConfig.errors.validationFailed')}
           </p>
         )}
         <button
           onClick={handleSave}
-          className="px-8 py-3 rounded-full bg-secondary text-brand text-sm font-semibold border-none cursor-pointer hover:opacity-90 transition-opacity"
+          className="px-8 py-3 rounded-full bg-secondary text-brand text-sm font-bold border-none cursor-pointer hover:opacity-90 transition-opacity"
         >
           {saved ? `✓ ${t('formConfig.saved')}` : t('formConfig.save')}
         </button>
       </div>
 
       {showLeaveModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-cb-black/40 px-4">
           <div className="bg-surface rounded-2xl p-6 max-w-sm w-full border border-primary/10">
-            <h2 className="text-lg font-semibold mb-2">{t('formConfig.unsavedTitle')}</h2>
+            <h2 className="text-lg font-bold mb-2">{t('formConfig.unsavedTitle')}</h2>
             <p className="text-sm text-primary/70 mb-6">{t('formConfig.unsavedDescription')}</p>
             <div className="flex flex-col gap-2">
               <button
                 onClick={handleSaveAndExit}
-                className="px-4 py-2 rounded-xl bg-secondary text-brand text-sm font-semibold hover:opacity-90 transition-opacity"
+                className="px-4 py-2 rounded-xl bg-secondary text-brand text-sm font-bold hover:opacity-90 transition-opacity"
               >
                 {t('formConfig.saveAndExit')}
               </button>
               <button
                 onClick={() => history.goBack()}
-                className="px-4 py-2 rounded-xl border border-primary text-primary text-sm font-semibold hover:bg-background transition-colors"
+                className="px-4 py-2 rounded-xl border border-primary text-primary text-sm font-bold hover:bg-background transition-colors"
               >
                 {t('formConfig.exitWithoutSaving')}
               </button>

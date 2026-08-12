@@ -59,7 +59,7 @@ export default function RegistrationEdit() {
 
   if (error) {
     return (
-      <p className="p-8 text-red-600">
+      <p className="p-8 text-error">
         {t('registrationEdit.error')}: {error}
       </p>
     );
