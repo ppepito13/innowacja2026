@@ -375,7 +375,7 @@ export default function RegistrationsList() {
     }
     if (status === 'cancelled') { // NOWE
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:border-slate-600/60 dark:bg-slate-800/50 dark:text-slate-400">
+        <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold border-cb-grad-4/40 bg-cb-grad-4/15 text-primary/60">
         <Icon icon={LuBan} size={13} />
           {t('registrationsList.status.cancelled')}
       </span>
@@ -653,7 +653,7 @@ export default function RegistrationsList() {
                                   </button>
                                 )}
                                 <button
-                                  className="flex w-full items-center gap-2 px-3 py-2 bg-transparent text-xs text-red-500 hover:bg-red-900/10 cursor-pointer"
+                                  className="flex w-full items-center gap-2 px-3 py-2 bg-transparent text-xs text-error hover:bg-cb-error/10 cursor-pointer"
                                   onClick={() => setDeleteConfirmId(reg.objectId)}
                                 >
                                   <Icon icon={LuTrash2} size={13} />

@@ -542,7 +542,7 @@ export default function EventDetails() {
               ) : (
                 <div className="flex flex-col items-center gap-3">
                   {qrError ? (
-                    <p className="text-error text-xl font-semibold mt-2 mb-0">
+                    <p className="text-error text-xl font-bold mt-2 mb-0">
                       {t('eventDetails.error')}
                     </p>
                   ) : (
@@ -571,7 +571,7 @@ export default function EventDetails() {
                   )}
 
                   {!event.requiresApproval && !qrLoading && qrError && (
-                    <span className="text-xs text-error font-medium pb-5 text-center">
+                    <span className="text-xs text-error font-book pb-5 text-center">
                         {t('eventDetails.qrError')}
                         <br className="mb-2" />
                         {t('eventDetails.qrErrorHint')}
@@ -582,7 +582,7 @@ export default function EventDetails() {
                     <div className="flex flex-col sm:flex-row gap-2 w-full mt-2">
                       <button
                         type="button"
-                        className="flex-1 box-border flex items-center justify-center gap-2 py-3 px-4 rounded-md bg-brand text-white font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                        className="flex-1 box-border flex items-center justify-center gap-2 py-3 px-4 rounded-md bg-brand text-cb-sand font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
                         onClick={async () => {
                           try {
                             await generateConfirmationPdf(event, t);

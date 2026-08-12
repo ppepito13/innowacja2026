@@ -79,7 +79,7 @@ export default function Home() {
                   href={`/events/${event.objectId}`}
                   className="group overflow-hidden rounded-3xl bg-surface shadow-lg transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
                 >
-                  <div className="relative h-48 overflow-hidden bg-primary/5">
+                  <div className="relative h-48 overflow-hidden bg-primary/5 font-book">
                     {event.heroImageUrl ? (
                       <img
                         src={event.heroImageUrl}
@@ -94,7 +94,7 @@ export default function Home() {
                     <div className="absolute bottom-0 left-0 h-1.5 w-full bg-gradient-to-r from-secondary via-cb-harvest to-secondary" />
                   </div>
 
-                  <div className="p-6">
+                  <div className="p-6 font-book">
                     <h3 className="mb-2 line-clamp-1 text-lg font-bold text-primary">
                       {event.title}
                     </h3>
