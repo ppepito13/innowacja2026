@@ -4,6 +4,21 @@ export interface EventOrganizer {
   objectId: string;
 }
 
+export type Locale = 'en' | 'pl';
+
+export interface LocalizedText {
+  en: string;
+  pl: string;
+}
+
+export type TranslatableEventField =
+  | 'title'
+  | 'description'
+  | 'location'
+  | 'dataProcessingAgreement';
+
+export type EventI18n = Partial<Record<TranslatableEventField, LocalizedText>>;
+
 export interface EventACL {
   read?: boolean;
   write?: boolean;
@@ -85,6 +100,7 @@ export interface Event {
   accentColor?: string;
   heroImageUrl?: string;
   dataProcessingAgreement?: string;
+  i18n?: EventI18n;
   isActive: boolean;
   formConfig: Record<string, unknown>; // JSON/Object
   organizer: EventOrganizer; // Pointer do _User
