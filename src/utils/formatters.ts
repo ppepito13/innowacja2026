@@ -1,5 +1,18 @@
-export const formatDate = (date: string) =>
-    new Intl.DateTimeFormat('pl-PL', { dateStyle: 'short', timeStyle: 'short' }).format(
+import i18next from 'i18next';
+import type { Locale } from '../types/types';
+import { toLocale } from './localizedEvent';
+
+const DATE_LOCALE_TAGS: Record<Locale, string> = {
+  en: 'en-GB',
+  pl: 'pl-PL',
+};
+
+const activeLanguage = () => (i18next as unknown as { language?: string }).language;
+
+export const dateLocaleTag = (language?: string): string => DATE_LOCALE_TAGS[toLocale(language ?? activeLanguage())];
+
+export const formatDate = (date: string, language?: string) =>
+    new Intl.DateTimeFormat(dateLocaleTag(language), { dateStyle: 'short', timeStyle: 'short' }).format(
         new Date(date),
     );
 

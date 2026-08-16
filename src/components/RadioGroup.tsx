@@ -18,7 +18,7 @@ export default function RadioGroup<T extends string>({
                                                      }: RadioGroupProps<T>) {
     return (
         <div className="flex flex-col gap-1">
-            <label className="block text-xs font-book text-primary/70">{label}</label>
+            <label className="block text-sm font-bold text-primary mt-3 mb-1">{label}</label>
             <div className="flex gap-5">
                 {options.map((option) => (
                     <label

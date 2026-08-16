@@ -1,4 +1,5 @@
 import { Event } from '../types/types';
+import { localizedEventField } from './localizedEvent';
 
 function pad(n: number) {
   return n.toString().padStart(2, '0');
@@ -16,7 +17,9 @@ function escapeIcs(text: string): string {
   });
 }
 
-export function downloadIcsFile(event: Event) {
+export function downloadIcsFile(event: Event, language?: string) {
+  const title = localizedEventField(event, 'title', language);
+  const location = localizedEventField(event, 'location', language);
   const startIso = event.startDate.iso ?? event.startDate.date?.toISOString() ?? '';
   const endIso = event.endDate?.iso ?? event.endDate?.date?.toISOString() ?? startIso;
 
@@ -32,8 +35,8 @@ export function downloadIcsFile(event: Event) {
     'BEGIN:VEVENT',
     `DTSTART:${start}`,
     `DTEND:${end}`,
-    `SUMMARY:${escapeIcs(event.title)}`,
-    event.location ? `LOCATION:${escapeIcs(event.location)}` : '',
+    `SUMMARY:${escapeIcs(title)}`,
+    location ? `LOCATION:${escapeIcs(location)}` : '',
     `URL:${window.location.href}`,
     'END:VEVENT',
     'END:VCALENDAR',
@@ -43,7 +46,7 @@ export function downloadIcsFile(event: Event) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${event.title.replace(/[^a-zA-Z0-9]/g, '_')}.ics`;
+  a.download = `${title.replace(/[^a-zA-Z0-9]/g, '_')}.ics`;
   document.body.appendChild(a);
   a.click();
   setTimeout(() => {

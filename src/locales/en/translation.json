@@ -5,7 +5,12 @@
     "boolean": {
       "true": "Yes",
       "false": "No"
-    }
+    },
+    "locale": {
+      "en": "English",
+      "pl": "Polish"
+    },
+    "localePrimary": "primary"
   },
   "layout": {
     "projectName": "Innovation Project",

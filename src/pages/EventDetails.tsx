@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { Event } from '../types/types';
 import { formatColumnName, formatDate } from '../utils/formatters';
+import { localizedEventField } from '../utils/localizedEvent';
 import { parseService, createPointer } from '../services/parseService';
 import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle, LuLink, LuTriangleAlert, LuDownload, LuCalendarPlus } from 'react-icons/lu';
 import DOMPurify from 'dompurify';
@@ -116,7 +117,7 @@ export default function EventDetails() {
           setQrToken(res.token);
           setTimeout(async () => {
             try {
-              await generateConfirmationPdf(event, t);
+              await generateConfirmationPdf(event, t, i18n.language);
             } catch (err) {
               console.error('PDF generation error:', err);
             }
@@ -149,7 +150,11 @@ export default function EventDetails() {
     setQrError(false);
     setQrLoading(false);
   };
-  useDocumentTitle(event ? `${event.title} - ${t('common.brand')}` : undefined);
+  useDocumentTitle(
+    event
+      ? `${localizedEventField(event, 'title', i18n.language)} - ${t('common.brand')}`
+      : undefined,
+  );
 
   if (!event) {
     return (
@@ -160,6 +165,11 @@ export default function EventDetails() {
   }
 
   const showMapEmbed = event.eventFormat === 'on-site' || event.eventFormat === 'hybrid';
+
+  const eventTitle = localizedEventField(event, 'title', i18n.language);
+  const eventDescription = localizedEventField(event, 'description', i18n.language);
+  const eventLocation = localizedEventField(event, 'location', i18n.language);
+  const termsUrl = localizedEventField(event, 'dataProcessingAgreement', i18n.language);
 
   const meetingUrl =
     event.meetingLink || (event.eventFormat === 'virtual' ? event.location : '');
@@ -201,7 +211,7 @@ export default function EventDetails() {
 
       <div className="w-full h-[35vh] sm:h-[50vh] relative z-0">
         {event.heroImageUrl && (
-          <img src={event.heroImageUrl} alt={event.title} className="w-full h-full object-cover" />
+          <img src={event.heroImageUrl} alt={eventTitle} className="w-full h-full object-cover" />
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background"></div>
       </div>
@@ -225,29 +235,35 @@ export default function EventDetails() {
           <section className="col-span-1 lg:col-span-7 bg-surface rounded-xl shadow-2xl overflow-hidden min-w-0">
             <div className="p-5 md:p-10">
               <h1 className="text-2xl md:text-4xl font-bold mb-4 text-primary tracking-tight">
-                {event.title}
+                {eventTitle}
               </h1>
 
               <div className="flex flex-wrap gap-6 text-sm text-primary/60 mb-8 pb-6 border-b border-primary/10">
                 <div className="flex items-center gap-2">
                   <Icon icon={LuCalendarDays} size={16} />
                   <span>
-                    {formatDate(event.startDate.iso ?? event.startDate.date?.toISOString() ?? '')}
+                    {formatDate(
+                      event.startDate.iso ?? event.startDate.date?.toISOString() ?? '',
+                      i18n.language,
+                    )}
                   </span>
                   {event.endDate && (
                     <>
                       <span>&ndash;</span>
                       <span>
-                        {formatDate(event.endDate.iso ?? event.endDate.date?.toISOString() ?? '')}
+                        {formatDate(
+                          event.endDate.iso ?? event.endDate.date?.toISOString() ?? '',
+                          i18n.language,
+                        )}
                       </span>
                     </>
                   )}
                 </div>
 
-                {event.eventFormat !== 'virtual' && event.location && (
+                {event.eventFormat !== 'virtual' && eventLocation && (
                   <div className="flex items-center gap-2">
                     <Icon icon={LuMapPin} size={16} />
-                    <span>{event.location}</span>
+                    <span>{eventLocation}</span>
                   </div>
                 )}
 
@@ -264,10 +280,10 @@ export default function EventDetails() {
                 )}
               </div>
 
-              {showMapEmbed && event.location && (
+              {showMapEmbed && eventLocation && (
                 <div className="mb-8">
                   <iframe
-                    src={`https://maps.google.com/maps?q=${encodeURIComponent(event.location)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(eventLocation)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                     title={`${t('eventDetails.locationPreview')}`}
                     width={MAP_IFRAME_WIDTH}
                     height={MAP_IFRAME_HEIGHT}
@@ -281,7 +297,7 @@ export default function EventDetails() {
 
               <div
                 className="rte-content max-w-none text-primary/70 leading-relaxed text-sm md:text-base break-words overflow-x-auto w-full"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.description || '') }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(eventDescription) }}
               />
             </div>
           </section>
@@ -508,11 +524,7 @@ export default function EventDetails() {
                           <p className="text-xs text-primary/70">
                             {t('eventDetails.readMoreIn')}{' '}
                             <a
-                              href={
-                                event.dataProcessingAgreement !== undefined
-                                  ? event.dataProcessingAgreement
-                                  : '#terms'
-                              }
+                              href={termsUrl || '#terms'}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="underline text-primary/80 hover:text-primary"
@@ -585,7 +597,7 @@ export default function EventDetails() {
                         className="flex-1 box-border flex items-center justify-center gap-2 py-3 px-4 rounded-md bg-brand text-cb-sand font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
                         onClick={async () => {
                           try {
-                            await generateConfirmationPdf(event, t);
+                            await generateConfirmationPdf(event, t, i18n.language);
                           } catch (err) {
                             console.error('PDF generation error:', err);
                           }
@@ -597,7 +609,7 @@ export default function EventDetails() {
                       <button
                         type="button"
                         className="flex-1 box-border flex items-center justify-center gap-2 py-3 px-4 rounded-md border border-primary/20 bg-surface text-primary font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                        onClick={() => downloadIcsFile(event)}
+                        onClick={() => downloadIcsFile(event, i18n.language)}
                       >
                         <Icon icon={LuCalendarPlus} size={16} />
                         {t('eventDetails.addToCalendar')}

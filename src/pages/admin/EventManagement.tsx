@@ -3,13 +3,20 @@ import { useParams, useHistory } from 'react-router';
 import { LuSave, LuPlus, LuArrowLeft, LuUpload } from 'react-icons/lu';
 import { InputDatepicker, InputTextfieldStateful } from '@lsg/components';
 import { parseService } from '../../services/parseService';
-import { Event, MongoDate } from '../../types/types';
+import { Event, Locale, MongoDate, TranslatableEventField } from '../../types/types';
 import { useTranslation } from 'react-i18next';
 import Icon from '../../components/Icon';
 import ColorField from '../../components/ColorField';
 import RadioGroup from '../../components/RadioGroup';
 import Toggle from '../../components/Toggle';
 import RichTextEditor from '../../components/RichTextEditor';
+import LocalizedField from '../../components/LocalizedField';
+import {
+  buildEventI18n,
+  emptyLocalizedText,
+  eventI18nFromEvent,
+  primaryValue,
+} from '../../utils/localizedEvent';
 import DOMPurify from 'dompurify';
 import parseClient from '../../services/parseClient';
 import {
@@ -40,6 +47,7 @@ const EMPTY_EVENT: Event = {
   isActive: false,
   organizer: { __type: 'Pointer', className: '_User', objectId: '' },
   formConfig: {},
+  i18n: eventI18nFromEvent({}),
 };
 
 function parseParseDate(value: any): MongoDate {
@@ -69,6 +77,28 @@ export default function EventManagement({ mode }: Props) {
     setFieldErrors((prev) => (prev[field] ? { ...prev, [field]: '' } : prev));
   };
 
+  const handleTranslationChange = (
+    field: TranslatableEventField,
+    locale: Locale,
+    value: string,
+  ) => {
+    setEvent((prev) =>
+      prev
+        ? {
+            ...prev,
+            i18n: {
+              ...prev.i18n,
+              [field]: { ...emptyLocalizedText(), ...prev.i18n?.[field], [locale]: value },
+            },
+          }
+        : null,
+    );
+    setFieldErrors((prev) => (prev[field] ? { ...prev, [field]: '' } : prev));
+  };
+
+  const translationOf = (field: TranslatableEventField, locale: Locale): string =>
+    event?.i18n?.[field]?.[locale] ?? '';
+
   useEffect(() => {
     if (!isEdit) return;
     parseService
@@ -94,6 +124,10 @@ export default function EventManagement({ mode }: Props) {
           heroImageUrl: rawEvent.heroImageUrl ?? '',
           startDate: parseParseDate(rawEvent.startDate),
           endDate: parseParseDate(rawEvent.endDate),
+          i18n: eventI18nFromEvent({
+            ...rawEvent,
+            location: legacyUrlInLocation ? '' : (rawEvent.location ?? ''),
+          }),
         });
         setLoaded(true);
       })
@@ -142,7 +176,7 @@ export default function EventManagement({ mode }: Props) {
   const validate = (): boolean => {
     if (!event) return false;
     const errors: Record<string, string> = {};
-    if (!event.title.trim()) errors.title = tt('validation.titleRequired');
+    if (!primaryValue(event.i18n?.title)) errors.title = tt('validation.titleRequired');
     if (!event.startDate?.date) errors.startDate = tt('validation.startDateRequired');
     if (event.dateType === 'multi' && !event.endDate?.date) {
       errors.endDate = tt('validation.endDateRequired');
@@ -156,9 +190,14 @@ export default function EventManagement({ mode }: Props) {
     setSaving(true);
     setError(null);
 
+    const translations = buildEventI18n(event.i18n, {
+      description: (html) => DOMPurify.sanitize(html),
+    });
+
     const payload: Event = {
-      title: event.title,
-      description: DOMPurify.sanitize(event.description),
+      title: primaryValue(translations.title),
+      description: primaryValue(translations.description),
+      i18n: translations,
       startDate: { __type: 'Date', iso: event.startDate.date?.toISOString() },
       ...(event.dateType === 'multi' && event.endDate?.date
         ? { endDate: { __type: 'Date', iso: event.endDate.date.toISOString() } }
@@ -167,7 +206,7 @@ export default function EventManagement({ mode }: Props) {
           : undefined),
       dateType: event.dateType,
       eventFormat: event.eventFormat,
-      location: event.location,
+      location: primaryValue(translations.location),
       meetingLink: event.meetingLink,
       requiresApproval: event.requiresApproval,
       primaryColor: event.primaryColor,
@@ -177,7 +216,7 @@ export default function EventManagement({ mode }: Props) {
       ...(event.capacity != null && event.capacity > 0
         ? { capacity: event.capacity }
         : isEdit ? { capacity: { __op: 'Delete' } as any } : undefined),
-      dataProcessingAgreement: event.dataProcessingAgreement,
+      dataProcessingAgreement: primaryValue(translations.dataProcessingAgreement),
       formConfig: event.formConfig,
       organizer: event.organizer,
     };
@@ -207,6 +246,8 @@ export default function EventManagement({ mode }: Props) {
   }
 
   const showMapEmbed = event?.eventFormat === 'on-site' || event?.eventFormat === 'hybrid';
+  const currentTitle = primaryValue(event?.i18n?.title);
+  const currentLocation = primaryValue(event?.i18n?.location);
 
   return (
     <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-2xl">
@@ -215,8 +256,8 @@ export default function EventManagement({ mode }: Props) {
           <h1 className="text-3xl mb-0">{ttm('title')}</h1>
           <p className="text-lg mt-0 text-primary/75">
             {isEdit
-              ? event?.title
-                ? t('eventManagement.edit.subtitle', { title: event.title })
+              ? currentTitle
+                ? t('eventManagement.edit.subtitle', { title: currentTitle })
                 : ''
               : ttm('subtitle')}
           </p>
@@ -232,22 +273,26 @@ export default function EventManagement({ mode }: Props) {
       {error && <p className="mb-2 text-sm text-error">{error}</p>}
 
       <div className="flex flex-col gap-2 mt-2">
-        <InputTextfieldStateful
-          label={tt('fields.title')}
-          placeholder={tt('fields.title')}
-          defaultValue={event?.title ?? ''}
-          onChange={(v) => handleFieldChange('title', String(v))}
-        />
-        {fieldErrors.title && <p className="text-xs text-error mt-0 mb-0">{fieldErrors.title}</p>}
-        <div className="flex flex-col gap-1 mt-1">
-          <label className="text-sm font-book text-primary">{tt('fields.description')}</label>
-          <RichTextEditor
-            value={event?.description ?? ''}
-            placeholder={tt('fields.descriptionPlaceholder')}
-            onChange={(html) => handleFieldChange('description', html)}
-            uploadImage={uploadImage}
-          />
-        </div>
+        <LocalizedField label={tt('fields.title')} error={fieldErrors.title}>
+          {(locale, ariaLabel) => (
+            <InputTextfieldStateful
+              placeholder={tt('fields.title')}
+              defaultValue={translationOf('title', locale)}
+              htmlAttrs={{ 'aria-label': ariaLabel }}
+              onChange={(v) => handleTranslationChange('title', locale, String(v))}
+            />
+          )}
+        </LocalizedField>
+        <LocalizedField label={tt('fields.description')}>
+          {(locale) => (
+            <RichTextEditor
+              value={translationOf('description', locale)}
+              placeholder={tt('fields.descriptionPlaceholder')}
+              onChange={(html) => handleTranslationChange('description', locale, html)}
+              uploadImage={uploadImage}
+            />
+          )}
+        </LocalizedField>
         <RadioGroup
           label={tt('fields.dateType')}
           value={event?.dateType ?? 'single'}
@@ -297,12 +342,16 @@ export default function EventManagement({ mode }: Props) {
         />
         {/* Physical address — on-site and hybrid only; always stored in `location`. */}
         {event?.eventFormat !== 'virtual' && (
-          <InputTextfieldStateful
-            label={tt('fields.locationOnSite')}
-            placeholder={tt('fields.locationOnSitePlaceholder')}
-            defaultValue={event?.location ?? ''}
-            onChange={(v) => handleFieldChange('location', String(v))}
-          />
+          <LocalizedField label={tt('fields.locationOnSite')}>
+            {(locale, ariaLabel) => (
+              <InputTextfieldStateful
+                placeholder={tt('fields.locationOnSitePlaceholder')}
+                defaultValue={translationOf('location', locale)}
+                htmlAttrs={{ 'aria-label': ariaLabel }}
+                onChange={(v) => handleTranslationChange('location', locale, String(v))}
+              />
+            )}
+          </LocalizedField>
         )}
         {event?.eventFormat !== 'on-site' && (
           <InputTextfieldStateful
@@ -312,13 +361,13 @@ export default function EventManagement({ mode }: Props) {
             onChange={(v) => handleFieldChange('meetingLink', String(v))}
           />
         )}
-        {showMapEmbed && event?.location && (
+        {showMapEmbed && currentLocation && (
           <div className="flex flex-col gap-1 mb-6">
             <label className="block text-xs font-book text-primary/70">
               {tt('fields.locationPreview')}
             </label>
             <iframe
-              src={`https://maps.google.com/maps?q=${encodeURIComponent(event.location)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(currentLocation)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
               title={tt('fields.locationPreview')}
               width={MAP_IFRAME_WIDTH}
               height={MAP_IFRAME_HEIGHT}
@@ -428,12 +477,18 @@ export default function EventManagement({ mode }: Props) {
             }}
           />
         )}
-        <InputTextfieldStateful
-          label={tt('fields.dataProcessingAgreement')}
-          placeholder="https://..."
-          defaultValue={event?.dataProcessingAgreement ?? ''}
-          onChange={(v) => handleFieldChange('dataProcessingAgreement', String(v))}
-        />
+        <LocalizedField label={tt('fields.dataProcessingAgreement')}>
+          {(locale, ariaLabel) => (
+            <InputTextfieldStateful
+              placeholder="https://..."
+              defaultValue={translationOf('dataProcessingAgreement', locale)}
+              htmlAttrs={{ 'aria-label': ariaLabel }}
+              onChange={(v) =>
+                handleTranslationChange('dataProcessingAgreement', locale, String(v))
+              }
+            />
+          )}
+        </LocalizedField>
       </div>
 
       <div className="flex flex-col items-end mt-6 pb-4 gap-2">
