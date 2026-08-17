@@ -1,4 +1,4 @@
-const crypto = require('node:crypto');
+import crypto from 'node:crypto';
 
 const QR_SECRET = process.env.QR_HMAC_SECRET;
 
