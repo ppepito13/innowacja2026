@@ -382,6 +382,10 @@
       "qrScanner": "QR Scanner",
       "manual": "Manual Check-in"
     },
+    "exportColumns": {
+      "checkedIn": "Checked in",
+      "checkInTime": "Check-in time"
+    },
     "scanner": {
       "title": "QR Code Scanner",
       "description": "Point the camera at an attendee's QR code to check them in.",
