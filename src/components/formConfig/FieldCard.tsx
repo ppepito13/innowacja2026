@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import type {FieldType, FormField, optionsTranslation} from "../../types/types";
+import type { FieldType, FormField } from "../../types/types";
 import { TYPES_WITH_OPTIONS } from "./constants";
 import TypeDropdown from "./TypeDropdown";
 import OptionsList from "./OptionsList";
@@ -14,6 +14,9 @@ interface FieldCardProps {
   setOpenDropdown: (id: string | null) => void;
   error?: string;
 }
+
+/** Pusty wiersz opcji. `id` zostanie nadane po wpisaniu wartości (OptionsList). */
+const emptyOptionRow = () => ({ id: "", i18n: { pl: "", en: "" }, limit: null });
 
 export default function FieldCard({
   field,
@@ -70,6 +73,12 @@ export default function FieldCard({
             }`}
           />
           {error && <div className="text-error text-xs mt-1">{error}</div>}
+          {/* Klucz pola — po zapisie niezmienny, bo wiążą się z nim rejestracje. */}
+          {field.key && (
+            <div className="text-[10px] text-primary/40 font-mono mt-1">
+              {t("formConfig.fieldKey")}: {field.key}
+            </div>
+          )}
         </div>
         <div>
           <label className="block text-xs font-book text-primary/70 mb-1.5">
@@ -94,12 +103,20 @@ export default function FieldCard({
             value={field.type}
             onChange={(type: FieldType) => {
               const patch: Partial<FormField> = { type };
-              if (TYPES_WITH_OPTIONS.includes(type) && field.options.length === 0) {
-                patch.options = [""];
-              }
-              if (!TYPES_WITH_OPTIONS.includes(type)) {
+
+              // Obie tablice zmieniamy razem — inaczej pierwsza opcja
+              // nowego dropdownu nie ma wpisu w optionsTranslation
+              // i nie da się jej przetłumaczyć.
+              if (TYPES_WITH_OPTIONS.includes(type)) {
+                if (field.options.length === 0) {
+                  patch.options = [""];
+                  patch.optionsTranslation = [emptyOptionRow()];
+                }
+              } else {
                 patch.options = [];
+                patch.optionsTranslation = [];
               }
+
               onUpdate(patch);
             }}
             isOpen={openDropdown === field.id}
@@ -145,11 +162,10 @@ export default function FieldCard({
         <OptionsList
           options={field.options}
           optionsTranslation={field.optionsTranslation}
-          onChange={(opts: string[]) => onUpdate({ options: opts })}
-          onChangeTranslation={(opts: optionsTranslation[]) => onUpdate({ optionsTranslation: opts })}
+          onChange={(patch) => onUpdate(patch)}
           onAdd={() => onUpdate({
             options: [...field.options, ""],
-            optionsTranslation: [...field.optionsTranslation, { id: '1', i18n: { pl: "", en: "" } }],
+            optionsTranslation: [...field.optionsTranslation, emptyOptionRow()],
           })}
           onRemove={(i: number) => onUpdate({
             options: field.options.filter((_, j) => j !== i),

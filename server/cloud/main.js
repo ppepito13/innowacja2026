@@ -221,3 +221,5 @@ Parse.Cloud.define('unregisterParticipant', async (request) => {
   await registration.save(null, { useMasterKey: true });
   return { success: true };
 });
+
+require('./optionLimits');

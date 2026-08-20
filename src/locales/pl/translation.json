@@ -83,6 +83,9 @@
     "title": "Rejestracje - {{title}}",
     "description": "Sprawdź i zarządzaj rejestracjami wydarzenia",
     "export": "Wyeksportuj",
+    "occupancyHint": "Liczone są zgłoszenia oczekujące i zatwierdzone.",
+    "overrideLabel": "Pomiń limit miejsc",
+    "overrideHint": "Pozwala zapisać uczestnika na zapełnione zadanie. Wymaga uprawnień organizatora.",
     "filters": {
       "search": "Szukaj",
       "from": "Od",
@@ -222,7 +225,10 @@
       "pending": "Zapisywanie"
     },
     "loading": "Ładowanie danych",
-    "error": "Błąd"
+    "errors": {
+      "error": "Błąd",
+      "optionFull": "Ta opcja nie ma już wolnych miejsc. Zaznacz „Pomiń limit miejsc”, jeśli chcesz mimo to zapisać."
+    }
   },
   "eventDetails": {
     "locationPreview": "Podgląd Lokalizacji",
@@ -260,10 +266,13 @@
     "confirmationUnregister": "Aby się wyrejestrować, skontaktuj się z organizatorem wydarzenia.",
     "dateLabel": "Data",
     "locationLabel": "Lokalizacja",
+    "optionFullShort": "brak miejsc",
+    "noSelection": "— nie wybrano —",
     "validation": {
       "required": "To pole jest wymagane.",
       "email": "Podaj poprawny adres e-mail.",
-      "phone": "Podaj poprawny numer telefonu."
+      "phone": "Podaj poprawny numer telefonu.",
+      "optionFull": "Ta opcja nie ma już wolnych miejsc. Wybierz inną."
     }
   },
   "formConfig": {
@@ -293,6 +302,10 @@
     "removeOption": "Usuń opcję",
     "i18nPl": "tlumaczenie pl",
     "i18nEn": "tlumaczenie en",
+    "fieldKey": "Klucz",
+    "optionKey": "Klucz",
+    "optionLimit": "Limit",
+    "optionLimitHint": "Maksymalna liczba zgłoszeń na tę opcję. Puste = bez limitu.",
     "fieldType": {
       "text": "Tekst",
       "email": "Email",
@@ -307,7 +320,9 @@
       "labelRequired": "Etykieta jest wymagana",
       "duplicateLabel": "Zduplikowana etykieta",
       "optionRequired": "Wymagana co najmniej jedna opcja",
-      "validationFailed": "Walidacja schematu nie powiodła się — popraw podświetlone pola przed zapisem."
+      "validationFailed": "Walidacja schematu nie powiodła się — popraw podświetlone pola przed zapisem.",
+      "duplicateKey": "Inne pole ma już taki sam klucz — zmień etykietę.",
+      "optionKeyMissing": "Opcja z limitem musi mieć zapisany klucz. Wpisz jej wartość i kliknij poza pole."
     },
     "register": "Zarejestruj",
     "validation": {

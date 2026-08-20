@@ -83,6 +83,9 @@
     "title": "Registrations - {{title}}",
     "description": "View and manage event registrations",
     "export": "Export",
+    "occupancyHint": "Pending and approved sign-ups are counted.",
+    "overrideLabel": "Ignore spot limit",
+    "overrideHint": "Allows assigning a participant to a full task. Requires organizer permissions.",
     "filters": {
       "search": "Search",
       "from": "From",
@@ -222,7 +225,11 @@
       "pending": "Saving"
     },
     "loading": "Loading data",
-    "error": "Error"
+    "errors": {
+      "error": "Error",
+      "optionFull": "This option is full. Tick \"Ignore spot limit\" if you want to save anyway."
+    }
+
   },
   "eventDetails": {
     "locationPreview": "Location Preview",
@@ -260,10 +267,13 @@
     "confirmationUnregister": "To unregister, please contact the event organizer.",
     "dateLabel": "Date",
     "locationLabel": "Location",
+    "optionFullShort": "no spots left",
+    "noSelection": "— none —",
     "validation": {
       "required": "This field is required.",
       "email": "Please enter a valid email address.",
-      "phone": "Please enter a valid phone number."
+      "phone": "Please enter a valid phone number.",
+      "optionFull": "This option is full. Please choose another one."
     }
   },
   "formConfig": {
@@ -303,11 +313,17 @@
       "multiselect": "Multiple Choice (Checkbox)",
       "dropdown": "Dropdown (Single Choice)"
     },
+    "fieldKey": "Key",
+    "optionKey": "Key",
+    "optionLimit": "Limit",
+    "optionLimitHint": "Maximum number of sign-ups for this option. Empty = unlimited.",
     "errors": {
       "labelRequired": "Label is required",
       "duplicateLabel": "Duplicate label",
       "optionRequired": "At least one option is required",
-      "validationFailed": "Schema validation failed — fix highlighted fields before saving."
+      "validationFailed": "Schema validation failed — fix highlighted fields before saving.",
+      "duplicateKey": "Another field already uses this key — change the label.",
+      "optionKeyMissing": "An option with a limit needs a saved key. Type its value and click outside the field."
     },
     "register": "Register",
     "validation": {
