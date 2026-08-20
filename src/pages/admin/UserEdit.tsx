@@ -10,6 +10,7 @@ import Icon from '../../components/Icon';
 import { Event, User } from '../../types/types';
 import { EVENT_CLASS } from '../../constants/eventDefaults';
 import { useAuth } from '../../auth/AuthProvider';
+import { validateUserFields, UserFieldErrors } from '../../utils/userValidation';
 
 interface Params {
   id: string;
@@ -46,9 +47,11 @@ export default function UserEdit() {
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [assignedIds, setAssignedIds] = useState<Set<string>>(new Set());
+  const [fieldErrors, setFieldErrors] = useState<UserFieldErrors>({});
 
   const handleChange = <K extends keyof User>(field: K, value: User[K]) => {
     setUser((prev) => ({ ...prev, [field]: value }));
+    setFieldErrors((prev) => (prev[field as keyof UserFieldErrors] ? { ...prev, [field]: '' } : prev));
   };
 
   useEffect(() => {
@@ -82,12 +85,16 @@ export default function UserEdit() {
   };
 
   const handleSubmit = () => {
+    const errors = validateUserFields(user, t);
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
     setSaving(true);
     setError(null);
 
     const payload: UserEditPayload = {
-      fullName: user.fullName ?? '',
-      email: user.email,
+      fullName: (user.fullName ?? '').trim(),
+      email: user.email.trim(),
       isLocked: user.isLocked ?? false,
       role: user.role,
     };
@@ -135,6 +142,9 @@ export default function UserEdit() {
           defaultValue={user.fullName ?? ''}
           onChange={(value) => handleChange('fullName', String(value))}
         />
+        {fieldErrors.fullName && (
+          <p className="text-error text-xs mt-1">{fieldErrors.fullName}</p>
+        )}
 
         <div>
           <InputTextfieldStateful
@@ -144,6 +154,9 @@ export default function UserEdit() {
             onChange={(value) => handleChange('email', String(value))}
           />
           <p className="text-xs text-primary/70 mt-1">{t('users.edit.emailHint')}</p>
+          {fieldErrors.email && (
+            <p className="text-error text-xs mt-1">{fieldErrors.email}</p>
+          )}
         </div>
 
         <div>
