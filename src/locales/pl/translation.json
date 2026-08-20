@@ -339,6 +339,11 @@
     },
     "noUsers": "Nie znaleziono użytkowników.",
     "deleteConfirm": "Na pewno usunąć użytkownika?",
+    "validation": {
+      "fullNameRequired": "Imię i nazwisko jest wymagane.",
+      "emailRequired": "Adres e-mail jest wymagany.",
+      "emailInvalid": "Podaj poprawny adres e-mail, np. john.doe@example.com."
+    },
     "new": {
       "title": "Dodaj nowego użytkownika",
       "description": "Wprowadź dane, aby utworzyć nowe konto.",
