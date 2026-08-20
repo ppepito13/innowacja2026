@@ -150,6 +150,7 @@
     "deleteEvent": "Usuń wydarzenie"
   },
   "eventManagement": {
+    "formConfigRequiresSave": "Zapisz wydarzenie, aby skonfigurować formularz rejestracyjny.",
     "new": {
       "title": "Nowe wydarzenie",
       "subtitle": "Wypełnij szczegóły, aby utworzyć nowe wydarzenie",
@@ -307,7 +308,8 @@
       "labelRequired": "Etykieta jest wymagana",
       "duplicateLabel": "Zduplikowana etykieta",
       "optionRequired": "Wymagana co najmniej jedna opcja",
-      "validationFailed": "Walidacja schematu nie powiodła się — popraw podświetlone pola przed zapisem."
+      "validationFailed": "Walidacja schematu nie powiodła się — popraw podświetlone pola przed zapisem.",
+      "saveEventFirst": "Najpierw zapisz wydarzenie — pola formularza rejestracyjnego można dodać dopiero potem."
     },
     "register": "Zarejestruj",
     "validation": {

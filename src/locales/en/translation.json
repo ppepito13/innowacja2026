@@ -150,6 +150,7 @@
     "deleteEvent": "Delete event"
   },
   "eventManagement": {
+    "formConfigRequiresSave": "Save the event to configure its registration form.",
     "new": {
       "title": "New Event",
       "subtitle": "Fill in the details to create a new event",
@@ -307,7 +308,8 @@
       "labelRequired": "Label is required",
       "duplicateLabel": "Duplicate label",
       "optionRequired": "At least one option is required",
-      "validationFailed": "Schema validation failed — fix highlighted fields before saving."
+      "validationFailed": "Schema validation failed — fix highlighted fields before saving.",
+      "saveEventFirst": "Save the event first — registration form fields can be added afterwards."
     },
     "register": "Register",
     "validation": {

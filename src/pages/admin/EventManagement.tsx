@@ -50,6 +50,15 @@ const EMPTY_EVENT: Event = {
   i18n: eventI18nFromEvent({}),
 };
 
+/**
+ * Trasa /admin/events/new nie ma parametru :id, więc useParams zwraca
+ * undefined. Bez tej kontroli przycisk konfiguracji formularza prowadził
+ * na /admin/events/undefined/formconfig, a kreator odpytywał
+ * TestEvent/undefined i kończył błędem 404.
+ */
+const hasValidEventId = (id?: string): boolean =>
+  Boolean(id) && id !== 'new' && id !== 'undefined';
+
 function parseParseDate(value: any): MongoDate {
   if (!value) return {};
   if (value.iso) return { date: new Date(value.iso) };
@@ -71,6 +80,10 @@ export default function EventManagement({ mode }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Formularz rejestracyjny da się konfigurować dopiero, gdy wydarzenie
+  // istnieje w bazie — `formConfig` jest jego kolumną.
+  const canEditFormConfig = isEdit && hasValidEventId(id);
 
   const handleFieldChange = <K extends keyof Event>(field: K, value: Event[K] | undefined) => {
     setEvent((prev) => (prev ? { ...prev, [field]: value } : null));
@@ -225,6 +238,8 @@ export default function EventManagement({ mode }: Props) {
       ? parseService.update<Event>(EVENT_CLASS, id, payload).then(() => history.goBack())
       : parseService
           .create<Event>(EVENT_CLASS, payload)
+          // Po utworzeniu przechodzimy w tryb edycji — dopiero tam istnieje
+          // objectId, a więc i dostęp do kreatora formularza.
           .then(({ objectId }) => history.push(`/admin/events/${objectId}/edit`));
 
     request.catch((e: any) => setError(e.message)).finally(() => setSaving(false));
@@ -495,6 +510,13 @@ export default function EventManagement({ mode }: Props) {
         {Object.values(fieldErrors).some(Boolean) && (
           <p className="text-sm text-error mt-0 mb-0">{tt('validation.fillRequired')}</p>
         )}
+
+        {/* Wyjaśnienie, dlaczego kreator formularza jest niedostępny —
+            sam wyszarzony przycisk nie mówi użytkownikowi nic. */}
+        {!canEditFormConfig && (
+          <p className="text-xs text-primary/60 mt-0 mb-0">{tt('formConfigRequiresSave')}</p>
+        )}
+
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -505,8 +527,10 @@ export default function EventManagement({ mode }: Props) {
           </button>
           <button
             type="button"
+            disabled={!canEditFormConfig}
+            title={!canEditFormConfig ? tt('formConfigRequiresSave') : undefined}
             onClick={() => history.push(`/admin/events/${id}/formconfig`)}
-            className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-bold hover:bg-background transition-colors"
+            className="px-8 py-3 rounded-full border border-primary text-primary text-sm font-bold hover:bg-background transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
           >
             {t('eventManagement.editFormConfig')}
           </button>

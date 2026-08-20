@@ -5,20 +5,25 @@ import type {
   FormConfig as FormConfigType,
   FormConfigEntry,
   Event,
-  MongoDate,
 } from '../types/types';
 import { FieldCard, TYPES_WITH_OPTIONS } from '../components/formConfig';
 import { useParams, useHistory } from 'react-router';
 import { LuArrowLeft } from 'react-icons/lu';
 import Icon from '../components/Icon';
 import { parseService } from '../services/parseService';
-import {
-  DEFAULT_ACCENT_COLOR,
-  DEFAULT_PRIMARY_COLOR,
-  EVENT_CLASS,
-} from '../constants/eventDefaults';
+import { EVENT_CLASS } from '../constants/eventDefaults';
+
 type EventEditParams = { id: string };
 const uid = (): string => Math.random().toString(36).slice(2, 9);
+
+/**
+ * `formConfig` jest kolumną na rekordzie TestEvent, więc bez zapisanego
+ * wydarzenia nie ma go gdzie zapisać. Trasa /admin/events/new nie ma
+ * parametru :id, przez co useParams zwraca undefined — stąd wcześniejsze
+ * zapytania o TestEvent/undefined kończące się błędem 404.
+ */
+const hasValidEventId = (id?: string): boolean =>
+  Boolean(id) && id !== 'new' && id !== 'undefined';
 
 const defaultField = (): FormField => ({
   id: uid(),
@@ -46,20 +51,8 @@ export default function FormConfig() {
   const [event, setEvent] = useState<Event | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    parseService
-      .getById<Event>(EVENT_CLASS, id)
-      .then((rawEvent) => {
-        setEvent(rawEvent);
-        if (rawEvent.formConfig) {
-          setFields(configToFields(rawEvent.formConfig));
-        }
-      })
-      .catch((e: any) => setError(e.message));
-  }, []);
-
   // Konwertuje formConfig z bazy → tablicę FormField[] do edycji
-  const configToFields = (config: Record<string, unknown>): FormField[] => {
+  const configToFields = useCallback((config: Record<string, unknown>): FormField[] => {
     const entries = Object.entries(config);
     if (entries.length === 0) return [defaultField()];
 
@@ -79,21 +72,38 @@ export default function FormConfig() {
         optionsTranslation: entry.optionsTranslation ?? [],
       };
     });
-  };
+  }, []);
 
-  const updateField = useCallback((id: string, patch: Partial<FormField>) => {
-    setFields((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
+  useEffect(() => {
+    if (!hasValidEventId(id)) {
+      setError(t('formConfig.errors.saveEventFirst'));
+      return;
+    }
+
+    parseService
+      .getById<Event>(EVENT_CLASS, id)
+      .then((rawEvent) => {
+        setEvent(rawEvent);
+        if (rawEvent.formConfig) {
+          setFields(configToFields(rawEvent.formConfig));
+        }
+      })
+      .catch((e: any) => setError(e.message));
+  }, [id, configToFields, t]);
+
+  const updateField = useCallback((fieldId: string, patch: Partial<FormField>) => {
+    setFields((prev) => prev.map((f) => (f.id === fieldId ? { ...f, ...patch } : f)));
     setErrors((prev) => {
       const next = { ...prev };
-      delete next[id];
+      delete next[fieldId];
       return next;
     });
     setSaved(false);
     setHasChanged(true);
   }, []);
 
-  const removeField = useCallback((id: string) => {
-    setFields((prev) => prev.filter((f) => f.id !== id));
+  const removeField = useCallback((fieldId: string) => {
+    setFields((prev) => prev.filter((f) => f.id !== fieldId));
     setSaved(false);
     setHasChanged(true);
   }, []);
@@ -106,6 +116,7 @@ export default function FormConfig() {
 
   const buildFormConfig = useCallback((): FormConfigType => {
     const config: FormConfigType = {};
+
     for (const f of fields) {
       const key = f.label
         .trim()
@@ -113,29 +124,35 @@ export default function FormConfig() {
         .replace(/[^a-zA-Z0-9_]/g, '')
         .toLowerCase();
       if (!key) continue;
+
       const i18nInstance = {
         en: f.i18n.en,
         pl: f.i18n.pl,
       };
+
       const entry: FormConfigEntry = {
         type: f.type,
         required: f.required,
         i18n: i18nInstance,
         optionsTranslation: f.optionsTranslation,
       };
+
       if (f.placeholder) entry.placeholder = f.placeholder;
       if (f.label) entry.label = f.label.trim();
       if (TYPES_WITH_OPTIONS.includes(f.type)) {
         entry.options = f.options.filter((o) => o.trim() !== '');
       }
+
       config[key] = entry;
     }
+
     return config;
   }, [fields]);
 
   const validate = useCallback((): boolean => {
     const errs: Record<string, string> = {};
     const seen = new Set<string>();
+
     for (const f of fields) {
       if (!f.label.trim()) {
         errs[f.id] = t('formConfig.errors.labelRequired');
@@ -146,6 +163,7 @@ export default function FormConfig() {
         }
         seen.add(key);
       }
+
       if (TYPES_WITH_OPTIONS.includes(f.type)) {
         const validOpts = f.options.filter((o) => o.trim() !== '');
         if (validOpts.length < 1) {
@@ -153,34 +171,38 @@ export default function FormConfig() {
         }
       }
     }
+
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }, [fields, t]);
 
-  const handleSave = (): void => {
+  const persist = (onDone: () => void): void => {
+    // Bez tego przycisk zapisu klika się i cicho nic nie robi.
+    if (!hasValidEventId(id)) {
+      setError(t('formConfig.errors.saveEventFirst'));
+      return;
+    }
+
     if (!validate()) return;
+
     const config = buildFormConfig();
+
     parseService
       .update<Event>(EVENT_CLASS, id, { formConfig: config })
       .then(() => {
-        setSaved(true);
         setHasChanged(false);
-        setTimeout(() => setSaved(false), 2500);
+        onDone();
       })
       .catch((e: any) => setError(e.message));
   };
 
-  const handleSaveAndExit = (): void => {
-    if (!validate()) return;
-    const config = buildFormConfig();
-    parseService
-      .update<Event>(EVENT_CLASS, id, { formConfig: config })
-      .then(() => {
-        setHasChanged(false);
-        history.goBack();
-      })
-      .catch((e: any) => setError(e.message));
-  };
+  const handleSave = (): void =>
+    persist(() => {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    });
+
+  const handleSaveAndExit = (): void => persist(() => history.goBack());
 
   const handleBackClick = (): void => {
     if (hasChanged) {
@@ -189,6 +211,29 @@ export default function FormConfig() {
       history.goBack();
     }
   };
+
+  // Wejście na kreator bez zapisanego wydarzenia (np. wpisany ręcznie URL
+  // albo zakładka) — zamiast surowego 404 pokazujemy, co trzeba zrobić.
+  if (!hasValidEventId(id)) {
+    return (
+      <div className="flex flex-col bg-surface px-4 sm:px-8 py-4 rounded-2xl w-full max-w-4xl">
+        <h1 className="text-3xl mb-0">{t('formConfig.title')}</h1>
+        <p className="text-lg mt-0 text-primary/75">{t('formConfig.subtitle')}</p>
+
+        <div className="mt-6 rounded-xl border border-primary/15 bg-surface-2 px-5 py-6">
+          <p className="text-sm text-primary mt-0">{t('formConfig.errors.saveEventFirst')}</p>
+
+          <button
+            onClick={() => history.goBack()}
+            className="mt-4 flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/20 bg-transparent text-sm text-primary cursor-pointer hover:bg-background transition-colors"
+          >
+            <Icon icon={LuArrowLeft} size={14} />
+            {t('formConfig.back')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const formConfig = buildFormConfig();
 
@@ -216,6 +261,8 @@ export default function FormConfig() {
           </button>
         </div>
       </div>
+
+      {error && <p className="text-sm text-error">{error}</p>}
 
       <div className="flex flex-col gap-6 mt-2 w-full">
         {/* Field cards */}
@@ -305,6 +352,4 @@ export default function FormConfig() {
   );
 }
 // TODO: Unifikacja tworzenia pól formularza na podstawie formConfig (string czy text, choice czy dropdown etc)
-// TODO: event.formConfig is null ? event.formConfig : buildFormConfig()
 // TODO: Poprawa tła, ale to drugorzędne
-// TODO: Przewijalny JSON formConfiga
