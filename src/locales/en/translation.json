@@ -200,6 +200,11 @@
       "accentColor": "Accent Color",
       "heroImageUrl": "Image URL",
       "heroImagePreview": "Hero image preview",
+      "heroImageHint": "Recommended size: 1920×800px, min. 1600px wide, JPG/PNG/WebP format, max 5MB",
+      "heroImageUploading": "Uploading image...",
+      "heroImageUploadSuccess": "Image uploaded successfully",
+      "heroImageUploadError": "Failed to upload image",
+      "heroImageAspectWarning": "The image aspect ratio differs significantly from the recommended one — it may be cropped on the event page",
       "dataProcessingAgreement": "Data Processing Agreement URL",
       "upload": "Upload",
       "uploading": "Uploading...",
@@ -211,7 +216,8 @@
       "fillRequired": "Please fill in all required fields",
       "titleRequired": "Event name is required",
       "startDateRequired": "Start date is required",
-      "endDateRequired": "End date is required"
+      "endDateRequired": "End date is required",
+      "heroImageTooLarge": "File is too large. Maximum size is 5MB"
     }
   },
   "registrationEdit": {
