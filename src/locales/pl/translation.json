@@ -208,10 +208,15 @@
       "capacityHint": "Zostaw puste, aby nie ograniczać liczby uczestników."
     },
     "validation": {
-      "fillRequired": "Uzupełnij wszystkie wymagane pola",
+      "summaryTitle": "Popraw poniższe błędy przed zapisaniem:",
       "titleRequired": "Nazwa wydarzenia jest wymagana",
       "startDateRequired": "Data początkowa jest wymagana",
-      "endDateRequired": "Data końcowa jest wymagana"
+      "startDateInPast": "Data początkowa nie może być z przeszłości",
+      "endDateRequired": "Data końcowa jest wymagana",
+      "endDateBeforeStart": "Data końcowa musi być późniejsza niż data początkowa",
+      "locationRequired": "Adres jest wymagany dla wydarzeń stacjonarnych i hybrydowych",
+      "meetingLinkRequired": "Link do spotkania jest wymagany dla wydarzeń wirtualnych i hybrydowych",
+      "capacityInvalid": "Limit miejsc być co najmniej 1"
     }
   },
   "registrationEdit": {
