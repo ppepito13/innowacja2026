@@ -344,6 +344,11 @@
     },
     "noUsers": "No users found.",
     "deleteConfirm": "Are you sure you want to delete this user?",
+    "validation": {
+      "fullNameRequired": "Full name is required.",
+      "emailRequired": "Email address is required.",
+      "emailInvalid": "Enter a valid email address, e.g. john.doe@example.com."
+    },
     "new": {
       "title": "Add New User",
       "description": "Enter the details to create a new account.",
