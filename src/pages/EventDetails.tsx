@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-import { Event } from '../types/types';
-import { formatColumnName, formatDate } from '../utils/formatters';
-import { localizedEventField } from '../utils/localizedEvent';
+import { Event, FormConfig, FormConfigEntry } from '../types/types';
+import { formatDate } from '../utils/formatters';
 import { parseService, createPointer } from '../services/parseService';
 import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle, LuLink, LuTriangleAlert, LuDownload, LuCalendarPlus } from 'react-icons/lu';
 import DOMPurify from 'dompurify';
@@ -17,6 +16,9 @@ import ThemeToggle from '../components/ThemeToggle';
 import { QRCodeSVG } from 'qrcode.react';
 import { generateConfirmationPdf } from '../utils/confirmationPdf';
 import { downloadIcsFile } from '../utils/calendarIcs';
+import { getFieldOptions, getOptionLabel, hasOptions } from '../utils/formOptions';
+import { useOptionAvailability, optionAvailability } from '../hooks/useOptionAvailability';
+import { toLocale } from '../utils/localizedEvent';
 
 const LANGUAGES = [
   { code: 'en', label: 'EN' },
@@ -37,8 +39,9 @@ export default function EventDetails() {
   const [qrLoading, setQrLoading] = useState(false);
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
-  let currentLabel = i18n.language;
-  console.log(currentLabel);
+
+  const { availability, refresh: refreshAvailability } = useOptionAvailability(eventId);
+
   useEffect(() => {
     if (!eventId) return;
     parseClient
@@ -108,6 +111,10 @@ export default function EventDetails() {
         setEvent(prev => prev ? { ...prev, registeredCount: (prev.registeredCount ?? 0) + 1 } : prev);
       }
 
+      // Licznik miejsc na zadania zszedł o jeden — odśwież, żeby kolejna
+      // rejestracja (przycisk „zarejestruj ponownie") widziała aktualny stan.
+      refreshAvailability();
+
       setQrLoading(true);
       parseService
         .runFunction<{ token: string }>('generateQrToken', {
@@ -117,7 +124,7 @@ export default function EventDetails() {
           setQrToken(res.token);
           setTimeout(async () => {
             try {
-              await generateConfirmationPdf(event, t, i18n.language);
+              await generateConfirmationPdf(event, t);
             } catch (err) {
               console.error('PDF generation error:', err);
             }
@@ -129,6 +136,24 @@ export default function EventDetails() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (e: any) {
       const serverMsg = e?.response?.data?.error || e?.message || 'Error';
+
+      // Limit na konkretną opcję — komunikat przy tym jednym polu,
+      // reszta wypełnionego formularza zostaje nietknięta.
+      try {
+        const parsed = JSON.parse(serverMsg);
+        if (parsed?.code === 'OPTION_FULL') {
+          setFormErrors((prev) => ({
+            ...prev,
+            [parsed.field]: t('eventDetails.validation.optionFull'),
+          }));
+          setFormData((prev) => ({ ...prev, [parsed.field]: '' }));
+          refreshAvailability();
+          return;
+        }
+      } catch {
+        // nie JSON — lecimy starą ścieżką
+      }
+
       if (serverMsg.includes('full')) {
         setError(t('eventDetails.capacityFullDescription'));
         setEvent(prev => prev ? { ...prev, registeredCount: prev.capacity ?? prev.registeredCount } : prev);
@@ -149,12 +174,10 @@ export default function EventDetails() {
     setQrToken(null);
     setQrError(false);
     setQrLoading(false);
+    refreshAvailability();
   };
-  useDocumentTitle(
-    event
-      ? `${localizedEventField(event, 'title', i18n.language)} - ${t('common.brand')}`
-      : undefined,
-  );
+
+  useDocumentTitle(event ? `${event.title} - ${t('common.brand')}` : undefined);
 
   if (!event) {
     return (
@@ -166,13 +189,10 @@ export default function EventDetails() {
 
   const showMapEmbed = event.eventFormat === 'on-site' || event.eventFormat === 'hybrid';
 
-  const eventTitle = localizedEventField(event, 'title', i18n.language);
-  const eventDescription = localizedEventField(event, 'description', i18n.language);
-  const eventLocation = localizedEventField(event, 'location', i18n.language);
-  const termsUrl = localizedEventField(event, 'dataProcessingAgreement', i18n.language);
-
   const meetingUrl =
     event.meetingLink || (event.eventFormat === 'virtual' ? event.location : '');
+
+  const locale = toLocale(i18n.language);
 
   return (
     <div className="min-h-screen bg-background text-primary font-sans relative pb-16 overflow-x-hidden">
@@ -191,11 +211,8 @@ export default function EventDetails() {
                 <button
                   key={code}
                   type="button"
-                  onClick={() => {
-                    i18n.changeLanguage(code);
-                    currentLabel = i18n.language;
-                  }}
-                  className={`cursor-pointer px-2 py-1 text-sm font-book transition-all duration-200 bg-transparent border-none tracking-wide ${
+                  onClick={() => i18n.changeLanguage(code)}
+                  className={`cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide ${
                     i18n.language === code ? 'text-primary' : 'text-primary/50 hover:text-primary/70'
                   }`}
                 >
@@ -211,7 +228,7 @@ export default function EventDetails() {
 
       <div className="w-full h-[35vh] sm:h-[50vh] relative z-0">
         {event.heroImageUrl && (
-          <img src={event.heroImageUrl} alt={eventTitle} className="w-full h-full object-cover" />
+          <img src={event.heroImageUrl} alt={event.title} className="w-full h-full object-cover" />
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background"></div>
       </div>
@@ -235,35 +252,29 @@ export default function EventDetails() {
           <section className="col-span-1 lg:col-span-7 bg-surface rounded-xl shadow-2xl overflow-hidden min-w-0">
             <div className="p-5 md:p-10">
               <h1 className="text-2xl md:text-4xl font-bold mb-4 text-primary tracking-tight">
-                {eventTitle}
+                {event.title}
               </h1>
 
               <div className="flex flex-wrap gap-6 text-sm text-primary/60 mb-8 pb-6 border-b border-primary/10">
                 <div className="flex items-center gap-2">
                   <Icon icon={LuCalendarDays} size={16} />
                   <span>
-                    {formatDate(
-                      event.startDate.iso ?? event.startDate.date?.toISOString() ?? '',
-                      i18n.language,
-                    )}
+                    {formatDate(event.startDate.iso ?? event.startDate.date?.toISOString() ?? '')}
                   </span>
                   {event.endDate && (
                     <>
                       <span>&ndash;</span>
                       <span>
-                        {formatDate(
-                          event.endDate.iso ?? event.endDate.date?.toISOString() ?? '',
-                          i18n.language,
-                        )}
+                        {formatDate(event.endDate.iso ?? event.endDate.date?.toISOString() ?? '')}
                       </span>
                     </>
                   )}
                 </div>
 
-                {event.eventFormat !== 'virtual' && eventLocation && (
+                {event.eventFormat !== 'virtual' && event.location && (
                   <div className="flex items-center gap-2">
                     <Icon icon={LuMapPin} size={16} />
-                    <span>{eventLocation}</span>
+                    <span>{event.location}</span>
                   </div>
                 )}
 
@@ -280,10 +291,10 @@ export default function EventDetails() {
                 )}
               </div>
 
-              {showMapEmbed && eventLocation && (
+              {showMapEmbed && event.location && (
                 <div className="mb-8">
                   <iframe
-                    src={`https://maps.google.com/maps?q=${encodeURIComponent(eventLocation)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(event.location)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                     title={`${t('eventDetails.locationPreview')}`}
                     width={MAP_IFRAME_WIDTH}
                     height={MAP_IFRAME_HEIGHT}
@@ -297,7 +308,7 @@ export default function EventDetails() {
 
               <div
                 className="rte-content max-w-none text-primary/70 leading-relaxed text-sm md:text-base break-words overflow-x-auto w-full"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(eventDescription) }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.description || '') }}
               />
             </div>
           </section>
@@ -328,7 +339,7 @@ export default function EventDetails() {
                       </p>
                       <div className="w-full bg-error/5 border border-error/20 rounded-lg px-4 py-3 mt-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-primary/70 font-book">{t('dashboard.col.capacity')}</span>
+                          <span className="text-primary/70 font-medium">{t('dashboard.col.capacity')}</span>
                           <span className="font-bold text-error">{registered} / {event.capacity}</span>
                         </div>
                         <div className="w-full bg-error/10 rounded-full h-2 mt-2">
@@ -349,22 +360,22 @@ export default function EventDetails() {
                     {hasCapacity && spotsLeft != null && (
                       <div className={`w-full box-border rounded-lg px-4 py-3 mb-6 border ${
                         spotsLeft <= 5
-                          ? 'bg-cb-warning/10 border-cb-warning/30'
-                          : 'bg-cb-success/10 border-cb-success/30'
+                          ? 'bg-amber-50 border-amber-300 dark:bg-amber-900/20 dark:border-amber-600/40'
+                          : 'bg-emerald-50 border-emerald-300 dark:bg-emerald-900/20 dark:border-emerald-600/40'
                       }`}>
                         <div className="flex items-center justify-between text-sm mb-2">
-                          <span className="text-primary/70 font-book">{t('dashboard.col.capacity')}</span>
-                          <span className={`font-bold ${spotsLeft <= 5 ? 'text-warning' : 'text-success'}`}>
+                          <span className="text-primary/70 font-medium">{t('dashboard.col.capacity')}</span>
+                          <span className={`font-bold ${spotsLeft <= 5 ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
                             {registered} / {event.capacity}
                           </span>
                         </div>
-                        <div className={`w-full rounded-full h-2 ${spotsLeft <= 5 ? 'bg-cb-warning/20' : 'bg-cb-success/20'}`}>
+                        <div className={`w-full rounded-full h-2 ${spotsLeft <= 5 ? 'bg-amber-200 dark:bg-amber-800/40' : 'bg-emerald-200 dark:bg-emerald-800/40'}`}>
                           <div
-                            className={`rounded-full h-2 transition-all ${spotsLeft <= 5 ? 'bg-cb-warning' : 'bg-cb-success'}`}
+                            className={`rounded-full h-2 transition-all ${spotsLeft <= 5 ? 'bg-amber-500' : 'bg-emerald-500'}`}
                             style={{ width: `${Math.min(100, (registered / event.capacity!) * 100)}%` }}
                           />
                         </div>
-                        <p className={`text-xs font-bold mt-2 mb-0 ${spotsLeft <= 5 ? 'text-warning' : 'text-success'}`}>
+                        <p className={`text-xs font-semibold mt-2 mb-0 ${spotsLeft <= 5 ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
                           {spotsLeft === 1
                             ? t('eventDetails.spotsLeftOne')
                             : t('eventDetails.spotsLeft', { count: spotsLeft })}
@@ -373,8 +384,8 @@ export default function EventDetails() {
                     )}
 
                   <form className="flex flex-col gap-6 w-full min-w-0">
-                    {Object.entries(event.formConfig ?? {}).map(([key, config]) => {
-                      const field = config as any;
+                    {Object.entries((event.formConfig ?? {}) as FormConfig).map(([key, config]) => {
+                      const field = config as FormConfigEntry;
                       const isRequired = field.required === true;
                       const value = formData[key] || '';
 
@@ -384,11 +395,11 @@ export default function EventDetails() {
                             htmlFor={key}
                             className="block text-xs font-bold text-primary mb-2 truncate"
                           >
-                            {currentLabel === 'pl' ? field.i18n['pl'] : field.i18n['en']}{' '}
-                            {isRequired && <span className="text-error">*</span>}
+                            {String(field.i18n?.[locale] ?? field.label ?? key)}{' '}
+                            {isRequired && <span className="text-red-500">*</span>}
                           </label>
 
-                          {(field.type === 'string' || field.type === 'text') && (
+                          {(field.type === 'text' || (field.type as string) === 'string') && (
                             <input
                               id={key}
                               type="text"
@@ -439,7 +450,7 @@ export default function EventDetails() {
                             />
                           )}
 
-                          {field.type === 'number' && (
+                          {(field.type as string) === 'number' && (
                             <input
                               id={key}
                               type="number"
@@ -456,7 +467,7 @@ export default function EventDetails() {
                             />
                           )}
 
-                          {(field.type === 'select' || field.type === 'dropdown') && (
+                          {hasOptions(field) && (
                             <div className="relative w-full box-border min-w-0">
                               <select
                                 id={key}
@@ -471,23 +482,34 @@ export default function EventDetails() {
                                 }}
                                 className="w-full box-border bg-surface-2 border border-transparent rounded-md pl-4 pr-10 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors appearance-none truncate"
                               >
-                                <option value="" disabled hidden>
-                                  {t('eventDetails.selectOption')}
-                                </option>
-                                {(field.options || field.values)?.map((val: string, index: number) => (
-                                  <option
-                                    key={value}
-                                    value={
-                                      i18n.language === 'pl'
-                                        ? field.optionsTranslation[index].i18n.pl
-                                        : field.optionsTranslation[index].i18n.en
-                                    }
-                                  >
-                                    {i18n.language === 'pl'
-                                      ? field.optionsTranslation[index].i18n.pl
-                                      : field.optionsTranslation[index].i18n.en}
-                                  </option>
-                                ))}
+                                {isRequired ? (
+                                    <option value="" disabled hidden>
+                                      {t('eventDetails.selectOption')}
+                                    </option>
+                                ) : (
+                                    <option value="">{t('eventDetails.noSelection')}</option>
+                                )}
+
+                                {getFieldOptions(field).map((option) => {
+                                  const stats = optionAvailability(availability, key, option.id);
+                                  const optionFull = stats !== undefined && stats.remaining === 0;
+                                  const isSelected = value === option.id;
+
+                                  return (
+                                    <option
+                                      key={option.id}
+                                      value={option.id}
+                                      // Zajętą opcję blokujemy, chyba że użytkownik ma ją
+                                      // już wybraną — inaczej select nie wyświetliłby
+                                      // bieżącej wartości.
+                                      disabled={optionFull && !isSelected}
+                                    >
+                                      {getOptionLabel(option, i18n.language)}
+                                      {stats && ` (${stats.remaining}/${stats.limit})`}
+                                      {optionFull && ` — ${t('eventDetails.optionFullShort')}`}
+                                    </option>
+                                  );
+                                })}
                               </select>
 
                               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-primary/60">
@@ -517,14 +539,18 @@ export default function EventDetails() {
                         <div>
                           <label
                             htmlFor="consent"
-                            className="text-sm font-book text-primary cursor-pointer block mb-1 break-words"
+                            className="text-sm font-medium text-primary cursor-pointer block mb-1 break-words"
                           >
-                            {t('eventDetails.dataConsent')} <span className="text-error">*</span>
+                            {t('eventDetails.dataConsent')} <span className="text-red-500">*</span>
                           </label>
                           <p className="text-xs text-primary/70">
                             {t('eventDetails.readMoreIn')}{' '}
                             <a
-                              href={termsUrl || '#terms'}
+                              href={
+                                event.dataProcessingAgreement !== undefined
+                                  ? event.dataProcessingAgreement
+                                  : '#terms'
+                              }
                               target="_blank"
                               rel="noopener noreferrer"
                               className="underline text-primary/80 hover:text-primary"
@@ -554,11 +580,11 @@ export default function EventDetails() {
               ) : (
                 <div className="flex flex-col items-center gap-3">
                   {qrError ? (
-                    <p className="text-error text-xl font-bold mt-2 mb-0">
+                    <p className="text-error text-xl font-semibold mt-2 mb-0">
                       {t('eventDetails.error')}
                     </p>
                   ) : (
-                    <p className="text-success text-xl font-bold mt-2 mb-0">
+                    <p className="text-success text-xl font-semibold mt-2 mb-0">
                       {t('eventDetails.success')}
                     </p>
                   )}
@@ -566,8 +592,9 @@ export default function EventDetails() {
                   <p className="text-sm text-primary/85 text-center mt-0">
                     {event.requiresApproval
                       ? t('eventDetails.waitForApproval')
-                      : !qrError ?? t('eventDetails.showCodeAtEntrance')
-                    }
+                      : !qrError
+                        ? t('eventDetails.showCodeAtEntrance')
+                        : ''}
                   </p>
 
                   {!event.requiresApproval && qrLoading && (
@@ -577,13 +604,13 @@ export default function EventDetails() {
                   )}
 
                   {!event.requiresApproval && !qrLoading && qrToken && (
-                    <div id="qr-confirmation" className="rounded-lg border border-primary/10 bg-cb-white p-3">
+                    <div id="qr-confirmation" className="rounded-lg border border-primary/10 bg-white p-3">
                       <QRCodeSVG value={qrToken} size={180} level="M" />
                     </div>
                   )}
 
                   {!event.requiresApproval && !qrLoading && qrError && (
-                    <span className="text-xs text-error font-book pb-5 text-center">
+                    <span className="text-xs text-error font-medium pb-5 text-center">
                         {t('eventDetails.qrError')}
                         <br className="mb-2" />
                         {t('eventDetails.qrErrorHint')}
@@ -594,10 +621,10 @@ export default function EventDetails() {
                     <div className="flex flex-col sm:flex-row gap-2 w-full mt-2">
                       <button
                         type="button"
-                        className="flex-1 box-border flex items-center justify-center gap-2 py-3 px-4 rounded-md bg-brand text-cb-sand font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                        className="flex-1 box-border flex items-center justify-center gap-2 py-3 px-4 rounded-md bg-brand text-white font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
                         onClick={async () => {
                           try {
-                            await generateConfirmationPdf(event, t, i18n.language);
+                            await generateConfirmationPdf(event, t);
                           } catch (err) {
                             console.error('PDF generation error:', err);
                           }
@@ -609,7 +636,7 @@ export default function EventDetails() {
                       <button
                         type="button"
                         className="flex-1 box-border flex items-center justify-center gap-2 py-3 px-4 rounded-md border border-primary/20 bg-surface text-primary font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                        onClick={() => downloadIcsFile(event, i18n.language)}
+                        onClick={() => downloadIcsFile(event)}
                       >
                         <Icon icon={LuCalendarPlus} size={16} />
                         {t('eventDetails.addToCalendar')}
