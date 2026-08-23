@@ -35,6 +35,11 @@ import {
   validateEvent,
 } from '../../utils/eventValidation';
 
+const HERO_IMAGE_MAX_SIZE_BYTES = 5 * 1024 * 1024;
+const HERO_IMAGE_TARGET_RATIO = 1920 / 800;
+const HERO_IMAGE_RATIO_TOLERANCE = 0.1;
+const HERO_IMAGE_MIN_WIDTH = 1600;
+
 type Props = { mode: 'new' | 'edit' };
 type EventEditParams = { id: string };
 
@@ -85,6 +90,9 @@ export default function EventManagement({ mode }: Props) {
   const [loaded, setLoaded] = useState(!isEdit);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<'success' | 'error' | null>(null);
+  const [uploadAspectWarning, setUploadAspectWarning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<EventFieldErrors>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -204,17 +212,87 @@ export default function EventManagement({ mode }: Props) {
     e.target.value = '';
   };
 
+  const getImageDimensions = (file: File): Promise<{ width: number; height: number }> =>
+    new Promise((resolve, reject) => {
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error('Invalid image'));
+      };
+      img.src = objectUrl;
+    });
+
   const handleFileUpload = async (file: File) => {
+    if (uploading) return;
+
+    if (file.size > HERO_IMAGE_MAX_SIZE_BYTES) {
+      setError(tt('validation.heroImageTooLarge'));
+      setUploadStatus('error');
+      setUploadAspectWarning(false);
+      return;
+    }
+
     setUploading(true);
+    setUploadProgress(0);
+    setUploadStatus(null);
+    setUploadAspectWarning(false);
+    setError(null);
+
+    let aspectDeviates = false;
+
     try {
-      const { data } = await parseClient.post(`/files/${encodeURIComponent(file.name)}`, file, {
-        headers: { 'Content-Type': file.type },
-      });
+      const { width, height } = await getImageDimensions(file);
+
+      if (width < HERO_IMAGE_MIN_WIDTH) {
+        setError(tt('validation.heroImageTooNarrow'));
+        setUploadStatus('error');
+        return;
+      }
+
+      if (width > 0 && height > 0) {
+        const ratio = width / height;
+        const deviation = Math.abs(ratio - HERO_IMAGE_TARGET_RATIO) / HERO_IMAGE_TARGET_RATIO;
+        aspectDeviates = deviation > HERO_IMAGE_RATIO_TOLERANCE;
+      }
+    } catch {
+      setError(tt('validation.heroImageInvalid'));
+      setUploadStatus('error');
+      return;
+    }
+
+    try {
+      const { data } = await parseClient.post(
+        `/files/${encodeURIComponent(file.name)}`,
+        file,
+        {
+          headers: { 'Content-Type': file.type },
+          onUploadProgress: (progressEvent: {
+            loaded: number;
+            total?: number;
+          }) => {
+            if (progressEvent.total) {
+              setUploadProgress(
+                Math.round((progressEvent.loaded * 100) / progressEvent.total),
+              );
+            }
+          },
+        },
+      );
+
       handleFieldChange('heroImageUrl', data.url);
+      setUploadStatus('success');
+      setUploadAspectWarning(aspectDeviates);
     } catch (e: any) {
       setError(requestErrorMessage(e));
+      setUploadStatus('error');
     } finally {
       setUploading(false);
+      setUploadProgress(null);
     }
   };
 
@@ -535,11 +613,37 @@ export default function EventManagement({ mode }: Props) {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               className="hidden"
               onChange={handleFileChange}
             />
           </div>
+          {uploading && (
+            <div className="flex flex-col gap-1 mt-1">
+              <div className="h-1.5 w-full rounded-full bg-primary/10 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-secondary transition-all"
+                  style={{ width: `${uploadProgress ?? 0}%` }}
+                />
+              </div>
+              <p className="text-xs text-primary/60 mt-0">
+                {tt('fields.heroImageUploading')} {uploadProgress ?? 0}%
+              </p>
+            </div>
+          )}
+          {!uploading && uploadStatus === 'success' && (
+            <p className="text-xs text-success mt-1 mb-0">{tt('fields.heroImageUploadSuccess')}</p>
+          )}
+          {!uploading && uploadStatus === 'success' && uploadAspectWarning && (
+            <p className="text-xs text-warning mt-1 mb-0">{tt('fields.heroImageAspectWarning')}</p>
+          )}
+          {!uploading && uploadStatus === 'error' && (
+            <p className="text-xs text-error mt-1 mb-0">
+              {tt('fields.heroImageUploadError')}
+              {error ? `: ${error}` : ''}
+            </p>
+          )}
+          <p className="text-xs text-primary/60 mt-0">{tt('fields.heroImageHint')}</p>
         </div>
         {event?.heroImageUrl && (
           <img

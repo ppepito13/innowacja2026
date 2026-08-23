@@ -203,6 +203,11 @@
       "accentColor": "Kolor akcentu",
       "heroImageUrl": "URL zdjęcia",
       "heroImagePreview": "Podgląd zdjęcia głównego",
+      "heroImageHint": "Zalecane wymiary: 1920×800px, min. szerokość 1600px, format JPG/PNG/WebP, maks. 5MB",
+      "heroImageUploading": "Przesyłanie grafiki...",
+      "heroImageUploadSuccess": "Grafika została pomyślnie przesłana",
+      "heroImageUploadError": "Nie udało się przesłać grafiki",
+      "heroImageAspectWarning": "Proporcje grafiki znacznie odbiegają od zalecanych — obraz może zostać przycięty na stronie wydarzenia",
       "dataProcessingAgreement": "URL polityki przetwarzania danych",
       "upload": "Wgraj",
       "uploading": "Wgrywanie...",
@@ -219,7 +224,8 @@
       "endDateBeforeStart": "Data końcowa musi być późniejsza niż data początkowa",
       "locationRequired": "Adres jest wymagany dla wydarzeń stacjonarnych i hybrydowych",
       "meetingLinkRequired": "Link do spotkania jest wymagany dla wydarzeń wirtualnych i hybrydowych",
-      "capacityInvalid": "Limit miejsc być co najmniej 1"
+      "capacityInvalid": "Limit miejsc musi wynosić co najmniej 1",
+      "heroImageTooLarge": "Plik jest za duży. Maksymalny rozmiar to 5MB"
     }
   },
   "registrationEdit": {
