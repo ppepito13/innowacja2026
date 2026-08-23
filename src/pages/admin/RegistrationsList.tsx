@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useHistory, useParams } from 'react-router';
 import {
   LuDownload,
@@ -15,8 +16,11 @@ import {
 } from 'react-icons/lu';
 import { useAuth } from '../../auth/AuthProvider';
 import { parseService, createPointer } from '../../services/parseService';
-import { Registration, Event } from '../../types/types';
+import { Registration, Event, FormConfig, FormConfigEntry } from '../../types/types';
 import { formatDate, formatColumnName, formatCellValue } from '../../utils/formatters';
+import { resolveOptionValue, hasOptions } from '../../utils/formOptions';
+import { useOptionAvailability } from '../../hooks/useOptionAvailability';
+import OptionOccupancy from '../../components/OptionOccupancy';
 import { useTranslation } from 'react-i18next';
 import parseClient from '../../services/parseClient';
 import Icon from '../../components/Icon';
@@ -24,6 +28,12 @@ import Pagination from '../../components/Pagination';
 import '../../components/BulkActionBar.css';
 
 const EVENT_CLASS = 'TestEvent';
+
+const ActionMenuWidth = 176; // odpowiednik klasy w-44
+const ActionMenuHeight = 120; // przyblizona wysokosc menu (3 pozycje)
+const ActionMenuGap = 4;
+
+type ActionMenuPosition = { top: number; left: number };
 
 type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected' | 'cancelled';
 type SortField = string;
@@ -47,7 +57,7 @@ function SortIcon({
 }
 
 export default function RegistrationsList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const history = useHistory();
   const { eventId: eventIdParam } = useParams<{ eventId?: string }>();
@@ -75,6 +85,7 @@ export default function RegistrationsList() {
   const [sortField, setSortField] = useState<SortField>('createdAt');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [openedActionId, setOpenedActionId] = useState<string | null>(null);
+  const [actionMenuPosition, setActionMenuPosition] = useState<ActionMenuPosition | null>(null);
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -85,16 +96,51 @@ export default function RegistrationsList() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  const closeActionMenu = useCallback(() => {
+    setOpenedActionId(null);
+    setActionMenuPosition(null);
+  }, []);
+
   useEffect(() => {
     if (!openedActionId) return;
     const onPointerDown = (e: MouseEvent) => {
       if (!(e.target as HTMLElement).closest('[data-action-menu]')) {
-        setOpenedActionId(null);
+        closeActionMenu();
       }
     };
     document.addEventListener('mousedown', onPointerDown);
-    return () => document.removeEventListener('mousedown', onPointerDown);
-  }, [openedActionId]);
+    // Menu jest pozycjonowane wzgledem viewportu (portal), wiec kazde
+    // przewiniecie rozjechaloby je z przyciskiem. true = faza przechwytywania,
+    // lapie takze scroll wewnatrz kontenera tabeli.
+    window.addEventListener('scroll', closeActionMenu, true);
+    window.addEventListener('resize', closeActionMenu);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      window.removeEventListener('scroll', closeActionMenu, true);
+      window.removeEventListener('resize', closeActionMenu);
+    };
+  }, [openedActionId, closeActionMenu]);
+
+  const toggleActionMenu = (objectId: string, trigger: HTMLElement) => {
+    if (openedActionId === objectId) {
+      closeActionMenu();
+      return;
+    }
+
+    const rect = trigger.getBoundingClientRect();
+    const openUpwards = rect.bottom + ActionMenuHeight > window.innerHeight;
+
+    setActionMenuPosition({
+      top: openUpwards
+        ? rect.top - ActionMenuHeight - ActionMenuGap
+        : rect.bottom + ActionMenuGap,
+      left: Math.max(
+        8,
+        Math.min(rect.right - ActionMenuWidth, window.innerWidth - ActionMenuWidth - 8),
+      ),
+    });
+    setOpenedActionId(objectId);
+  };
 
   // ── Load events ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -154,6 +200,8 @@ export default function RegistrationsList() {
     setSelectedIds(new Set());
   }, [selectedEventId, search, statusFilter]);
 
+  const { availability, refresh: refreshAvailability } = useOptionAvailability(selectedEventId);
+
   // ── Columns (derived from formConfig) ────────────────────────────────
   const columns = useMemo(() => {
     const keys = Object.keys(selectedEvent?.formConfig ?? {});
@@ -163,8 +211,19 @@ export default function RegistrationsList() {
   const getCellValue = (reg: Registration, col: string): string => {
     if (col === 'createdAt') return formatDate(reg.createdAt);
     if (col === 'status') return reg.status;
+
     const v = reg.formData?.[col];
-    return v !== undefined ? String(v) : 'N/A';
+    if (v === undefined) return 'N/A';
+
+    // W formData siedzi klucz opcji (optionsTranslation[].id), nie etykieta.
+    // Stare rejestracje maja jeszcze etykiete - resolveOptionValue rozpoznaje oba.
+    const field = (selectedEvent?.formConfig as FormConfig | undefined)?.[col] as
+      | FormConfigEntry
+      | undefined;
+
+    if (field && hasOptions(field)) return resolveOptionValue(field, v, i18n.language);
+
+    return String(v);
   };
 
   // ── Filter + sort ─────────────────────────────────────────────────────
@@ -173,7 +232,11 @@ export default function RegistrationsList() {
       const searchable = [
         reg.status,
         formatDate(reg.createdAt),
-        ...Object.values(reg.formData ?? {}),
+        // Po przejsciu na klucze surowe formData zawiera slugi - szukamy
+        // po wartosciach wyswietlanych, zeby "Analiza" nadal cokolwiek znajdowalo.
+        ...columns
+          .filter((col) => col !== 'createdAt' && col !== 'status')
+          .map((col) => getCellValue(reg, col)),
       ];
       const matchesSearch = searchable.some((v) =>
         String(v).toLowerCase().includes(search.toLowerCase()),
@@ -181,7 +244,7 @@ export default function RegistrationsList() {
       const matchesStatus = statusFilter === 'all' || reg.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
-  }, [registrations, search, statusFilter]);
+  }, [registrations, search, statusFilter, columns, selectedEvent, i18n.language]);
 
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
@@ -269,11 +332,13 @@ export default function RegistrationsList() {
       setRegistrations((prev) =>
         prev.map((r) => (r.objectId === registrationId ? { ...r, status } : r)),
       );
+      // rejected/cancelled zwalniaja miejsce na opcji - liczby musza zejsc
+      refreshAvailability();
     } catch (e: any) {
       const msg = e?.response?.data?.error || e?.message || 'Error';
       setError(msg);
     } finally {
-      setOpenedActionId(null);
+      closeActionMenu();
     }
   };
 
@@ -283,6 +348,7 @@ export default function RegistrationsList() {
     try {
       await parseService.remove('Registration', deleteConfirmId);
       setRegistrations((prev) => prev.filter((r) => r.objectId !== deleteConfirmId));
+      refreshAvailability();
       setSelectedIds((prev) => {
         const next = new Set(prev);
         next.delete(deleteConfirmId);
@@ -294,7 +360,7 @@ export default function RegistrationsList() {
     } finally {
       setDeleteLoading(false);
       setDeleteConfirmId(null);
-      setOpenedActionId(null);
+      closeActionMenu();
     }
   };
 
@@ -332,6 +398,7 @@ export default function RegistrationsList() {
       if (bulkConfirm.action === 'deleted') {
         await parseService.batchDelete('Registration', ids);
         setRegistrations((prev) => prev.filter((r) => !selectedIds.has(r.objectId)));
+        refreshAvailability();
       } else {
         const status: Registration['status'] = bulkConfirm.action;
         const updates = ids.map((id) => ({ objectId: id, payload: { status } }));
@@ -339,6 +406,7 @@ export default function RegistrationsList() {
         setRegistrations((prev) =>
           prev.map((r) => (selectedIds.has(r.objectId) ? { ...r, status } : r)),
         );
+        refreshAvailability();
       }
       setSelectedIds(new Set());
     } catch (e: any) {
@@ -514,6 +582,11 @@ export default function RegistrationsList() {
           </div>
         )}
 
+        {/* Oblozenie opcji z limitem */}
+        {!registrationsLoading && selectedEventId && (
+          <OptionOccupancy event={selectedEvent} availability={availability} />
+        )}
+
         {/* Table */}
         {!registrationsLoading && selectedEventId && (
           <>
@@ -588,15 +661,12 @@ export default function RegistrationsList() {
                         </td>
                         {Object.keys(selectedEvent?.formConfig ?? {}).map((col) => (
                           <td key={col} className="px-3 sm:px-4 py-3">
-                            {formatCellValue(String(reg.formData?.[col] ?? 'N/A'), t)}
+                            {formatCellValue(getCellValue(reg, col), t)}
                           </td>
                         ))}
                         <td className="px-3 sm:px-4 py-3">{renderStatusBadge(reg.status)}</td>
                         <td className="px-3 sm:px-4 py-3">
-                          <div
-                            className="relative flex items-center justify-center gap-1.5"
-                            data-action-menu={openedActionId === reg.objectId ? '' : undefined}
-                          >
+                          <div className="flex items-center justify-center gap-1.5">
                             <button
                               className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface text-primary/70 transition hover:bg-background hover:text-primary active:scale-95 cursor-pointer"
                               onClick={() => setSelectedRegistration(reg)}
@@ -617,23 +687,28 @@ export default function RegistrationsList() {
 
                             <button
                               disabled={reg.status === 'cancelled'}
+                              data-action-menu=""
                               className={`flex h-8 w-8 items-center justify-center rounded-lg border border-primary/15 bg-surface transition active:scale-95 ${
                                 reg.status === 'cancelled'
                                   ? 'cursor-not-allowed opacity-40 text-primary/30'
                                   : 'cursor-pointer text-primary/70 hover:bg-background hover:text-primary'
                               }`}
-                              onClick={() =>
+                              onClick={(e) =>
                                 reg.status !== 'cancelled' &&
-                                setOpenedActionId((id) =>
-                                  id === reg.objectId ? null : reg.objectId,
-                                )
+                                toggleActionMenu(reg.objectId, e.currentTarget)
                               }
                             >
                               <Icon icon={LuEllipsis} size={14} />
                             </button>
 
-                            {openedActionId === reg.objectId && (
-                              <div className="absolute right-0 top-10 z-50 w-44 rounded-xl border border-primary/15 bg-surface shadow-xl overflow-hidden">
+                            {openedActionId === reg.objectId &&
+                              actionMenuPosition &&
+                              createPortal(
+                              <div
+                                data-action-menu=""
+                                className="fixed z-[100] w-44 rounded-xl border border-primary/15 bg-surface shadow-xl overflow-hidden"
+                                style={{ top: actionMenuPosition.top, left: actionMenuPosition.left }}
+                              >
                                 {reg.status !== 'approved' && (
                                   <button
                                     className="flex w-full items-center gap-2 px-3 py-2 bg-transparent text-xs text-primary/80 hover:bg-background cursor-pointer"
@@ -659,7 +734,8 @@ export default function RegistrationsList() {
                                   <Icon icon={LuTrash2} size={13} />
                                   {t('registrationsList.delete')}
                                 </button>
-                              </div>
+                              </div>,
+                              document.body,
                             )}
                           </div>
                         </td>

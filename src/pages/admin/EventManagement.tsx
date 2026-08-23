@@ -27,6 +27,13 @@ import {
   MAP_IFRAME_HEIGHT,
 } from '../../constants/eventDefaults';
 import { useAuth } from '../../auth/AuthProvider';
+import {
+  EVENT_ERROR_FIELDS,
+  EventErrorField,
+  EventFieldErrors,
+  isValidDate,
+  validateEvent,
+} from '../../utils/eventValidation';
 
 const HERO_IMAGE_MAX_SIZE_BYTES = 5 * 1024 * 1024;
 const HERO_IMAGE_TARGET_RATIO = 1920 / 800;
@@ -55,6 +62,16 @@ const EMPTY_EVENT: Event = {
   i18n: eventI18nFromEvent({}),
 };
 
+function requestErrorMessage(e: any): string {
+  return e?.response?.data?.error ?? e?.message ?? '';
+}
+
+function nextDay(date: Date): Date {
+  const next = new Date(date);
+  next.setDate(next.getDate() + 1);
+  return next;
+}
+
 function parseParseDate(value: any): MongoDate {
   if (!value) return {};
   if (value.iso) return { date: new Date(value.iso) };
@@ -77,12 +94,22 @@ export default function EventManagement({ mode }: Props) {
   const [uploadStatus, setUploadStatus] = useState<'success' | 'error' | null>(null);
   const [uploadAspectWarning, setUploadAspectWarning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [fieldErrors, setFieldErrors] = useState<EventFieldErrors>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const storedStartTime = useRef<number | null>(null);
+
+  const clearFieldError = (field: string) =>
+    setFieldErrors((prev) => {
+      const key = field as EventErrorField;
+      if (!prev[key]) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
 
   const handleFieldChange = <K extends keyof Event>(field: K, value: Event[K] | undefined) => {
     setEvent((prev) => (prev ? { ...prev, [field]: value } : null));
-    setFieldErrors((prev) => (prev[field] ? { ...prev, [field]: '' } : prev));
+    clearFieldError(field as string);
   };
 
   const handleTranslationChange = (
@@ -101,7 +128,7 @@ export default function EventManagement({ mode }: Props) {
           }
         : null,
     );
-    setFieldErrors((prev) => (prev[field] ? { ...prev, [field]: '' } : prev));
+    clearFieldError(field);
   };
 
   const translationOf = (field: TranslatableEventField, locale: Locale): string =>
@@ -116,6 +143,9 @@ export default function EventManagement({ mode }: Props) {
           history.replace('/admin');
           return;
         }
+        const storedStart = parseParseDate(rawEvent.startDate).date;
+        storedStartTime.current = isValidDate(storedStart) ? storedStart.getTime() : null;
+
         const eventFormat = rawEvent.eventFormat ?? 'on-site';
         const legacyUrlInLocation =
           eventFormat === 'virtual' && !rawEvent.meetingLink && !!rawEvent.location;
@@ -139,7 +169,7 @@ export default function EventManagement({ mode }: Props) {
         });
         setLoaded(true);
       })
-      .catch((e: any) => setError(e.message));
+      .catch((e: any) => setError(requestErrorMessage(e)));
   }, [isEdit, id, history, user?.objectId, user?.role]);
 
   const handleDateTypeChange = (value: 'single' | 'multi') => {
@@ -151,7 +181,29 @@ export default function EventManagement({ mode }: Props) {
         ...(value === 'single' && { endDate: undefined }),
       };
     });
-    setFieldErrors((prev) => (prev.endDate ? { ...prev, endDate: '' } : prev));
+    clearFieldError('endDate');
+  };
+
+  const handleStartDateChange = (value: Date | string) => {
+    const start = value ? new Date(value) : undefined;
+    setEvent((prev) => {
+      if (!prev) return null;
+      const end = prev.endDate?.date;
+      const staleEnd = !!start && isValidDate(end) && end.getTime() <= start.getTime();
+      return {
+        ...prev,
+        startDate: start ? { date: start } : {},
+        ...(staleEnd && { endDate: undefined }),
+      };
+    });
+    clearFieldError('startDate');
+    clearFieldError('endDate');
+  };
+
+  const handleEventFormatChange = (value: Event['eventFormat']) => {
+    handleFieldChange('eventFormat', value);
+    clearFieldError('location');
+    clearFieldError('meetingLink');
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -236,7 +288,7 @@ export default function EventManagement({ mode }: Props) {
       setUploadStatus('success');
       setUploadAspectWarning(aspectDeviates);
     } catch (e: any) {
-      setError(e.message);
+      setError(requestErrorMessage(e));
       setUploadStatus('error');
     } finally {
       setUploading(false);
@@ -253,12 +305,7 @@ export default function EventManagement({ mode }: Props) {
 
   const validate = (): boolean => {
     if (!event) return false;
-    const errors: Record<string, string> = {};
-    if (!primaryValue(event.i18n?.title)) errors.title = tt('validation.titleRequired');
-    if (!event.startDate?.date) errors.startDate = tt('validation.startDateRequired');
-    if (event.dateType === 'multi' && !event.endDate?.date) {
-      errors.endDate = tt('validation.endDateRequired');
-    }
+    const errors = validateEvent(event, { storedStartTime: storedStartTime.current });
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -305,11 +352,21 @@ export default function EventManagement({ mode }: Props) {
           .create<Event>(EVENT_CLASS, payload)
           .then(({ objectId }) => history.push(`/admin/events/${objectId}/edit`));
 
-    request.catch((e: any) => setError(e.message)).finally(() => setSaving(false));
+    request.catch((e: any) => setError(requestErrorMessage(e))).finally(() => setSaving(false));
   };
 
   const tt = (key: string) => t(`eventManagement.${key}`);
   const ttm = (key: string) => t(`eventManagement.${isEdit ? 'edit' : 'new'}.${key}`);
+
+  const errorFor = (field: EventErrorField): string | undefined => {
+    const messageKey = fieldErrors[field];
+    return messageKey ? tt(`validation.${messageKey}`) : undefined;
+  };
+
+  const errorSummary = EVENT_ERROR_FIELDS.filter((field) => fieldErrors[field]).map((field) => ({
+    field,
+    message: tt(`validation.${fieldErrors[field]}`),
+  }));
 
   if (!loaded && !error) {
     return <p className="p-8 text-primary/60">{t('eventManagement.loading')}...</p>;
@@ -322,6 +379,11 @@ export default function EventManagement({ mode }: Props) {
       </p>
     );
   }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const startDate = event?.startDate?.date;
+  const endDateMin = isValidDate(startDate) ? nextDay(startDate) : today;
 
   const showMapEmbed = event?.eventFormat === 'on-site' || event?.eventFormat === 'hybrid';
   const currentTitle = primaryValue(event?.i18n?.title);
@@ -351,7 +413,7 @@ export default function EventManagement({ mode }: Props) {
       {error && <p className="mb-2 text-sm text-error">{error}</p>}
 
       <div className="flex flex-col gap-2 mt-2">
-        <LocalizedField label={tt('fields.title')} error={fieldErrors.title}>
+        <LocalizedField label={tt('fields.title')} error={errorFor('title')}>
           {(locale, ariaLabel) => (
             <InputTextfieldStateful
               placeholder={tt('fields.title')}
@@ -385,12 +447,12 @@ export default function EventManagement({ mode }: Props) {
             <InputDatepicker
               label={tt('fields.startDate')}
               value={event?.startDate?.date ?? ''}
-              onChange={(v) =>
-                handleFieldChange('startDate', v ? { date: new Date(v) } : undefined)
-              }
+              invalid={!!fieldErrors.startDate}
+              minDate={today}
+              onChange={handleStartDateChange}
             />
-            {fieldErrors.startDate && (
-              <p className="text-xs text-error mt-1 mb-0">{fieldErrors.startDate}</p>
+            {errorFor('startDate') && (
+              <p className="text-xs text-error mt-1 mb-0">{errorFor('startDate')}</p>
             )}
           </div>
           {event?.dateType === 'multi' && (
@@ -398,12 +460,14 @@ export default function EventManagement({ mode }: Props) {
               <InputDatepicker
                 label={tt('fields.endDate')}
                 value={event.endDate?.date ?? ''}
+                invalid={!!fieldErrors.endDate}
+                minDate={endDateMin}
                 onChange={(v) =>
                   handleFieldChange('endDate', v ? { date: new Date(v) } : undefined)
                 }
               />
-              {fieldErrors.endDate && (
-                <p className="text-xs text-error mt-1 mb-0">{fieldErrors.endDate}</p>
+              {errorFor('endDate') && (
+                <p className="text-xs text-error mt-1 mb-0">{errorFor('endDate')}</p>
               )}
             </div>
           )}
@@ -411,7 +475,7 @@ export default function EventManagement({ mode }: Props) {
         <RadioGroup
           label={tt('fields.eventFormat')}
           value={event?.eventFormat ?? 'on-site'}
-          onChange={(v) => handleFieldChange('eventFormat', v)}
+          onChange={handleEventFormatChange}
           options={[
             { value: 'virtual', label: tt('fields.formatVirtual') },
             { value: 'on-site', label: tt('fields.formatOnSite') },
@@ -420,12 +484,13 @@ export default function EventManagement({ mode }: Props) {
         />
         {/* Physical address — on-site and hybrid only; always stored in `location`. */}
         {event?.eventFormat !== 'virtual' && (
-          <LocalizedField label={tt('fields.locationOnSite')}>
+          <LocalizedField label={tt('fields.locationOnSite')} error={errorFor('location')}>
             {(locale, ariaLabel) => (
               <InputTextfieldStateful
                 placeholder={tt('fields.locationOnSitePlaceholder')}
                 defaultValue={translationOf('location', locale)}
                 htmlAttrs={{ 'aria-label': ariaLabel }}
+                invalid={!!fieldErrors.location}
                 onChange={(v) => handleTranslationChange('location', locale, String(v))}
               />
             )}
@@ -436,6 +501,8 @@ export default function EventManagement({ mode }: Props) {
             label={tt('fields.locationVirtual')}
             placeholder={tt('fields.locationVirtualPlaceholder')}
             defaultValue={event?.meetingLink ?? ''}
+            invalid={!!fieldErrors.meetingLink}
+            errorText={errorFor('meetingLink')}
             onChange={(v) => handleFieldChange('meetingLink', String(v))}
           />
         )}
@@ -472,21 +539,31 @@ export default function EventManagement({ mode }: Props) {
         </div>
         <p className="text-sm font-bold text-primary mt-3">{tt('capacitySection')}</p>
         <div className="flex flex-col gap-1">
-          <label className="block text-xs font-book text-primary/70">
+          <label htmlFor="capacity" className="block text-xs font-book text-primary/70">
             {tt('fields.capacity')}
           </label>
           <input
-            type="number"
-            min="1"
+            id="capacity"
+            type="text"
+            inputMode="numeric"
             value={event?.capacity ?? ''}
+            aria-invalid={!!fieldErrors.capacity}
             onChange={(e) => {
-              const val = e.target.value;
-              handleFieldChange('capacity', val ? Number(val) : undefined);
+              const digits = e.target.value.replace(/\D/g, '');
+              handleFieldChange('capacity', digits ? Number(digits) : undefined);
             }}
             placeholder={tt('fields.capacityPlaceholder')}
-            className="border border-primary/20 rounded-lg px-3 py-2 text-sm text-primary focus:outline-none focus:border-primary/60 w-full sm:w-48"
+            className={`border rounded-lg px-3 py-2 text-sm text-primary focus:outline-none w-full sm:w-48 ${
+              fieldErrors.capacity
+                ? 'border-error focus:border-error'
+                : 'border-primary/20 focus:border-primary/60'
+            }`}
           />
-          <p className="text-xs text-primary/60 mt-0">{tt('fields.capacityHint')}</p>
+          {errorFor('capacity') ? (
+            <p className="text-xs text-error mt-0 mb-0">{errorFor('capacity')}</p>
+          ) : (
+            <p className="text-xs text-primary/60 mt-0">{tt('fields.capacityHint')}</p>
+          )}
         </div>
         <p className="text-sm font-bold text-primary mt-3">{tt('sections.colors')}</p>
         <div className="flex flex-col sm:flex-row gap-4">
@@ -596,8 +673,20 @@ export default function EventManagement({ mode }: Props) {
       </div>
 
       <div className="flex flex-col items-end mt-6 pb-4 gap-2">
-        {Object.values(fieldErrors).some(Boolean) && (
-          <p className="text-sm text-error mt-0 mb-0">{tt('validation.fillRequired')}</p>
+        {errorSummary.length > 0 && (
+          <div
+            role="alert"
+            className="self-center max-w-full rounded-lg border border-error/40 bg-error/5 px-4 py-3 text-left"
+          >
+            <p className="text-sm font-bold text-error mt-0 mb-1">
+              {tt('validation.summaryTitle')}
+            </p>
+            <ul className="list-disc pl-5 my-0 text-sm text-error">
+              {errorSummary.map(({ field, message }) => (
+                <li key={field}>{message}</li>
+              ))}
+            </ul>
+          </div>
         )}
         <div className="flex items-center gap-3">
           <button

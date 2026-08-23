@@ -83,6 +83,9 @@
     "title": "Rejestracje - {{title}}",
     "description": "Sprawdź i zarządzaj rejestracjami wydarzenia",
     "export": "Wyeksportuj",
+    "occupancyHint": "Liczone są zgłoszenia oczekujące i zatwierdzone.",
+    "overrideLabel": "Pomiń limit miejsc",
+    "overrideHint": "Pozwala zapisać uczestnika na zapełnione zadanie. Wymaga uprawnień organizatora.",
     "filters": {
       "search": "Szukaj",
       "from": "Od",
@@ -213,10 +216,15 @@
       "capacityHint": "Zostaw puste, aby nie ograniczać liczby uczestników."
     },
     "validation": {
-      "fillRequired": "Uzupełnij wszystkie wymagane pola",
+      "summaryTitle": "Popraw poniższe błędy przed zapisaniem:",
       "titleRequired": "Nazwa wydarzenia jest wymagana",
       "startDateRequired": "Data początkowa jest wymagana",
+      "startDateInPast": "Data początkowa nie może być z przeszłości",
       "endDateRequired": "Data końcowa jest wymagana",
+      "endDateBeforeStart": "Data końcowa musi być późniejsza niż data początkowa",
+      "locationRequired": "Adres jest wymagany dla wydarzeń stacjonarnych i hybrydowych",
+      "meetingLinkRequired": "Link do spotkania jest wymagany dla wydarzeń wirtualnych i hybrydowych",
+      "capacityInvalid": "Limit miejsc musi wynosić co najmniej 1",
       "heroImageTooLarge": "Plik jest za duży. Maksymalny rozmiar to 5MB"
     }
   },
@@ -228,7 +236,10 @@
       "pending": "Zapisywanie"
     },
     "loading": "Ładowanie danych",
-    "error": "Błąd"
+    "errors": {
+      "error": "Błąd",
+      "optionFull": "Ta opcja nie ma już wolnych miejsc. Zaznacz „Pomiń limit miejsc”, jeśli chcesz mimo to zapisać."
+    }
   },
   "eventDetails": {
     "locationPreview": "Podgląd Lokalizacji",
@@ -266,10 +277,13 @@
     "confirmationUnregister": "Aby się wyrejestrować, skontaktuj się z organizatorem wydarzenia.",
     "dateLabel": "Data",
     "locationLabel": "Lokalizacja",
+    "optionFullShort": "brak miejsc",
+    "noSelection": "— nie wybrano —",
     "validation": {
       "required": "To pole jest wymagane.",
       "email": "Podaj poprawny adres e-mail.",
-      "phone": "Podaj poprawny numer telefonu."
+      "phone": "Podaj poprawny numer telefonu.",
+      "optionFull": "Ta opcja nie ma już wolnych miejsc. Wybierz inną."
     }
   },
   "formConfig": {
@@ -299,6 +313,10 @@
     "removeOption": "Usuń opcję",
     "i18nPl": "tlumaczenie pl",
     "i18nEn": "tlumaczenie en",
+    "fieldKey": "Klucz",
+    "optionKey": "Klucz",
+    "optionLimit": "Limit",
+    "optionLimitHint": "Maksymalna liczba zgłoszeń na tę opcję. Puste = bez limitu.",
     "fieldType": {
       "text": "Tekst",
       "email": "Email",
@@ -313,7 +331,9 @@
       "labelRequired": "Etykieta jest wymagana",
       "duplicateLabel": "Zduplikowana etykieta",
       "optionRequired": "Wymagana co najmniej jedna opcja",
-      "validationFailed": "Walidacja schematu nie powiodła się — popraw podświetlone pola przed zapisem."
+      "validationFailed": "Walidacja schematu nie powiodła się — popraw podświetlone pola przed zapisem.",
+      "duplicateKey": "Inne pole ma już taki sam klucz — zmień etykietę.",
+      "optionKeyMissing": "Opcja z limitem musi mieć zapisany klucz. Wpisz jej wartość i kliknij poza pole."
     },
     "register": "Zarejestruj",
     "validation": {
@@ -345,6 +365,11 @@
     },
     "noUsers": "Nie znaleziono użytkowników.",
     "deleteConfirm": "Na pewno usunąć użytkownika?",
+    "validation": {
+      "fullNameRequired": "Imię i nazwisko jest wymagane.",
+      "emailRequired": "Adres e-mail jest wymagany.",
+      "emailInvalid": "Podaj poprawny adres e-mail, np. john.doe@example.com."
+    },
     "new": {
       "title": "Dodaj nowego użytkownika",
       "description": "Wprowadź dane, aby utworzyć nowe konto.",
@@ -387,6 +412,10 @@
     "tabs": {
       "qrScanner": "Skaner QR",
       "manual": "Ręczne zameldowanie"
+    },
+    "exportColumns": {
+      "checkedIn": "Zameldowany",
+      "checkInTime": "Czas zameldowania"
     },
     "scanner": {
       "title": "Skaner Kodów QR",

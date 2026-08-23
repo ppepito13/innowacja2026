@@ -9,6 +9,7 @@ import { parseService } from '../../services/parseService';
 import Icon from '../../components/Icon';
 import { Event } from '../../types/types';
 import { EVENT_CLASS } from '../../constants/eventDefaults';
+import { validateUserFields, UserFieldErrors } from '../../utils/userValidation';
 
 type NewUser = {
   fullName: string;
@@ -31,9 +32,11 @@ export default function UserNew() {
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [assignedIds, setAssignedIds] = useState<Set<string>>(new Set());
+  const [fieldErrors, setFieldErrors] = useState<UserFieldErrors>({});
 
   const handleChange = <K extends keyof NewUser>(field: K, value: NewUser[K]) => {
     setUser((prev) => ({ ...prev, [field]: value }));
+    setFieldErrors((prev) => (prev[field as keyof UserFieldErrors] ? { ...prev, [field]: '' } : prev));
   };
 
   useEffect(() => {
@@ -52,22 +55,22 @@ export default function UserNew() {
   };
 
   const handleSubmit = () => {
-    if (!user.fullName || !user.email) {
-      setError(t('users.new.fullName') + ' and ' + t('users.new.email') + ' are required.');
-      return;
-    }
+    const errors = validateUserFields(user, t);
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
 
     setLoading(true);
     setError(null);
 
+    const email = user.email.trim();
     const hashedPassword = bcrypt.hashSync(password, process.env.REACT_APP_BCRYPT_SALT);
 
     parseClient
       .post('/users', {
-        username: user.email,
-        email: user.email,
+        username: email,
+        email: email,
         password: hashedPassword,
-        fullName: user.fullName,
+        fullName: user.fullName.trim(),
         role: user.role,
       })
       .then(({ data }) => {
@@ -99,6 +102,9 @@ export default function UserNew() {
           defaultValue={user.fullName ?? ''}
           onChange={(value) => handleChange('fullName', String(value))}
         />
+        {fieldErrors.fullName && (
+          <p className="text-error text-xs mt-1">{fieldErrors.fullName}</p>
+        )}
 
         <div>
           <InputTextfieldStateful
@@ -108,6 +114,9 @@ export default function UserNew() {
             onChange={(value) => handleChange('email', String(value))}
           />
           <p className="text-xs text-primary/70 mt-1">{t('users.new.emailHint')}</p>
+          {fieldErrors.email && (
+            <p className="text-error text-xs mt-1">{fieldErrors.email}</p>
+          )}
         </div>
 
         <div>

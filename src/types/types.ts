@@ -12,10 +12,10 @@ export interface LocalizedText {
 }
 
 export type TranslatableEventField =
-  | 'title'
-  | 'description'
-  | 'location'
-  | 'dataProcessingAgreement';
+    | 'title'
+    | 'description'
+    | 'location'
+    | 'dataProcessingAgreement';
 
 export type EventI18n = Partial<Record<TranslatableEventField, LocalizedText>>;
 
@@ -27,27 +27,49 @@ export interface EventACL {
 // --- FormConfig Types ---
 
 export type FieldType =
-  | 'text'
-  | 'email'
-  | 'phone'
-  | 'textarea'
-  | 'checkbox'
-  | 'radio'
-  | 'multiselect'
-  | 'dropdown';
+    | 'text'
+    | 'email'
+    | 'phone'
+    | 'textarea'
+    | 'checkbox'
+    | 'radio'
+    | 'multiselect'
+    | 'dropdown';
 
 export interface FieldTypeOption {
   value: FieldType;
   labelKey: string;
   icon: string;
 }
-export interface optionsTranslation{
+
+export interface optionsTranslation {
+  /**
+   * Klucz stabilny. To ON trafia do `Registration.formData` i po nim liczone
+   * są limity miejsc. Nadawany RAZ w edytorze (po wpisaniu wartości opcji);
+   * późniejsza zmiana etykiety go NIE rusza, bo zerwałaby powiązanie
+   * z istniejącymi rejestracjami.
+   *
+   * Pusty string = opcja jeszcze nie zapisana.
+   */
   id: string;
   i18n: {
     pl: string;
     en: string
   };
+  /** Maksymalna liczba zgłoszeń na tę opcję. null/brak = bez limitu. */
+  limit?: number | null;
+  /**
+   * Wartości, jakie ta opcja mogła przyjąć PRZED wprowadzeniem kluczy —
+   * czyli etykiety zapisane w starych `Registration.formData`.
+   * Migawka robiona raz, w momencie nadania `id`.
+   *
+   * Dzięki temu nie trzeba przepisywać istniejących rejestracji: licznik
+   * dopasowuje zarówno `id`, jak i te wartości. Późniejsza zmiana etykiety
+   * w edytorze niczego nie psuje, bo migawka zostaje.
+   */
+  legacyValues?: string[];
 }
+
 export interface FormField {
   /**
    * Local-only identifier used for React list keys and UI state (e.g. tracking
@@ -56,6 +78,12 @@ export interface FormField {
    * @see https://docs.parseplatform.org/rest/guide/#relational-queries
    */
   id: string;
+  /**
+   * Klucz w `formConfig` i w `Registration.formData`. Wyliczany raz z etykiety
+   * przy pierwszym zapisie, potem niezmienny — inaczej edycja etykiety odcięłaby
+   * wszystkie dotychczasowe rejestracje. Brak = pole jeszcze nie zapisane.
+   */
+  key?: string;
   label: string;
   type: FieldType;
   placeholder: string;
@@ -117,6 +145,11 @@ export interface Registration {
   isCheckedIn?: boolean;
   checkInTime: Date | MongoDate | null; // Date/Nullable
   consent: boolean;
+  /**
+   * Świadome przekroczenie limitu miejsc przez organizatora.
+   * Ustawiane wyłącznie z panelu admina — serwer weryfikuje rolę sesji.
+   */
+  limitOverride?: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -3,6 +3,8 @@ import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { parseService } from '../../services/parseService';
 import { Registration, Event } from '../../types/types';
+import { exportRegistrationsToCsv, ExportColumn } from '../../utils/export';
+import { formatDate, formatColumnName } from '../../utils/formatters';
 import { ReactComponent as DownloadIcon } from '../../assets/download-icon.svg';
 import { ReactComponent as ChevronDownIcon } from '../../assets/chevron-down-icon.svg';
 import { ReactComponent as ZapIcon } from '../../assets/zap-icon.svg';
@@ -196,6 +198,63 @@ export default function CheckIn() {
     });
   }, [registrations, searchQuery]);
 
+  const selectedEvent = useMemo(
+    () => events.find((e) => e.objectId === selectedEventId) ?? null,
+    [events, selectedEventId],
+  );
+
+  // Zatwierdzone zgloszenia, niezaleznie od wyszukiwarki. Pole szukania sluzy
+  // do odnalezienia osoby przy wejsciu, a nie do zawezania eksportu.
+  const approvedRegistrations = useMemo(
+    () => registrations.filter((reg) => reg.status === 'approved'),
+    [registrations],
+  );
+
+  // Kolumny wynikaja z formConfig wybranego eventu, doklejamy status zameldowania.
+  const exportColumns: ExportColumn<Registration>[] = useMemo(() => {
+    const formKeys = Object.keys(selectedEvent?.formConfig ?? {});
+
+    return [
+      {
+        header: formatColumnName('createdAt'),
+        getValue: (reg: Registration) => formatDate(reg.createdAt),
+      },
+      ...formKeys.map((key) => ({
+        header: formatColumnName(key),
+        getValue: (reg: Registration) => {
+          const value = reg.formData?.[key];
+          return value !== undefined ? String(value) : '';
+        },
+      })),
+      {
+        header: t('checkIn.exportColumns.checkedIn'),
+        getValue: (reg: Registration) =>
+          (reg.isCheckedIn ?? !!reg.checkInTime)
+            ? t('common.boolean.true')
+            : t('common.boolean.false'),
+      },
+      {
+        header: t('checkIn.exportColumns.checkInTime'),
+        getValue: (reg: Registration) => {
+          if (!reg.checkInTime) return '';
+          const iso =
+            reg.checkInTime instanceof Date
+              ? reg.checkInTime.toISOString()
+              : ((reg.checkInTime as any).iso ?? (reg.checkInTime as any).date ?? '');
+          return iso ? formatDate(iso) : '';
+        },
+      },
+    ];
+  }, [selectedEvent, t]);
+
+  const handleExport = () => {
+    exportRegistrationsToCsv<Registration>({
+      eventTitle: selectedEvent?.title ?? selectedEventId,
+      columns: exportColumns,
+      rows: approvedRegistrations,
+    });
+  };
+
   const handleManualCheckInToggle = async (registration: Registration) => {
     const currentlyCheckedIn = registration.isCheckedIn ?? !!registration.checkInTime;
     const nextCheckedIn = !currentlyCheckedIn;
@@ -281,7 +340,11 @@ export default function CheckIn() {
 
           <button
             type="button"
-            className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-book cursor-pointer outline-none border-none"
+            onClick={handleExport}
+            // exportRegistrationsToCsv przy pustej liscie konczy sie po cichu,
+            // wiec bez tego przycisk wygladalby na zepsuty.
+            disabled={!selectedEventId || approvedRegistrations.length === 0}
+            className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-brand bg-secondary hover:bg-secondary/90 transition-colors font-book cursor-pointer outline-none border-none disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <DownloadIcon width="14" height="14" />
             {t('checkIn.export')}

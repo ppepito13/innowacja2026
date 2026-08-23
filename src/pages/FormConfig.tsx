@@ -5,18 +5,15 @@ import type {
   FormConfig as FormConfigType,
   FormConfigEntry,
   Event,
-  MongoDate,
 } from '../types/types';
 import { FieldCard, TYPES_WITH_OPTIONS } from '../components/formConfig';
 import { useParams, useHistory } from 'react-router';
 import { LuArrowLeft } from 'react-icons/lu';
 import Icon from '../components/Icon';
 import { parseService } from '../services/parseService';
-import {
-  DEFAULT_ACCENT_COLOR,
-  DEFAULT_PRIMARY_COLOR,
-  EVENT_CLASS,
-} from '../constants/eventDefaults';
+import { makeOptionId } from '../utils/formOptions';
+import { EVENT_CLASS } from '../constants/eventDefaults';
+
 type EventEditParams = { id: string };
 const uid = (): string => Math.random().toString(36).slice(2, 9);
 
@@ -46,20 +43,8 @@ export default function FormConfig() {
   const [event, setEvent] = useState<Event | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    parseService
-      .getById<Event>(EVENT_CLASS, id)
-      .then((rawEvent) => {
-        setEvent(rawEvent);
-        if (rawEvent.formConfig) {
-          setFields(configToFields(rawEvent.formConfig));
-        }
-      })
-      .catch((e: any) => setError(e.message));
-  }, []);
-
   // Konwertuje formConfig z bazy → tablicę FormField[] do edycji
-  const configToFields = (config: Record<string, unknown>): FormField[] => {
+  const configToFields = useCallback((config: Record<string, unknown>): FormField[] => {
     const entries = Object.entries(config);
     if (entries.length === 0) return [defaultField()];
 
@@ -67,6 +52,8 @@ export default function FormConfig() {
       const entry = raw as FormConfigEntry;
       return {
         id: uid(),
+        // Klucz z bazy zostaje — to po nim wiążą się istniejące rejestracje.
+        key,
         label: entry.label ?? key,
         type: entry.type ?? 'text',
         placeholder: entry.placeholder ?? '',
@@ -79,21 +66,33 @@ export default function FormConfig() {
         optionsTranslation: entry.optionsTranslation ?? [],
       };
     });
-  };
+  }, []);
 
-  const updateField = useCallback((id: string, patch: Partial<FormField>) => {
-    setFields((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
+  useEffect(() => {
+    parseService
+      .getById<Event>(EVENT_CLASS, id)
+      .then((rawEvent) => {
+        setEvent(rawEvent);
+        if (rawEvent.formConfig) {
+          setFields(configToFields(rawEvent.formConfig));
+        }
+      })
+      .catch((e: any) => setError(e.message));
+  }, [id, configToFields]);
+
+  const updateField = useCallback((fieldId: string, patch: Partial<FormField>) => {
+    setFields((prev) => prev.map((f) => (f.id === fieldId ? { ...f, ...patch } : f)));
     setErrors((prev) => {
       const next = { ...prev };
-      delete next[id];
+      delete next[fieldId];
       return next;
     });
     setSaved(false);
     setHasChanged(true);
   }, []);
 
-  const removeField = useCallback((id: string) => {
-    setFields((prev) => prev.filter((f) => f.id !== id));
+  const removeField = useCallback((fieldId: string) => {
+    setFields((prev) => prev.filter((f) => f.id !== fieldId));
     setSaved(false);
     setHasChanged(true);
   }, []);
@@ -106,81 +105,112 @@ export default function FormConfig() {
 
   const buildFormConfig = useCallback((): FormConfigType => {
     const config: FormConfigType = {};
+
     for (const f of fields) {
-      const key = f.label
-        .trim()
-        .replace(/\s+/g, '_')
-        .replace(/[^a-zA-Z0-9_]/g, '')
-        .toLowerCase();
-      if (!key) continue;
-      const i18nInstance = {
-        en: f.i18n.en,
-        pl: f.i18n.pl,
-      };
+      // Pole wczytane z bazy zachowuje swój klucz. Nowe dostaje go raz,
+      // z etykiety — z transliteracją diakrytyków i sufiksem przy kolizji.
+      const key = f.key ?? makeOptionId(f.label, Object.keys(config));
+      if (!key || !f.label.trim()) continue;
+
       const entry: FormConfigEntry = {
         type: f.type,
         required: f.required,
-        i18n: i18nInstance,
+        i18n: { en: f.i18n.en, pl: f.i18n.pl },
         optionsTranslation: f.optionsTranslation,
       };
+
       if (f.placeholder) entry.placeholder = f.placeholder;
       if (f.label) entry.label = f.label.trim();
+
       if (TYPES_WITH_OPTIONS.includes(f.type)) {
-        entry.options = f.options.filter((o) => o.trim() !== '');
+        // options i optionsTranslation muszą mieć zgodne indeksy — filtrujemy
+        // je razem, jednym przebiegiem, inaczej etykiety rozjadą się z wartościami.
+        const rows = f.optionsTranslation
+          .map((option, i) => ({ option, value: f.options[i] ?? '' }))
+          .filter((row) => row.option.id || row.value.trim() !== '');
+
+        entry.options = rows.map((row) => row.value);
+        entry.optionsTranslation = rows.map((row) => row.option);
       }
+
       config[key] = entry;
     }
+
     return config;
   }, [fields]);
 
   const validate = useCallback((): boolean => {
     const errs: Record<string, string> = {};
-    const seen = new Set<string>();
+    const seenLabels = new Set<string>();
+    const seenKeys = new Set<string>();
+
     for (const f of fields) {
       if (!f.label.trim()) {
         errs[f.id] = t('formConfig.errors.labelRequired');
       } else {
-        const key = f.label.trim().toLowerCase();
-        if (seen.has(key)) {
+        const label = f.label.trim().toLowerCase();
+        if (seenLabels.has(label)) {
           errs[f.id] = t('formConfig.errors.duplicateLabel');
         }
-        seen.add(key);
+        seenLabels.add(label);
+
+        // Dwie różne etykiety mogą dać ten sam klucz („E-mail" i „Email").
+        // Bez tej kontroli drugie pole po cichu nadpisuje pierwsze.
+        const key = f.key ?? makeOptionId(f.label, Array.from(seenKeys));
+        if (key && seenKeys.has(key)) {
+          errs[f.id] = errs[f.id] || t('formConfig.errors.duplicateKey');
+        }
+        seenKeys.add(key);
       }
+
       if (TYPES_WITH_OPTIONS.includes(f.type)) {
         const validOpts = f.options.filter((o) => o.trim() !== '');
         if (validOpts.length < 1) {
           errs[f.id] = errs[f.id] || t('formConfig.errors.optionRequired');
         }
+
+        // Limit bez klucza jest niepoliczalny — serwer nie miałby po czym liczyć.
+        const withLimit = f.optionsTranslation.filter((o) => o.limit != null);
+        if (withLimit.some((o) => !o.id)) {
+          errs[f.id] = errs[f.id] || t('formConfig.errors.optionKeyMissing');
+        }
       }
     }
+
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }, [fields, t]);
 
-  const handleSave = (): void => {
+  const persist = (onDone: () => void): void => {
     if (!validate()) return;
+
     const config = buildFormConfig();
+
     parseService
       .update<Event>(EVENT_CLASS, id, { formConfig: config })
       .then(() => {
-        setSaved(true);
         setHasChanged(false);
-        setTimeout(() => setSaved(false), 2500);
+        onDone();
       })
       .catch((e: any) => setError(e.message));
   };
 
-  const handleSaveAndExit = (): void => {
-    if (!validate()) return;
+  const handleSave = (): void => {
     const config = buildFormConfig();
-    parseService
-      .update<Event>(EVENT_CLASS, id, { formConfig: config })
-      .then(() => {
-        setHasChanged(false);
-        history.goBack();
-      })
-      .catch((e: any) => setError(e.message));
+
+    persist(() => {
+      // Przepisujemy klucze nadane przy tym zapisie z powrotem do stanu,
+      // żeby kolejny zapis w tej samej sesji ich nie przeliczył od nowa.
+      setFields((prev) => {
+        const keys = Object.keys(config);
+        return prev.map((f, i) => ({ ...f, key: f.key ?? keys[i] }));
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    });
   };
+
+  const handleSaveAndExit = (): void => persist(() => history.goBack());
 
   const handleBackClick = (): void => {
     if (hasChanged) {
@@ -216,6 +246,8 @@ export default function FormConfig() {
           </button>
         </div>
       </div>
+
+      {error && <p className="text-sm text-error">{error}</p>}
 
       <div className="flex flex-col gap-6 mt-2 w-full">
         {/* Field cards */}
@@ -304,7 +336,3 @@ export default function FormConfig() {
     </div>
   );
 }
-// TODO: Unifikacja tworzenia pól formularza na podstawie formConfig (string czy text, choice czy dropdown etc)
-// TODO: event.formConfig is null ? event.formConfig : buildFormConfig()
-// TODO: Poprawa tła, ale to drugorzędne
-// TODO: Przewijalny JSON formConfiga
