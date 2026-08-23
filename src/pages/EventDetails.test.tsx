@@ -4,6 +4,11 @@ import { MongoDate } from '../types/types';
 
 jest.mock('react-router-dom', () => ({
   useParams: () => ({ eventId: 'event123' }),
+  Link: ({ children, to }: any) => <a href={to}>{children}</a>,
+}));
+
+jest.mock('../theme/ThemeProvider', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: jest.fn() }),
 }));
 
 jest.mock('react-i18next', () => ({
@@ -27,8 +32,17 @@ jest.mock('../utils/formatters', () => ({
 jest.mock('../services/parseService', () => ({
   parseService: {
     getById: jest.fn(),
+    create: jest.fn(),
+    count: jest.fn().mockResolvedValue(0),
   },
   createPointer: jest.fn(),
+}));
+
+jest.mock('../services/parseClient', () => ({
+  __esModule: true,
+  default: {
+    get: jest.fn(),
+  },
 }));
 
 jest.mock('react-icons/lu', () => ({
@@ -36,11 +50,25 @@ jest.mock('react-icons/lu', () => ({
   LuMapPin: 'LuMapPin',
   LuChevronDown: 'LuChevronDown',
   LuLoaderCircle: 'LuLoaderCircle',
+  LuLink: 'LuLink',
+  LuTriangleAlert: 'LuTriangleAlert',
+  LuDownload: 'LuDownload',
+  LuCalendarPlus: 'LuCalendarPlus',
+  LuSun: 'LuSun',
+  LuMoon: 'LuMoon',
 }));
 
 jest.mock('../components/Icon', () => ({
   __esModule: true,
   default: ({ icon }: any) => <span>{icon}</span>,
+}));
+
+jest.mock('../utils/confirmationPdf', () => ({
+  generateConfirmationPdf: jest.fn(),
+}));
+
+jest.mock('qrcode.react', () => ({
+  QRCodeSVG: () => <div data-testid="qr-code" />,
 }));
 
 const mockEvent = {
@@ -66,9 +94,11 @@ describe('EventDetails', () => {
     jest.clearAllMocks();
 
     const { parseService } = require('../services/parseService');
+    const parseClient = require('../services/parseClient').default;
     mockGetById = parseService.getById as jest.Mock;
 
     mockGetById.mockResolvedValue(mockEvent);
+    parseClient.get.mockResolvedValue({ data: mockEvent });
   });
 
   it('Renders properly', async () => {
