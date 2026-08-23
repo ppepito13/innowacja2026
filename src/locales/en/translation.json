@@ -427,7 +427,21 @@
       "invalidCode": "This QR code is invalid or has been tampered with.",
       "notApproved": "Registration is not approved.",
       "notFound": "Registration not found.",
-      "wrongEvent": "This ticket is for a different event."
+      "wrongEvent": "This ticket is for a different event.",
+      "errors": {
+        "not_secure": "Camera requires a secure connection",
+        "not_secureHint": "Open this page via HTTPS or on localhost.",
+        "no_camera_api": "Browser does not support camera access",
+        "no_camera_apiHint": "Use a newer browser version or a different device.",
+        "permission_denied": "Camera access denied",
+        "permission_deniedHint": "Allow camera access in your browser settings and refresh the page.",
+        "no_camera": "No camera detected",
+        "no_cameraHint": "Make sure your device has a camera and it is not disabled.",
+        "camera_in_use": "Camera is in use",
+        "camera_in_useHint": "Close other apps using the camera and try again.",
+        "unknown": "Could not start the camera",
+        "unknownHint": "Check your browser settings or try a different browser."
+      }
     },
     "manual": {
       "title": "Manual Attendee List",

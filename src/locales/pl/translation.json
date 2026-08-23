@@ -426,7 +426,21 @@
       "invalidCode": "Ten kod QR jest nieprawidłowy lub został zmodyfikowany.",
       "notApproved": "Rejestracja nie została zatwierdzona.",
       "notFound": "Nie znaleziono rejestracji.",
-      "wrongEvent": "Ten bilet dotyczy innego wydarzenia."
+      "wrongEvent": "Ten bilet dotyczy innego wydarzenia.",
+      "errors": {
+        "not_secure": "Kamera wymaga bezpiecznego połączenia",
+        "not_secureHint": "Otwórz stronę przez HTTPS lub na localhost.",
+        "no_camera_api": "Przeglądarka nie obsługuje kamery",
+        "no_camera_apiHint": "Użyj nowszej wersji przeglądarki lub innego urządzenia.",
+        "permission_denied": "Brak dostępu do kamery",
+        "permission_deniedHint": "Zezwól na dostęp do kamery w ustawieniach przeglądarki i odśwież stronę.",
+        "no_camera": "Nie wykryto kamery",
+        "no_cameraHint": "Upewnij się, że urządzenie posiada kamerę i nie jest ona wyłączona.",
+        "camera_in_use": "Kamera jest zajęta",
+        "camera_in_useHint": "Zamknij inne aplikacje korzystające z kamery i spróbuj ponownie.",
+        "unknown": "Nie udało się uruchomić kamery",
+        "unknownHint": "Sprawdź ustawienia przeglądarki lub spróbuj innej."
+      }
     },
     "manual": {
       "title": "Ręczna lista uczestników",
