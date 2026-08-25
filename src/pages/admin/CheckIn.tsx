@@ -9,6 +9,8 @@ import { ReactComponent as DownloadIcon } from '../../assets/download-icon.svg';
 import { ReactComponent as ChevronDownIcon } from '../../assets/chevron-down-icon.svg';
 import { ReactComponent as ZapIcon } from '../../assets/zap-icon.svg';
 import { ReactComponent as ZapOffIcon } from '../../assets/zap-off-icon.svg';
+import { ReactComponent as CameraIcon } from '../../assets/camera-icon.svg';
+import { ReactComponent as AlertCircleIcon } from '../../assets/alert-circle-icon.svg';
 
 import { useAuth } from '../../auth/AuthProvider';
 import { EVENT_CLASS } from '../../constants/eventDefaults';
@@ -140,6 +142,7 @@ export default function CheckIn() {
     isScanning,
     hasFlashlight,
     flashlightOn,
+    scannerError,
     toggleScanner,
     toggleFlashlight,
     pauseScanner,
@@ -414,22 +417,22 @@ export default function CheckIn() {
             >
               <div id="qr-reader" className="w-full h-full flex items-center justify-center" />
 
-              {!isScanning && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-primary/30 gap-2">
-                  <svg
-                    width="40"
-                    height="40"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                    <circle cx="12" cy="13" r="4" />
-                  </svg>
+              {!isScanning && !scannerError && (
+                <div className="scanner-placeholder">
+                  <CameraIcon width="40" height="40" />
                   <p className="text-xs font-book">{t('checkIn.scanner.start')}</p>
+                </div>
+              )}
+
+              {scannerError && (
+                <div className="scanner-error-overlay">
+                  <AlertCircleIcon width="36" height="36" className="text-error" />
+                  <p className="text-sm font-bold text-error">
+                    {t(`checkIn.scanner.errors.${scannerError}`)}
+                  </p>
+                  <p className="text-xs text-primary/60">
+                    {t(`checkIn.scanner.errors.${scannerError}Hint`)}
+                  </p>
                 </div>
               )}
 
