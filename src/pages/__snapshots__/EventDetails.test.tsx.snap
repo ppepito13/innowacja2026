@@ -3,35 +3,53 @@
 exports[`EventDetails Renders properly 1`] = `
 <DocumentFragment>
   <div
-    class="min-h-screen bg-[#0b1521] text-white font-sans relative pb-16"
+    class="min-h-screen bg-background text-primary font-sans relative pb-16 overflow-x-hidden"
   >
     <header
-      class="bg-[#1f2937] p-4 flex items-center justify-between shadow-md relative z-20"
+      class="bg-surface p-4 flex items-center justify-between shadow-md relative z-20"
     >
-      <div
-        class="text-xl font-bold text-white"
+      <a
+        href="/"
       >
-        Commerzbank Events
-      </div>
+        common.brand
+      </a>
       <div
-        class="flex gap-2 text-sm"
+        class="flex items-center gap-6"
       >
+        <div
+          class="flex items-center gap-3 text-sm"
+        >
+          <div
+            class="flex gap-2"
+          >
+            <button
+              class="cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide text-primary"
+              type="button"
+            >
+              EN
+            </button>
+            <button
+              class="cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide text-primary/50 hover:text-primary/70"
+              type="button"
+            >
+              PL
+            </button>
+          </div>
+        </div>
         <button
-          class="cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide text-white"
+          aria-label="theme.toggleToDark"
+          class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-primary/15 bg-surface text-primary/80 transition-colors hover:border-primary/30 hover:text-primary cursor-pointer "
+          title="theme.toggleToDark"
           type="button"
         >
-          EN
-        </button>
-        <button
-          class="cursor-pointer px-2 py-1 text-sm font-medium transition-all duration-200 bg-transparent border-none tracking-wide text-gray-500 hover:text-gray-300"
-          type="button"
-        >
-          PL
+          <span>
+            LuMoon
+          </span>
         </button>
       </div>
     </header>
     <div
-      class="w-full h-[50vh] relative z-0"
+      class="w-full h-[35vh] sm:h-[50vh] relative z-0"
     >
       <img
         alt="Tech Conference 2024"
@@ -39,28 +57,28 @@ exports[`EventDetails Renders properly 1`] = `
         src="https://example.com/hero.jpg"
       />
       <div
-        class="absolute inset-0 bg-gradient-to-b from-transparent via-[#0b1521]/40 to-[#0b1521]"
+        class="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background"
       />
     </div>
     <main
-      class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-40"
+      class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-16 sm:-mt-56"
     >
       <div
-        class="flex flex-col lg:flex-row gap-8 items-start"
+        class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full min-w-0"
       >
         <section
-          class="w-full lg:w-[60%] bg-[#162436] rounded-xl shadow-2xl overflow-hidden"
+          class="col-span-1 lg:col-span-7 bg-surface rounded-xl shadow-2xl overflow-hidden min-w-0"
         >
           <div
-            class="p-8 md:p-10"
+            class="p-5 md:p-10"
           >
             <h1
-              class="text-3xl md:text-4xl font-bold mb-4 text-white tracking-tight"
+              class="text-2xl md:text-4xl font-bold mb-4 text-primary tracking-tight"
             >
               Tech Conference 2024
             </h1>
             <div
-              class="flex flex-wrap gap-6 text-sm text-gray-400 mb-8 pb-6 border-b border-gray-700/50"
+              class="flex flex-wrap gap-6 text-sm text-primary/60 mb-8 pb-6 border-b border-primary/10"
             >
               <div
                 class="flex items-center gap-2"
@@ -84,7 +102,21 @@ exports[`EventDetails Renders properly 1`] = `
               </div>
             </div>
             <div
-              class="prose prose-invert max-w-none text-gray-300 leading-relaxed text-sm md:text-base"
+              class="mb-8"
+            >
+              <iframe
+                class="rounded-lg border border-primary/10 max-w-full w-full"
+                height="300"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                src="https://maps.google.com/maps?q=Warsaw%2C%20Poland&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                style="border: 0px;"
+                title="eventDetails.locationPreview"
+                width="400"
+              />
+            </div>
+            <div
+              class="rte-content max-w-none text-primary/70 leading-relaxed text-sm md:text-base break-words overflow-x-auto w-full"
             >
               <p>
                 An amazing tech event.
@@ -93,79 +125,82 @@ exports[`EventDetails Renders properly 1`] = `
           </div>
         </section>
         <section
-          class="w-full lg:w-[40%] bg-[#162436] rounded-xl shadow-2xl p-8 sticky top-8"
+          class="col-span-1 lg:col-span-5 bg-surface rounded-xl shadow-2xl lg:sticky lg:top-8 overflow-hidden min-w-0"
         >
-          <h2
-            class="text-xl font-bold mb-1 text-white"
+          <div
+            class="p-5 sm:p-8"
           >
-            eventDetails.registerNow
-          </h2>
-          <p
-            class="text-sm text-gray-400 mb-8"
-          >
-            eventDetails.fillForm
-          </p>
-          <form
-            class="flex flex-col gap-6"
-          >
-            <div
-              class="bg-[#1e2e40] border border-gray-600/50 rounded-md p-4 mt-2"
+            <h2
+              class="text-xl font-bold mb-1 text-primary"
+            >
+              eventDetails.registerNow
+            </h2>
+            <p
+              class="text-sm text-primary/60 mb-4"
+            >
+              eventDetails.fillForm
+            </p>
+            <form
+              class="flex flex-col gap-6 w-full min-w-0"
             >
               <div
-                class="flex items-start gap-3"
+                class="bg-surface-2 border border-primary/15 rounded-md p-4 mt-2 w-full box-border min-w-0"
               >
                 <div
-                  class="flex items-center mt-1"
+                  class="flex items-start gap-3"
                 >
-                  <input
-                    class="w-4 h-4 rounded-full border border-gray-500 bg-[#162436] focus:ring-0 cursor-pointer appearance-none checked:bg-current"
-                    id="consent"
-                    style="color: rgb(255, 102, 0);"
-                    type="checkbox"
-                  />
-                </div>
-                <div>
-                  <label
-                    class="text-sm font-medium text-white cursor-pointer block mb-1"
-                    for="consent"
+                  <div
+                    class="flex items-center mt-1 shrink-0"
                   >
-                    eventDetails.dataConsent 
-                    <span
-                      class="text-red-500"
+                    <input
+                      class="w-4 h-4 rounded-full border border-secondary bg-surface focus:ring-0 cursor-pointer appearance-none checked:bg-secondary"
+                      id="consent"
+                      type="checkbox"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="text-sm font-medium text-primary cursor-pointer block mb-1 break-words"
+                      for="consent"
                     >
-                      *
-                    </span>
-                  </label>
-                  <p
-                    class="text-xs text-gray-300"
-                  >
-                    eventDetails.readMoreIn 
-                    <a
-                      class="underline text-gray-200 hover:text-white"
-                      href="#terms"
-                      rel="noopener noreferrer"
-                      target="_blank"
+                      eventDetails.dataConsent 
+                      <span
+                        class="text-red-500"
+                      >
+                        *
+                      </span>
+                    </label>
+                    <p
+                      class="text-xs text-primary/70"
                     >
-                      eventDetails.termsAndConditions
-                    </a>
-                    .
-                  </p>
+                      eventDetails.readMoreIn 
+                      <a
+                        class="underline text-primary/80 hover:text-primary"
+                        href="#terms"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      >
+                        eventDetails.termsAndConditions
+                      </a>
+                      .
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <p
-              class="text-[11px] text-gray-400 -mt-2"
-            >
-              * eventDetails.requiredField
-            </p>
-            <button
-              class="w-full mt-2 py-3 px-4 rounded-md text-[#0b1521] font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
-              disabled=""
-              type="button"
-            >
-              eventDetails.register
-            </button>
-          </form>
+              <p
+                class="text-[11px] text-primary/60 -mt-2"
+              >
+                * eventDetails.requiredField
+              </p>
+              <button
+                class="w-full box-border mt-2 py-3 px-4 rounded-md bg-secondary text-brand font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+                disabled=""
+                type="button"
+              >
+                eventDetails.register
+              </button>
+            </form>
+          </div>
         </section>
       </div>
     </main>

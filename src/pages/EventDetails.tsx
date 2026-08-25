@@ -33,7 +33,7 @@ export default function EventDetails() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ title: string; description: string } | null>(null);
   const [qrToken, setQrToken] = useState<string | null>(null);
   const [qrError, setQrError] = useState(false);
   const [qrLoading, setQrLoading] = useState(false);
@@ -109,36 +109,33 @@ export default function EventDetails() {
 
       if (!event.requiresApproval) {
         setEvent(prev => prev ? { ...prev, registeredCount: (prev.registeredCount ?? 0) + 1 } : prev);
+
+        setQrLoading(true);
+        parseService
+          .runFunction<{ token: string }>('generateQrToken', {
+            registrationId: registration.objectId,
+          })
+          .then(async (res) => {
+            setQrToken(res.token);
+            setTimeout(async () => {
+              try {
+                await generateConfirmationPdf(event, t);
+              } catch (err) {
+                console.error('PDF generation error:', err);
+              }
+            }, 300);
+          })
+          .catch(() => setQrError(true))
+          .finally(() => setQrLoading(false));
       }
 
-      // Licznik miejsc na zadania zszedł o jeden — odśwież, żeby kolejna
-      // rejestracja (przycisk „zarejestruj ponownie") widziała aktualny stan.
       refreshAvailability();
-
-      setQrLoading(true);
-      parseService
-        .runFunction<{ token: string }>('generateQrToken', {
-          registrationId: registration.objectId,
-        })
-        .then(async (res) => {
-          setQrToken(res.token);
-          setTimeout(async () => {
-            try {
-              await generateConfirmationPdf(event, t);
-            } catch (err) {
-              console.error('PDF generation error:', err);
-            }
-          }, 300);
-        })
-        .catch(() => setQrError(true))
-        .finally(() => setQrLoading(false));
-
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (e: any) {
-      const serverMsg = e?.response?.data?.error || e?.message || 'Error';
+      const serverMsg = e?.response?.data?.error || e?.message || '';
+      const lowerMsg = String(serverMsg).toLowerCase();
+      const code = e?.response?.data?.code;
 
-      // Limit na konkretną opcję — komunikat przy tym jednym polu,
-      // reszta wypełnionego formularza zostaje nietknięta.
       try {
         const parsed = JSON.parse(serverMsg);
         if (parsed?.code === 'OPTION_FULL') {
@@ -151,14 +148,50 @@ export default function EventDetails() {
           return;
         }
       } catch {
-        // nie JSON — lecimy starą ścieżką
+        // Ignored: server message is not JSON
       }
 
-      if (serverMsg.includes('full')) {
-        setError(t('eventDetails.capacityFullDescription'));
+      if (lowerMsg.includes('full') || lowerMsg.includes('capacity') || code === 'CAPACITY_FULL') {
+        setError({
+          title: t('eventDetails.errors.capacityFullTitle'),
+          description: t('eventDetails.capacityFullDescription'),
+        });
         setEvent(prev => prev ? { ...prev, registeredCount: prev.capacity ?? prev.registeredCount } : prev);
+      } else if (lowerMsg.includes('duplicate') || lowerMsg.includes('already') || code === 137) {
+        setError({
+          title: t('eventDetails.errors.duplicateTitle'),
+          description: t('eventDetails.errors.duplicateDescription'),
+        });
+      } else if (lowerMsg.includes('closed') || lowerMsg.includes('ended') || lowerMsg.includes('inactive')) {
+        setError({
+          title: t('eventDetails.errors.closedTitle'),
+          description: t('eventDetails.errors.closedDescription'),
+        });
+      } else if (lowerMsg.includes('validation') || lowerMsg.includes('invalid') || code === 142) {
+        setError({
+          title: t('eventDetails.errors.validationTitle'),
+          description: t('eventDetails.errors.validationDescription'),
+        });
+      } else if (!navigator.onLine || e?.code === 'ERR_NETWORK' || e?.message === 'Network Error' || (e?.isAxiosError && !e?.response)) {
+        setError({
+          title: t('eventDetails.errors.networkTitle'),
+          description: t('eventDetails.errors.networkDescription'),
+        });
+      } else if (e?.response?.status >= 500) {
+        setError({
+          title: t('eventDetails.errors.serverTitle'),
+          description: t('eventDetails.errors.serverDescription'),
+        });
+      } else if (e?.response?.status === 401 || e?.response?.status === 403) {
+        setError({
+          title: t('eventDetails.errors.unauthorizedTitle'),
+          description: t('eventDetails.errors.unauthorizedDescription'),
+        });
       } else {
-        setError(serverMsg);
+        setError({
+          title: t('eventDetails.errorTitle'),
+          description: serverMsg || t('eventDetails.errors.genericDescription'),
+        });
       }
     } finally {
       setLoading(false);
@@ -241,10 +274,10 @@ export default function EventDetails() {
                 <Icon icon={LuTriangleAlert} size={18} />
               </span>
               <h3 className="text-xl font-bold text-primary">
-                {t('eventDetails.errorTitle')}
+                {error.title}
               </h3>
             </div>
-            <p className="text-base text-primary/70 mt-0 max-w-fit">{error}</p>
+            <p className="text-base text-primary/70 mt-0 max-w-fit">{error.description}</p>
           </div>
         )}
 
@@ -579,15 +612,9 @@ export default function EventDetails() {
                 </>
               ) : (
                 <div className="flex flex-col items-center gap-3">
-                  {qrError ? (
-                    <p className="text-error text-xl font-semibold mt-2 mb-0">
-                      {t('eventDetails.error')}
-                    </p>
-                  ) : (
-                    <p className="text-success text-xl font-semibold mt-2 mb-0">
-                      {t('eventDetails.success')}
-                    </p>
-                  )}
+                  <p className="text-success text-xl font-semibold mt-2 mb-0">
+                    {t('eventDetails.success')}
+                  </p>
 
                   <p className="text-sm text-primary/85 text-center mt-0">
                     {event.requiresApproval
