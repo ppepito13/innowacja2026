@@ -202,6 +202,7 @@
       "primaryColor": "Kolor główny",
       "accentColor": "Kolor akcentu",
       "heroImageUrl": "URL zdjęcia",
+      "heroImageRemove": "Usuń",
       "heroImagePreview": "Podgląd zdjęcia głównego",
       "heroImageHint": "Zalecane wymiary: 1920×800px, min. szerokość 1600px, format JPG/PNG/WebP, maks. 5MB",
       "heroImageUploading": "Przesyłanie grafiki...",
@@ -225,7 +226,8 @@
       "locationRequired": "Adres jest wymagany dla wydarzeń stacjonarnych i hybrydowych",
       "meetingLinkRequired": "Link do spotkania jest wymagany dla wydarzeń wirtualnych i hybrydowych",
       "capacityInvalid": "Limit miejsc musi wynosić co najmniej 1",
-      "heroImageTooLarge": "Plik jest za duży. Maksymalny rozmiar to 5MB"
+      "heroImageTooLarge": "Plik jest za duży. Maksymalny rozmiar to 5MB",
+      "heroImageInvalidFormat": "Nieobsługiwany format pliku. Dozwolone formaty: JPEG, PNG, WEBP."
     }
   },
   "registrationEdit": {
