@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useHistory } from 'react-router';
-import { LuSave, LuPlus, LuArrowLeft, LuUpload } from 'react-icons/lu';
+import { LuSave, LuPlus, LuArrowLeft, LuUpload, LuX } from 'react-icons/lu';
 import { InputDatepicker, InputTextfieldStateful } from '@lsg/components';
 import { parseService } from '../../services/parseService';
 import { Event, Locale, MongoDate, TranslatableEventField } from '../../types/types';
@@ -39,6 +39,7 @@ const HERO_IMAGE_MAX_SIZE_BYTES = 5 * 1024 * 1024;
 const HERO_IMAGE_TARGET_RATIO = 1920 / 800;
 const HERO_IMAGE_RATIO_TOLERANCE = 0.1;
 const HERO_IMAGE_MIN_WIDTH = 1600;
+const HERO_IMAGE_ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 type Props = { mode: 'new' | 'edit' };
 type EventEditParams = { id: string };
@@ -230,6 +231,13 @@ export default function EventManagement({ mode }: Props) {
   const handleFileUpload = async (file: File) => {
     if (uploading) return;
 
+    if (!HERO_IMAGE_ALLOWED_TYPES.includes(file.type)) {
+      setError(tt('validation.heroImageInvalidFormat'));
+      setUploadStatus('error');
+      setUploadAspectWarning(false);
+      return;
+    }
+
     if (file.size > HERO_IMAGE_MAX_SIZE_BYTES) {
       setError(tt('validation.heroImageTooLarge'));
       setUploadStatus('error');
@@ -243,29 +251,29 @@ export default function EventManagement({ mode }: Props) {
     setUploadAspectWarning(false);
     setError(null);
 
-    let aspectDeviates = false;
-
     try {
-      const { width, height } = await getImageDimensions(file);
+      let aspectDeviates = false;
 
-      if (width < HERO_IMAGE_MIN_WIDTH) {
-        setError(tt('validation.heroImageTooNarrow'));
+      try {
+        const { width, height } = await getImageDimensions(file);
+
+        if (width < HERO_IMAGE_MIN_WIDTH) {
+          setError(tt('validation.heroImageTooNarrow'));
+          setUploadStatus('error');
+          return;
+        }
+
+        if (width > 0 && height > 0) {
+          const ratio = width / height;
+          const deviation = Math.abs(ratio - HERO_IMAGE_TARGET_RATIO) / HERO_IMAGE_TARGET_RATIO;
+          aspectDeviates = deviation > HERO_IMAGE_RATIO_TOLERANCE;
+        }
+      } catch {
+        setError(tt('validation.heroImageInvalid'));
         setUploadStatus('error');
         return;
       }
 
-      if (width > 0 && height > 0) {
-        const ratio = width / height;
-        const deviation = Math.abs(ratio - HERO_IMAGE_TARGET_RATIO) / HERO_IMAGE_TARGET_RATIO;
-        aspectDeviates = deviation > HERO_IMAGE_RATIO_TOLERANCE;
-      }
-    } catch {
-      setError(tt('validation.heroImageInvalid'));
-      setUploadStatus('error');
-      return;
-    }
-
-    try {
       const { data } = await parseClient.post(
         `/files/${encodeURIComponent(file.name)}`,
         file,
@@ -301,6 +309,13 @@ export default function EventManagement({ mode }: Props) {
       headers: { 'Content-Type': file.type },
     });
     return data.url as string;
+  };
+
+  const handleHeroImageClear = () => {
+    handleFieldChange('heroImageUrl', '');
+    setUploadStatus(null);
+    setUploadAspectWarning(false);
+    setError(null);
   };
 
   const validate = (): boolean => {
@@ -610,6 +625,17 @@ export default function EventManagement({ mode }: Props) {
               <Icon icon={LuUpload} size={14} />
               <span>{uploading ? tt('fields.uploading') : tt('fields.upload')}</span>
             </button>
+            {(event?.heroImageUrl || uploadStatus === 'error') && (
+              <button
+                type="button"
+                disabled={uploading}
+                onClick={handleHeroImageClear}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/20 text-sm text-primary hover:bg-background transition-colors disabled:opacity-50 whitespace-nowrap"
+              >
+                <Icon icon={LuX} size={14} />
+                <span>{tt('fields.heroImageRemove')}</span>
+              </button>
+            )}
             <input
               ref={fileInputRef}
               type="file"
