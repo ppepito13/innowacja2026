@@ -295,7 +295,7 @@
     "downloadPdf": "Download confirmation",
     "addToCalendar": "Add to calendar",
     "confirmationThankYou": "Thank you for registering!",
-    "confirmationUnregister": "To unregister, please contact the event organizer.",
+    "confirmationUnregister": "To unregister, please click here.",
     "dateLabel": "Date",
     "locationLabel": "Location",
     "optionFullShort": "no spots left",

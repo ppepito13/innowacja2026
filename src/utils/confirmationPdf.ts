@@ -41,12 +41,17 @@ function qrSvgToDataUrl(svgElement: SVGSVGElement): Promise<string> {
 
 export async function generateConfirmationPdf(
   event: Event,
+  unregisterToken: string,
   t: (key: string) => string,
   language?: string,
 ): Promise<void> {
   const qrSvg = document.querySelector('#qr-confirmation svg') as SVGSVGElement | null;
   const eventTitle = localizedEventField(event, 'title', language);
   const eventLocation = localizedEventField(event, 'location', language);
+
+  // const baseUrl = process.env.UNREGISTER_URL!;
+  const baseUrl = "http://31.182.34.134:20080/unregister/";
+  const unrregisterUrl = `${baseUrl.replace(/\/$/, '')}/${unregisterToken}`;
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -142,7 +147,8 @@ export async function generateConfirmationPdf(
   y += 8;
   doc.setFontSize(9);
   doc.setTextColor(150, 150, 150);
-  doc.text(stripDiacritics(t('eventDetails.confirmationUnregister')), pageWidth / 2, y, { align: 'center' });
+  doc.textWithLink(stripDiacritics(t('eventDetails.confirmationUnregister')), pageWidth / 2, y, { align: 'center', url: unrregisterUrl });
+      
   y += 6;
 
   // footer

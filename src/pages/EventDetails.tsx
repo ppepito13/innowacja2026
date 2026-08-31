@@ -38,6 +38,7 @@ export default function EventDetails() {
   const [qrToken, setQrToken] = useState<string | null>(null);
   const [qrError, setQrError] = useState(false);
   const [qrLoading, setQrLoading] = useState(false);
+  const [unregisterToken, setUnRegisterToken] = useState<string>("");
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
 
@@ -96,6 +97,7 @@ export default function EventDetails() {
     setError(null);
     setSuccess(false);
     setQrToken(null);
+    setUnRegisterToken("");
     setQrError(false);
 
     try {
@@ -117,14 +119,15 @@ export default function EventDetails() {
 
         setQrLoading(true);
         parseService
-          .runFunction<{ token: string }>('generateQrToken', {
+          .runFunction<{ token: string, unregisterToken: string }>('generateQrToken', {
             registrationId: registration.objectId,
           })
           .then(async (res) => {
             setQrToken(res.token);
+            setUnRegisterToken(res.unregisterToken);
             setTimeout(async () => {
               try {
-                await generateConfirmationPdf(event, t);
+                await generateConfirmationPdf(event, res.unregisterToken, t);
               } catch (err) {
                 console.error('PDF generation error:', err);
               }
@@ -212,6 +215,7 @@ export default function EventDetails() {
     setQrToken(null);
     setQrError(false);
     setQrLoading(false);
+    setUnRegisterToken("");
     refreshAvailability();
   };
 
@@ -656,7 +660,7 @@ export default function EventDetails() {
                         className="flex-1 box-border flex items-center justify-center gap-2 py-3 px-4 rounded-md bg-brand text-white font-bold text-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
                         onClick={async () => {
                           try {
-                            await generateConfirmationPdf(event, t);
+                            await generateConfirmationPdf(event, unregisterToken, t);
                           } catch (err) {
                             console.error('PDF generation error:', err);
                           }

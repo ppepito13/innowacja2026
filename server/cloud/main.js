@@ -61,6 +61,7 @@ Parse.Cloud.define('generateQrToken', async (request) => {
 
   return {
     token: buildToken(registration.id),
+    unregisterToken: buildUnregisterToken(registration.id),
     registrationId: registration.id,
   };
 });
@@ -222,4 +223,4 @@ Parse.Cloud.define('unregisterParticipant', async (request) => {
   return { success: true };
 });
 
-require('./optionLimits');
+import './optionLimits.js';
