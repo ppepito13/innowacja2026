@@ -321,6 +321,7 @@
     "saved": "Zapisano",
     "addField": "Dodaj pole",
     "removeField": "Usuń pole",
+    "lockedField": "Pole wymagane, nie można go usunąć",
     "label": "Etykieta",
     "labelPlaceholder": "np. Imię i nazwisko",
     "placeholder": "Placeholder",

@@ -13,6 +13,7 @@ interface FieldCardProps {
   openDropdown: string | null;
   setOpenDropdown: (id: string | null) => void;
   error?: string;
+  locked?: boolean;
 }
 
 /** Pusty wiersz opcji. `id` zostanie nadane po wpisaniu wartości (OptionsList). */
@@ -26,6 +27,7 @@ export default function FieldCard({
   openDropdown,
   setOpenDropdown,
   error,
+  locked = false,
 }: FieldCardProps) {
   const { t } = useTranslation();
   const needsOptions = TYPES_WITH_OPTIONS.includes(field.type);
@@ -41,21 +43,25 @@ export default function FieldCard({
         <span className="bg-secondary text-brand rounded-md px-2.5 py-0.5 text-xs font-bold tracking-wider">
           {index + 1}
         </span>
-        <button
-          onClick={onRemove}
-          className="bg-transparent border border-primary/10 rounded-lg w-[30px] h-[30px] flex items-center justify-center cursor-pointer text-error hover:bg-background transition-colors"
-          title={t("formConfig.removeField")}
-        >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-            <path
-              d="M5 2h6M2 4h12M6 4v8M10 4v8M3 4l1 10h8l1-10"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+        {locked ? (
+          <span className="text-[11px] text-primary/50">{t("formConfig.lockedField")}</span>
+        ) : (
+          <button
+            onClick={onRemove}
+            className="bg-transparent border border-primary/10 rounded-lg w-[30px] h-[30px] flex items-center justify-center cursor-pointer text-error hover:bg-background transition-colors"
+            title={t("formConfig.removeField")}
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M5 2h6M2 4h12M6 4v8M10 4v8M3 4l1 10h8l1-10"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Label + Placeholder */}
@@ -66,11 +72,12 @@ export default function FieldCard({
           </label>
           <input
             value={field.label}
+            readOnly={locked}
             onChange={(e) => onUpdate({ label: e.target.value })}
             placeholder={t("formConfig.labelPlaceholder")}
-            className={`w-full bg-surface-2 border rounded-md px-1 py-2 text-primary text-sm font-mono outline-none transition-colors focus:border-cb-coast ${
+            className={`w-full bg-surface-2 border rounded-md px-1 py-2 text-sm font-mono outline-none transition-colors focus:border-cb-coast ${
               error ? "border-error" : "border-primary/15"
-            }`}
+            } ${locked ? "text-primary/50 cursor-not-allowed" : "text-primary"}`}
           />
           {error && <div className="text-error text-xs mt-1">{error}</div>}
           {/* Klucz pola — po zapisie niezmienny, bo wiążą się z nim rejestracje. */}
@@ -99,6 +106,11 @@ export default function FieldCard({
           <label className="block text-xs font-book text-primary/70 mb-1.5">
             {t("formConfig.type")}
           </label>
+          {locked ? (
+            <div className="bg-surface-2 border border-primary/15 rounded-md px-3 py-2 text-primary/50 text-sm">
+              {t(`formConfig.fieldType.${field.type}`)}
+            </div>
+          ) : (
           <TypeDropdown
             value={field.type}
             onChange={(type: FieldType) => {
@@ -124,6 +136,7 @@ export default function FieldCard({
               setOpenDropdown(openDropdown === field.id ? null : field.id)
             }
           />
+          )}
         </div>
 
         <label className="flex flex-col items-start gap-1.5 cursor-pointer pb-1">
@@ -131,7 +144,8 @@ export default function FieldCard({
             {t("formConfig.required")}
           </span>
           <Toggle
-            checked={field.required}
+            checked={locked ? true : field.required}
+            disabled={locked}
             onChange={(v) => onUpdate({ required: v })}
           />
         </label>
