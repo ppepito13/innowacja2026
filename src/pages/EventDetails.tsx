@@ -428,7 +428,7 @@ export default function EventDetails() {
                             htmlFor={key}
                             className="block text-xs font-bold text-primary mb-2 truncate"
                           >
-                            {String(field.i18n?.[locale] ?? field.label ?? key)}{' '}
+                            {String(field.i18n?.[locale] || field.label || key)}{' '}
                             {isRequired && <span className="text-red-500">*</span>}
                           </label>
 

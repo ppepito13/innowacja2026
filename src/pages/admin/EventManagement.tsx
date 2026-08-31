@@ -13,8 +13,11 @@ import RichTextEditor from '../../components/RichTextEditor';
 import LocalizedField from '../../components/LocalizedField';
 import {
   buildEventI18n,
+  DEFAULT_LOCALE,
   emptyLocalizedText,
   eventI18nFromEvent,
+  LOCALES,
+  mirrorDefaultLocale,
   primaryValue,
 } from '../../utils/localizedEvent';
 import DOMPurify from 'dompurify';
@@ -54,6 +57,7 @@ const EMPTY_EVENT: Event = {
   location: '',
   meetingLink: '',
   requiresApproval: false,
+  englishOnly: false,
   primaryColor: DEFAULT_PRIMARY_COLOR,
   accentColor: DEFAULT_ACCENT_COLOR,
   heroImageUrl: '',
@@ -156,6 +160,7 @@ export default function EventManagement({ mode }: Props) {
           dateType: rawEvent.dateType ?? 'single',
           eventFormat,
           requiresApproval: rawEvent.requiresApproval ?? false,
+          englishOnly: rawEvent.englishOnly ?? false,
           location: legacyUrlInLocation ? '' : (rawEvent.location ?? ''),
           meetingLink: legacyUrlInLocation ? rawEvent.location : (rawEvent.meetingLink ?? ''),
           primaryColor: rawEvent.primaryColor ?? DEFAULT_PRIMARY_COLOR,
@@ -330,9 +335,10 @@ export default function EventManagement({ mode }: Props) {
     setSaving(true);
     setError(null);
 
-    const translations = buildEventI18n(event.i18n, {
-      description: (html) => DOMPurify.sanitize(html),
-    });
+    const translations = buildEventI18n(
+      event.englishOnly ? mirrorDefaultLocale(event.i18n) : event.i18n,
+      { description: (html) => DOMPurify.sanitize(html) },
+    );
 
     const payload: Event = {
       title: primaryValue(translations.title),
@@ -349,6 +355,7 @@ export default function EventManagement({ mode }: Props) {
       location: primaryValue(translations.location),
       meetingLink: event.meetingLink,
       requiresApproval: event.requiresApproval,
+      englishOnly: event.englishOnly ?? false,
       primaryColor: event.primaryColor,
       accentColor: event.accentColor,
       heroImageUrl: event.heroImageUrl,
@@ -400,6 +407,7 @@ export default function EventManagement({ mode }: Props) {
   const startDate = event?.startDate?.date;
   const endDateMin = isValidDate(startDate) ? nextDay(startDate) : today;
 
+  const editedLocales = event?.englishOnly ? [DEFAULT_LOCALE] : LOCALES;
   const showMapEmbed = event?.eventFormat === 'on-site' || event?.eventFormat === 'hybrid';
   const currentTitle = primaryValue(event?.i18n?.title);
   const currentLocation = primaryValue(event?.i18n?.location);
@@ -428,7 +436,24 @@ export default function EventManagement({ mode }: Props) {
       {error && <p className="mb-2 text-sm text-error">{error}</p>}
 
       <div className="flex flex-col gap-2 mt-2">
-        <LocalizedField label={tt('fields.title')} error={errorFor('title')}>
+        <div className="flex items-start justify-between gap-4 rounded-lg border border-primary/10 p-4">
+          <div className="flex flex-col">
+            <label htmlFor="englishOnly" className="text-sm font-book text-primary">
+              {tt('fields.englishOnly')}
+            </label>
+            <p className="text-xs text-primary/60 mt-1">{tt('fields.englishOnlyHint')}</p>
+          </div>
+          <Toggle
+            id="englishOnly"
+            checked={event?.englishOnly ?? false}
+            onChange={(v) => handleFieldChange('englishOnly', v)}
+          />
+        </div>
+        <LocalizedField
+          label={tt('fields.title')}
+          error={errorFor('title')}
+          locales={editedLocales}
+        >
           {(locale, ariaLabel) => (
             <InputTextfieldStateful
               placeholder={tt('fields.title')}
@@ -438,7 +463,7 @@ export default function EventManagement({ mode }: Props) {
             />
           )}
         </LocalizedField>
-        <LocalizedField label={tt('fields.description')}>
+        <LocalizedField label={tt('fields.description')} locales={editedLocales}>
           {(locale) => (
             <RichTextEditor
               value={translationOf('description', locale)}
@@ -499,7 +524,11 @@ export default function EventManagement({ mode }: Props) {
         />
         {/* Physical address — on-site and hybrid only; always stored in `location`. */}
         {event?.eventFormat !== 'virtual' && (
-          <LocalizedField label={tt('fields.locationOnSite')} error={errorFor('location')}>
+          <LocalizedField
+            label={tt('fields.locationOnSite')}
+            error={errorFor('location')}
+            locales={editedLocales}
+          >
             {(locale, ariaLabel) => (
               <InputTextfieldStateful
                 placeholder={tt('fields.locationOnSitePlaceholder')}
@@ -684,7 +713,7 @@ export default function EventManagement({ mode }: Props) {
             }}
           />
         )}
-        <LocalizedField label={tt('fields.dataProcessingAgreement')}>
+        <LocalizedField label={tt('fields.dataProcessingAgreement')} locales={editedLocales}>
           {(locale, ariaLabel) => (
             <InputTextfieldStateful
               placeholder="https://..."
