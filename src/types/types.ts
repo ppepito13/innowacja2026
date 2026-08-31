@@ -84,6 +84,7 @@ export interface FormField {
    * wszystkie dotychczasowe rejestracje. Brak = pole jeszcze nie zapisane.
    */
   key?: string;
+  locked?: boolean;
   label: string;
   type: FieldType;
   placeholder: string;
@@ -129,6 +130,7 @@ export interface Event {
   heroImageUrl?: string;
   dataProcessingAgreement?: string;
   i18n?: EventI18n;
+  englishOnly?: boolean;
   isActive: boolean;
   formConfig: Record<string, unknown>; // JSON/Object
   organizer: EventOrganizer; // Pointer do _User

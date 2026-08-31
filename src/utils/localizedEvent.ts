@@ -57,6 +57,18 @@ export function eventI18nFromEvent(event: Partial<Event>): EventI18n {
   return seeded;
 }
 
+export function mirrorDefaultLocale(i18n: EventI18n | undefined): EventI18n {
+  const mirrored: EventI18n = {};
+  for (const field of TRANSLATABLE_EVENT_FIELDS) {
+    const source = i18n?.[field]?.[DEFAULT_LOCALE] ?? '';
+    mirrored[field] = LOCALES.reduce(
+      (acc, locale) => ({ ...acc, [locale]: source }),
+      emptyLocalizedText(),
+    );
+  }
+  return mirrored;
+}
+
 export function buildEventI18n(
   i18n: EventI18n | undefined,
   transform: Partial<Record<TranslatableEventField, (value: string) => string>> = {},
