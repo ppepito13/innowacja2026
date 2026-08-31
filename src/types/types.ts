@@ -129,6 +129,7 @@ export interface Event {
   heroImageUrl?: string;
   dataProcessingAgreement?: string;
   i18n?: EventI18n;
+  englishOnly?: boolean;
   isActive: boolean;
   formConfig: Record<string, unknown>; // JSON/Object
   organizer: EventOrganizer; // Pointer do _User
