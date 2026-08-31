@@ -183,6 +183,8 @@
       "title": "Event Name",
       "requiresApproval": "Require Organizer Confirmation",
       "requiresApprovalHint": "If enabled, registrations will be pending until an organizer approves them manually.",
+      "englishOnly": "English only",
+      "englishOnlyHint": "Fill in English only, the Polish version is saved as a copy of it.",
       "description": "Description",
       "descriptionPlaceholder": "Describe your event...",
       "dateType": "Date Type",
