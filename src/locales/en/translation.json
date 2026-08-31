@@ -322,6 +322,7 @@
     "saved": "Saved",
     "addField": "Add Field",
     "removeField": "Remove field",
+    "lockedField": "Required field, cannot be removed",
     "label": "Label",
     "labelPlaceholder": "e.g. Full Name",
     "placeholder": "Placeholder",

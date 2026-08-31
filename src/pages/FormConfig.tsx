@@ -12,6 +12,7 @@ import { LuArrowLeft } from 'react-icons/lu';
 import Icon from '../components/Icon';
 import { parseService } from '../services/parseService';
 import { makeOptionId } from '../utils/formOptions';
+import { isMandatoryFieldKey, withMandatoryFields } from '../utils/mandatoryFields';
 import { EVENT_CLASS } from '../constants/eventDefaults';
 
 type EventEditParams = { id: string };
@@ -28,6 +29,32 @@ const defaultField = (): FormField => ({
   optionsTranslation: [],
 });
 
+// Konwertuje formConfig z bazy → tablicę FormField[] do edycji
+const configToFields = (config: Record<string, unknown>): FormField[] => {
+  const entries = Object.entries(config);
+  if (entries.length === 0) return [defaultField()];
+
+  return entries.map(([key, raw]) => {
+    const entry = raw as FormConfigEntry;
+    return {
+      id: uid(),
+      // Klucz z bazy zostaje — to po nim wiążą się istniejące rejestracje.
+      key,
+      locked: isMandatoryFieldKey(key),
+      label: entry.label ?? key,
+      type: entry.type ?? 'text',
+      placeholder: entry.placeholder ?? '',
+      required: entry.required ?? false,
+      options: entry.options ?? [],
+      i18n: {
+        pl: String(entry.i18n?.pl ?? ''),
+        en: String(entry.i18n?.en ?? ''),
+      },
+      optionsTranslation: entry.optionsTranslation ?? [],
+    };
+  });
+};
+
 export default function FormConfig() {
   const { t } = useTranslation();
   const { id } = useParams<EventEditParams>();
@@ -35,7 +62,11 @@ export default function FormConfig() {
 
   const [hasChanged, setHasChanged] = useState(false);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
-  const [fields, setFields] = useState<FormField[]>([defaultField()]);
+  // Pola identyfikacyjne są w formularzu od pierwszego renderu, jeszcze przed
+  // wczytaniem wydarzenia.
+  const [fields, setFields] = useState<FormField[]>(() =>
+    configToFields(withMandatoryFields({})),
+  );
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState<boolean>(false);
@@ -43,42 +74,19 @@ export default function FormConfig() {
   const [event, setEvent] = useState<Event | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Konwertuje formConfig z bazy → tablicę FormField[] do edycji
-  const configToFields = useCallback((config: Record<string, unknown>): FormField[] => {
-    const entries = Object.entries(config);
-    if (entries.length === 0) return [defaultField()];
-
-    return entries.map(([key, raw]) => {
-      const entry = raw as FormConfigEntry;
-      return {
-        id: uid(),
-        // Klucz z bazy zostaje — to po nim wiążą się istniejące rejestracje.
-        key,
-        label: entry.label ?? key,
-        type: entry.type ?? 'text',
-        placeholder: entry.placeholder ?? '',
-        required: entry.required ?? false,
-        options: entry.options ?? [],
-        i18n: {
-          pl: String(entry.i18n?.pl ?? ''),
-          en: String(entry.i18n?.en ?? ''),
-        },
-        optionsTranslation: entry.optionsTranslation ?? [],
-      };
-    });
-  }, []);
-
   useEffect(() => {
     parseService
       .getById<Event>(EVENT_CLASS, id)
       .then((rawEvent) => {
         setEvent(rawEvent);
-        if (rawEvent.formConfig) {
-          setFields(configToFields(rawEvent.formConfig));
-        }
+        setFields(
+          configToFields(
+            withMandatoryFields(rawEvent.formConfig, { englishOnly: rawEvent.englishOnly }),
+          ),
+        );
       })
       .catch((e: any) => setError(e.message));
-  }, [id, configToFields]);
+  }, [id]);
 
   const updateField = useCallback((fieldId: string, patch: Partial<FormField>) => {
     setFields((prev) => prev.map((f) => (f.id === fieldId ? { ...f, ...patch } : f)));
@@ -92,7 +100,10 @@ export default function FormConfig() {
   }, []);
 
   const removeField = useCallback((fieldId: string) => {
-    setFields((prev) => prev.filter((f) => f.id !== fieldId));
+    setFields((prev) => {
+      if (prev.some((f) => f.id === fieldId && f.locked)) return prev;
+      return prev.filter((f) => f.id !== fieldId);
+    });
     setSaved(false);
     setHasChanged(true);
   }, []);
@@ -135,9 +146,8 @@ export default function FormConfig() {
 
       config[key] = entry;
     }
-
-    return config;
-  }, [fields]);
+    return withMandatoryFields(config, { englishOnly: event?.englishOnly });
+  }, [fields, event?.englishOnly]);
 
   const validate = useCallback((): boolean => {
     const errs: Record<string, string> = {};
@@ -257,6 +267,7 @@ export default function FormConfig() {
               key={field.id}
               field={field}
               index={i}
+              locked={field.locked}
               onUpdate={(patch) => updateField(field.id, patch)}
               onRemove={() => removeField(field.id)}
               openDropdown={openDropdown}

@@ -84,6 +84,7 @@ export interface FormField {
    * wszystkie dotychczasowe rejestracje. Brak = pole jeszcze nie zapisane.
    */
   key?: string;
+  locked?: boolean;
   label: string;
   type: FieldType;
   placeholder: string;

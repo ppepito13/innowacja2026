@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-import { Event, FormConfig, FormConfigEntry } from '../types/types';
+import { Event, FormConfigEntry } from '../types/types';
 import { formatDate } from '../utils/formatters';
 import { parseService, createPointer } from '../services/parseService';
 import { LuCalendarDays, LuMapPin, LuChevronDown, LuLoaderCircle, LuLink, LuTriangleAlert, LuDownload, LuCalendarPlus } from 'react-icons/lu';
@@ -19,6 +19,7 @@ import { downloadIcsFile } from '../utils/calendarIcs';
 import { getFieldOptions, getOptionLabel, hasOptions } from '../utils/formOptions';
 import { useOptionAvailability, optionAvailability } from '../hooks/useOptionAvailability';
 import { toLocale } from '../utils/localizedEvent';
+import { withMandatoryFields } from '../utils/mandatoryFields';
 
 const LANGUAGES = [
   { code: 'en', label: 'EN' },
@@ -77,8 +78,12 @@ export default function EventDetails() {
     return '';
   };
 
+  const formConfig = withMandatoryFields(event?.formConfig, {
+    englishOnly: event?.englishOnly,
+  });
+
   const isFormValid =
-    Object.entries(event?.formConfig ?? {}).every(([key, config]) => {
+    Object.entries(formConfig).every(([key, config]) => {
       const value = formData[key] ?? '';
       const field = config as any;
       return !validateField(value, field);
@@ -417,7 +422,7 @@ export default function EventDetails() {
                     )}
 
                   <form className="flex flex-col gap-6 w-full min-w-0">
-                    {Object.entries((event.formConfig ?? {}) as FormConfig).map(([key, config]) => {
+                    {Object.entries(formConfig).map(([key, config]) => {
                       const field = config as FormConfigEntry;
                       const isRequired = field.required === true;
                       const value = formData[key] || '';
