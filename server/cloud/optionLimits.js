@@ -120,6 +120,10 @@ Parse.Cloud.beforeSave(REGISTRATION_CLASS, async (request) => {
   const registration = request.object;
   const original = request.original; // undefined przy tworzeniu
 
+  if (registration.isNew() && registration.get('isCheckedIn') === undefined) {
+    registration.set('isCheckedIn', false);
+  }
+
   const status = registration.get('status') || 'pending';
 
   // Status nierezerwujący (rejected/cancelled) — miejsce właśnie się zwalnia,
@@ -144,8 +148,25 @@ Parse.Cloud.beforeSave(REGISTRATION_CLASS, async (request) => {
 
   const formData = registration.get('formData') || {};
 
-  // Czy poprzedni stan już rezerwował miejsca? Jeśli tak, opcje niezmienione
-  // są opłacone i nie wymagają ponownego sprawdzania.
+  if (registration.isNew()) {
+    const email = typeof formData.email === 'string' ? formData.email.trim().toLowerCase() : '';
+
+    if (email) {
+      const dupQuery = new Parse.Query(REGISTRATION_CLASS);
+      dupQuery.equalTo('event', eventPointer);
+      dupQuery.containedIn('status', RESERVING_STATUSES);
+      dupQuery.matches('formData.email', `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+
+      const existing = await dupQuery.first({ useMasterKey: true });
+      if (existing) {
+        throw new Parse.Error(
+          Parse.Error.VALIDATION_ERROR,
+          JSON.stringify({ code: 'DUPLICATE_EMAIL', email }),
+        );
+      }
+    }
+  }
+
   const wasReserving = Boolean(original) && RESERVING_STATUSES.includes(original.get('status'));
   const previousFormData = wasReserving ? original.get('formData') || {} : {};
 

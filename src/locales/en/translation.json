@@ -270,6 +270,7 @@
       "capacityFullTitle": "No spots available",
       "duplicateTitle": "Already registered",
       "duplicateDescription": "A registration with these details has already been submitted for this event.",
+      "duplicateEmailDescription": "This email address is already registered for this event. Each email address can only be used once.",
       "networkTitle": "No network connection",
       "networkDescription": "Unable to connect to the server. Please check your internet connection and try again.",
       "serverTitle": "Server error",
