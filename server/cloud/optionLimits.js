@@ -16,6 +16,9 @@ const REGISTRATION_CLASS = 'Registration';
 /** Statusy, które zajmują miejsce. */
 const RESERVING_STATUSES = ['pending', 'approved'];
 
+/** Pole, po którym wykrywamy duplikaty, dopóki organizator nie wskaże innego. */
+const DEFAULT_UNIQUE_FIELD = 'email';
+
 /** Typy pól, dla których limity mają sens. */
 const TYPES_WITH_OPTIONS = ['dropdown', 'multiselect', 'radio'];
 
@@ -91,6 +94,52 @@ async function countUsed(eventPointer, fieldKey, matchValues, excludeId) {
   return query.count({ useMasterKey: true });
 }
 
+function uniqueFieldKeys(formConfig) {
+  const config = formConfig || {};
+
+  const marked = Object.entries(config)
+    .filter(([, field]) => field && field.unique === true)
+    .map(([key]) => key);
+
+  if (marked.length > 0) return marked;
+
+  return config[DEFAULT_UNIQUE_FIELD] ? [DEFAULT_UNIQUE_FIELD] : [];
+}
+
+
+function comparableValue(raw) {
+  if (typeof raw === 'number') return String(raw);
+  if (typeof raw !== 'string') return '';
+
+  return raw.trim();
+}
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+async function assertNoDuplicate(eventPointer, formConfig, formData) {
+  for (const fieldKey of uniqueFieldKeys(formConfig)) {
+    const value = comparableValue(formData[fieldKey]);
+    if (!value) continue; // pole puste — nie ma po czym rozpoznać osoby
+
+    const query = new Parse.Query(REGISTRATION_CLASS);
+    query.equalTo('event', eventPointer);
+    query.containedIn('status', RESERVING_STATUSES);
+    query.matches(`formData.${fieldKey}`, `^\\s*${escapeRegExp(value)}\\s*$`, 'i');
+
+    const existing = await query.first({ useMasterKey: true });
+    if (existing) throw duplicateFieldError(fieldKey, value);
+  }
+}
+
+function duplicateFieldError(fieldKey, value) {
+    Parse.Error.VALIDATION_ERROR,
+    JSON.stringify({
+      code: fieldKey === DEFAULT_UNIQUE_FIELD ? 'DUPLICATE_EMAIL' : 'DUPLICATE_FIELD',
+      field: fieldKey,
+      value,
+    }),
+}
+
 function optionFullError(fieldKey, optionId, limit) {
   // Ustrukturyzowana treść, żeby front wiedział, KTÓRE pole odrzucić.
   // Uwaga: nie zawiera słowa "full" małymi literami — istniejąca obsługa
@@ -148,25 +197,6 @@ Parse.Cloud.beforeSave(REGISTRATION_CLASS, async (request) => {
 
   const formData = registration.get('formData') || {};
 
-  if (registration.isNew()) {
-    const email = typeof formData.email === 'string' ? formData.email.trim().toLowerCase() : '';
-
-    if (email) {
-      const dupQuery = new Parse.Query(REGISTRATION_CLASS);
-      dupQuery.equalTo('event', eventPointer);
-      dupQuery.containedIn('status', RESERVING_STATUSES);
-      dupQuery.matches('formData.email', `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
-
-      const existing = await dupQuery.first({ useMasterKey: true });
-      if (existing) {
-        throw new Parse.Error(
-          Parse.Error.VALIDATION_ERROR,
-          JSON.stringify({ code: 'DUPLICATE_EMAIL', email }),
-        );
-      }
-    }
-  }
-
   const wasReserving = Boolean(original) && RESERVING_STATUSES.includes(original.get('status'));
   const previousFormData = wasReserving ? original.get('formData') || {} : {};
 
@@ -177,8 +207,13 @@ Parse.Cloud.beforeSave(REGISTRATION_CLASS, async (request) => {
 
   const eventQuery = new Parse.Query(EVENT_CLASS);
   const event = await eventQuery.get(eventPointer.id, { useMasterKey: true });
+  const formConfig = event.get('formConfig');
 
-  const limits = collectLimits(event.get('formConfig'));
+  if (registration.isNew()) {
+    await assertNoDuplicate(eventPointer, formConfig, formData);
+  }
+
+  const limits = collectLimits(formConfig);
   if (Object.keys(limits).length === 0) return;
 
   for (const [fieldKey, optionLimits] of Object.entries(limits)) {
