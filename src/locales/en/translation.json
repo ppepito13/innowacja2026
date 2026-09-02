@@ -305,7 +305,8 @@
       "required": "This field is required.",
       "email": "Please enter a valid email address.",
       "phone": "Please enter a valid phone number.",
-      "optionFull": "This option is full. Please choose another one."
+      "optionFull": "This option is full. Please choose another one.",
+      "duplicateValue": "This value is already registered for this event."
     }
   },
   "formConfig": {
@@ -324,12 +325,14 @@
     "addField": "Add Field",
     "removeField": "Remove field",
     "lockedField": "Required field, cannot be removed",
+    "lastUniqueField": "Only one unique field, cannot be removed",
     "label": "Label",
     "labelPlaceholder": "e.g. Full Name",
     "placeholder": "Placeholder",
     "placeholderPlaceholder": "e.g. John Doe",
     "type": "Type",
     "required": "Required",
+    "unique": "Unique",
     "options": "Options",
     "option": "Option",
     "addOption": "Add Option",
@@ -356,7 +359,8 @@
       "optionRequired": "At least one option is required",
       "validationFailed": "Schema validation failed — fix highlighted fields before saving.",
       "duplicateKey": "Another field already uses this key — change the label.",
-      "optionKeyMissing": "An option with a limit needs a saved key. Type its value and click outside the field."
+      "optionKeyMissing": "An option with a limit needs a saved key. Type its value and click outside the field.",
+      "uniqueRequired": "At least one field must be marked as unique, so duplicate registrations can be detected."
     },
     "register": "Register",
     "validation": {

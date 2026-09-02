@@ -79,6 +79,7 @@ export default function EventDetails() {
     return '';
   };
 
+  const locale = toLocale(i18n.language);
   const formConfig = withMandatoryFields(event?.formConfig, {
     englishOnly: event?.englishOnly,
   });
@@ -155,11 +156,13 @@ export default function EventDetails() {
           refreshAvailability();
           return;
         }
-        if (parsed?.code === 'DUPLICATE_EMAIL') {
-          setError({
-            title: t('eventDetails.errors.duplicateTitle'),
-            description: t('eventDetails.errors.duplicateEmailDescription'),
-          });
+        if (parsed?.code === 'DUPLICATE_EMAIL' || parsed?.code === 'DUPLICATE_FIELD') {
+          if (parsed.field) {
+            setFormErrors((prev) => ({
+              ...prev,
+              [parsed.field]: t('eventDetails.validation.duplicateValue'),
+            }));
+          }
           return;
         }
       } catch {
@@ -241,7 +244,6 @@ export default function EventDetails() {
   const meetingUrl =
     event.meetingLink || (event.eventFormat === 'virtual' ? event.location : '');
 
-  const locale = toLocale(i18n.language);
 
   return (
     <div className="min-h-screen bg-background text-primary font-sans relative pb-16 overflow-x-hidden">
