@@ -144,6 +144,69 @@ exports[`EventDetails Renders properly 1`] = `
               class="flex flex-col gap-6 w-full min-w-0"
             >
               <div
+                class="w-full min-w-0 flex flex-col"
+              >
+                <label
+                  class="block text-xs font-bold text-primary mb-2 truncate"
+                  for="firstName"
+                >
+                  First name 
+                  <span
+                    class="text-red-500"
+                  >
+                    *
+                  </span>
+                </label>
+                <input
+                  class="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
+                  id="firstName"
+                  type="text"
+                  value=""
+                />
+              </div>
+              <div
+                class="w-full min-w-0 flex flex-col"
+              >
+                <label
+                  class="block text-xs font-bold text-primary mb-2 truncate"
+                  for="lastName"
+                >
+                  Last name 
+                  <span
+                    class="text-red-500"
+                  >
+                    *
+                  </span>
+                </label>
+                <input
+                  class="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
+                  id="lastName"
+                  type="text"
+                  value=""
+                />
+              </div>
+              <div
+                class="w-full min-w-0 flex flex-col"
+              >
+                <label
+                  class="block text-xs font-bold text-primary mb-2 truncate"
+                  for="email"
+                >
+                  Email 
+                  <span
+                    class="text-red-500"
+                  >
+                    *
+                  </span>
+                </label>
+                <input
+                  class="w-full box-border bg-surface-2 border border-transparent rounded-md px-4 py-3 text-sm text-primary focus:outline-none focus:border-primary/30 transition-colors"
+                  id="email"
+                  type="email"
+                  value=""
+                />
+              </div>
+              <div
                 class="bg-surface-2 border border-primary/15 rounded-md p-4 mt-2 w-full box-border min-w-0"
               >
                 <div

@@ -155,6 +155,13 @@ export default function EventDetails() {
           refreshAvailability();
           return;
         }
+        if (parsed?.code === 'DUPLICATE_EMAIL') {
+          setError({
+            title: t('eventDetails.errors.duplicateTitle'),
+            description: t('eventDetails.errors.duplicateEmailDescription'),
+          });
+          return;
+        }
       } catch {
         // Ignored: server message is not JSON
       }

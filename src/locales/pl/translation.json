@@ -269,6 +269,7 @@
       "capacityFullTitle": "Brak wolnych miejsc",
       "duplicateTitle": "Rejestracja już istnieje",
       "duplicateDescription": "Zgłoszenie z podanymi danymi zostało już wcześniej zarejestrowane na to wydarzenie.",
+      "duplicateEmailDescription": "Ten adres e-mail jest już zarejestrowany na to wydarzenie. Każdy adres e-mail może być użyty tylko raz.",
       "networkTitle": "Brak połączenia z siecią",
       "networkDescription": "Nie można połączyć się z serwerem. Sprawdź połączenie internetowe i spróbuj ponownie.",
       "serverTitle": "Błąd serwera",
