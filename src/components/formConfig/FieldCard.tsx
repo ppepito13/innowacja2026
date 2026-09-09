@@ -14,6 +14,7 @@ interface FieldCardProps {
   setOpenDropdown: (id: string | null) => void;
   error?: string;
   locked?: boolean;
+  isLastUnique?: boolean;
 }
 
 /** Pusty wiersz opcji. `id` zostanie nadane po wpisaniu wartości (OptionsList). */
@@ -28,6 +29,7 @@ export default function FieldCard({
   setOpenDropdown,
   error,
   locked = false,
+  isLastUnique = false,
 }: FieldCardProps) {
   const { t } = useTranslation();
   const needsOptions = TYPES_WITH_OPTIONS.includes(field.type);
@@ -43,8 +45,10 @@ export default function FieldCard({
         <span className="bg-secondary text-brand rounded-md px-2.5 py-0.5 text-xs font-bold tracking-wider">
           {index + 1}
         </span>
-        {locked ? (
-          <span className="text-[11px] text-primary/50">{t("formConfig.lockedField")}</span>
+        {locked || isLastUnique ? (
+          <span className="text-[11px] text-primary/50">
+            {t(locked ? "formConfig.lockedField" : "formConfig.lastUniqueField")}
+          </span>
         ) : (
           <button
             onClick={onRemove}
@@ -147,6 +151,19 @@ export default function FieldCard({
             checked={locked ? true : field.required}
             disabled={locked}
             onChange={(v) => onUpdate({ required: v })}
+          />
+        </label>
+        <label className="flex flex-col items-start gap-1.5 cursor-pointer pb-1">
+          <span
+            className="block text-xs font-book text-primary/70"
+            title={t("formConfig.uniqueHint")}
+          >
+            {t("formConfig.unique")}
+          </span>
+          <Toggle
+            checked={field.unique === true}
+            disabled={isLastUnique}
+            onChange={(v) => onUpdate({ unique: v })}
           />
         </label>
         <div className="w-32">

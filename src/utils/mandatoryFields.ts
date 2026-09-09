@@ -1,4 +1,5 @@
 import type { FieldType, FormConfig, FormConfigEntry } from '../types/types';
+import { withUniqueField } from './uniqueFields';
 
 export const MANDATORY_FIELD_KEYS = ['firstName', 'lastName', 'email'] as const;
 
@@ -59,5 +60,5 @@ export function withMandatoryFields(
     if (!isMandatoryFieldKey(key)) merged[key] = entry;
   }
 
-  return merged;
+  return withUniqueField(merged);
 }

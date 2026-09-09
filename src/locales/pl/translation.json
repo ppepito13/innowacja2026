@@ -270,6 +270,7 @@
       "duplicateTitle": "Rejestracja już istnieje",
       "duplicateDescription": "Zgłoszenie z podanymi danymi zostało już wcześniej zarejestrowane na to wydarzenie.",
       "duplicateEmailDescription": "Ten adres e-mail jest już zarejestrowany na to wydarzenie. Każdy adres e-mail może być użyty tylko raz.",
+      "duplicateFieldDescription": "Zgłoszenie z tą wartością pola {{field}} już istnieje dla tego wydarzenia.",
       "networkTitle": "Brak połączenia z siecią",
       "networkDescription": "Nie można połączyć się z serwerem. Sprawdź połączenie internetowe i spróbuj ponownie.",
       "serverTitle": "Błąd serwera",
@@ -304,7 +305,8 @@
       "required": "To pole jest wymagane.",
       "email": "Podaj poprawny adres e-mail.",
       "phone": "Podaj poprawny numer telefonu.",
-      "optionFull": "Ta opcja nie ma już wolnych miejsc. Wybierz inną."
+      "optionFull": "Ta opcja nie ma już wolnych miejsc. Wybierz inną.",
+      "duplicateValue": "Ta wartość jest już zarejestrowana na to wydarzenie."
     }
   },
   "formConfig": {
@@ -323,12 +325,14 @@
     "addField": "Dodaj pole",
     "removeField": "Usuń pole",
     "lockedField": "Pole wymagane, nie można go usunąć",
+    "lastUniqueField": "Jedyne pole unikalne, nie można go usunąć",
     "label": "Etykieta",
     "labelPlaceholder": "np. Imię i nazwisko",
     "placeholder": "Placeholder",
     "placeholderPlaceholder": "np. Jan Kowalski",
     "type": "Typ",
     "required": "Wymagane",
+    "unique": "Unikalne",
     "options": "Opcje",
     "option": "Opcja",
     "addOption": "Dodaj opcję",
@@ -355,7 +359,8 @@
       "optionRequired": "Wymagana co najmniej jedna opcja",
       "validationFailed": "Walidacja schematu nie powiodła się — popraw podświetlone pola przed zapisem.",
       "duplicateKey": "Inne pole ma już taki sam klucz — zmień etykietę.",
-      "optionKeyMissing": "Opcja z limitem musi mieć zapisany klucz. Wpisz jej wartość i kliknij poza pole."
+      "optionKeyMissing": "Opcja z limitem musi mieć zapisany klucz. Wpisz jej wartość i kliknij poza pole.",
+      "uniqueRequired": "Co najmniej jedno pole musi być oznaczone jako unikalne, żeby dało się wykryć powtórne zgłoszenia."
     },
     "register": "Zarejestruj",
     "validation": {

@@ -13,6 +13,7 @@ import Icon from '../components/Icon';
 import { parseService } from '../services/parseService';
 import { makeOptionId } from '../utils/formOptions';
 import { isMandatoryFieldKey, withMandatoryFields } from '../utils/mandatoryFields';
+import { canReleaseUniqueField, withUniqueField } from '../utils/uniqueFields';
 import { EVENT_CLASS } from '../constants/eventDefaults';
 
 type EventEditParams = { id: string };
@@ -45,6 +46,7 @@ const configToFields = (config: Record<string, unknown>): FormField[] => {
       type: entry.type ?? 'text',
       placeholder: entry.placeholder ?? '',
       required: entry.required ?? false,
+      unique: entry.unique === true,
       options: entry.options ?? [],
       i18n: {
         pl: String(entry.i18n?.pl ?? ''),
@@ -73,6 +75,7 @@ export default function FormConfig() {
   const [jsonPreview, setJsonPreview] = useState<boolean>(false);
   const [event, setEvent] = useState<Event | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [uniqueError, setUniqueError] = useState<string | null>(null);
 
   useEffect(() => {
     parseService
@@ -89,7 +92,12 @@ export default function FormConfig() {
   }, [id]);
 
   const updateField = useCallback((fieldId: string, patch: Partial<FormField>) => {
-    setFields((prev) => prev.map((f) => (f.id === fieldId ? { ...f, ...patch } : f)));
+    setFields((prev) => {
+      const target = prev.find((f) => f.id === fieldId);
+      if (patch.unique === false && target && !canReleaseUniqueField(prev, target)) return prev;
+
+      return prev.map((f) => (f.id === fieldId ? { ...f, ...patch } : f));
+    });
     setErrors((prev) => {
       const next = { ...prev };
       delete next[fieldId];
@@ -101,7 +109,10 @@ export default function FormConfig() {
 
   const removeField = useCallback((fieldId: string) => {
     setFields((prev) => {
-      if (prev.some((f) => f.id === fieldId && f.locked)) return prev;
+      const target = prev.find((f) => f.id === fieldId);
+      if (!target || target.locked) return prev;
+      if (!canReleaseUniqueField(prev, target)) return prev;
+
       return prev.filter((f) => f.id !== fieldId);
     });
     setSaved(false);
@@ -126,6 +137,7 @@ export default function FormConfig() {
       const entry: FormConfigEntry = {
         type: f.type,
         required: f.required,
+        unique: f.unique === true,
         i18n: { en: f.i18n.en, pl: f.i18n.pl },
         optionsTranslation: f.optionsTranslation,
       };
@@ -146,7 +158,7 @@ export default function FormConfig() {
 
       config[key] = entry;
     }
-    return withMandatoryFields(config, { englishOnly: event?.englishOnly });
+    return withUniqueField(withMandatoryFields(config, { englishOnly: event?.englishOnly }));
   }, [fields, event?.englishOnly]);
 
   const validate = useCallback((): boolean => {
@@ -186,6 +198,13 @@ export default function FormConfig() {
         }
       }
     }
+
+    if (!fields.some((f) => f.unique)) {
+      setUniqueError(t('formConfig.errors.uniqueRequired'));
+      setErrors(errs);
+      return false;
+    }
+    setUniqueError(null);
 
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -268,6 +287,7 @@ export default function FormConfig() {
               field={field}
               index={i}
               locked={field.locked}
+              isLastUnique={!canReleaseUniqueField(fields, field)}
               onUpdate={(patch) => updateField(field.id, patch)}
               onRemove={() => removeField(field.id)}
               openDropdown={openDropdown}
@@ -308,6 +328,7 @@ export default function FormConfig() {
             ⚠ {t('formConfig.errors.validationFailed')}
           </p>
         )}
+        {uniqueError && <p className="text-sm text-error mt-0 mb-0">⚠ {uniqueError}</p>}
         <button
           onClick={handleSave}
           className="px-8 py-3 rounded-full bg-secondary text-brand text-sm font-bold border-none cursor-pointer hover:opacity-90 transition-opacity"

@@ -89,6 +89,7 @@ export interface FormField {
   type: FieldType;
   placeholder: string;
   required: boolean;
+  unique?: boolean;
   options: string[];
   i18n: {
     pl: string;
@@ -105,6 +106,7 @@ export interface FormConfigEntry {
   options?: string[];
   i18n: Record<string,unknown>;
   optionsTranslation: optionsTranslation[];
+  unique?: boolean;
 }
 
 export type FormConfig = Record<string, FormConfigEntry>;

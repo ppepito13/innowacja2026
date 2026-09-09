@@ -120,12 +120,6 @@ Parse.Cloud.define('checkInByToken', async (request) => {
   };
 });
 
-Parse.Cloud.beforeSave('Registration', (request) => {
-  const registration = request.object;
-  if (registration.isNew() && registration.get('isCheckedIn') === undefined) {
-    registration.set('isCheckedIn', false);
-  }
-});
 
 function signUnregisterId(objectId) {
   return base64url(
